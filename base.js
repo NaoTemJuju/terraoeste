@@ -550,7 +550,6 @@
   }
 
   
-  // ====================== Disponibilidade (GM) via Cloudflare KV ======================
   // ====================== Classes Personalizadas (via KV) ======================
   async function loadCustomClasses(){
     try {
@@ -559,7 +558,6 @@
       const data = await resp.json();
       if (!data || !Array.isArray(data.classes)) return;
       const extras = data.classes;
-      // Overlays globais usados por outros módulos
       const customSpec = {};
       const customOrigens = {};
       extras.forEach(cls => {
@@ -589,12 +587,8 @@
             const br = parseInt(cls.languages.bonus.rare||0,10) || 0;
             if (bc>0 || br>0) spec.bonus = { common: bc, rare: br };
           }
-          if (Array.isArray(cls.languages.pickOne) && cls.languages.pickOne.length){
-            spec.pickOne = cls.languages.pickOne.slice();
-          }
-          if (Array.isArray(cls.languages.pickOneOrNone) && cls.languages.pickOneOrNone.length){
-            spec.pickOneOrNone = cls.languages.pickOneOrNone.slice();
-          }
+          if (Array.isArray(cls.languages.pickOne) && cls.languages.pickOne.length) spec.pickOne = cls.languages.pickOne.slice();
+          if (Array.isArray(cls.languages.pickOneOrNone) && cls.languages.pickOneOrNone.length) spec.pickOneOrNone = cls.languages.pickOneOrNone.slice();
           if (Object.keys(spec).length) customSpec[name] = spec;
         }
       });
@@ -603,6 +597,7 @@
     } catch {}
   }
 
+  // ====================== Disponibilidade (GM) via Cloudflare KV ======================
   let __availability = { classes:{}, races:{} };
 
   function availabilityDefault(){
@@ -622,7 +617,7 @@
   async function loadAvailability(){
     __availability = availabilityDefault();
     try {
-      const resp = await fetch("/api/availability", { headers: { "cache-control":"no-store" } });
+      const resp = await fetch("/api/availability", { headers: { "cache-control": "no-store" } });
       if (resp.ok){
         const data = await resp.json();
         if (data && typeof data === "object") __availability = Object.assign(availabilityDefault(), data);
@@ -640,18 +635,8 @@
     const headerActions = document.querySelector('.header-actions');
     if (headerActions){
       const btnGM = document.createElement('button');
-      btnGM.id = 'btnGM';
-      btnGM.className = 'ghost';
-      btnGM.textContent = 'GM';
-      btnGM.addEventListener('click', () => {
-        const code = prompt('Código do GM:');
-        if (code === '123'){
-          sessionStorage.setItem('gmAuth','ok');
-          window.location.href = 'gm.html';
-        } else if (code !== null) {
-          alert('Código incorreto.');
-        }
-      });
+      btnGM.id = 'btnGM'; btnGM.className='ghost'; btnGM.textContent='GM';
+      btnGM.addEventListener('click', ()=>{ const code = prompt('Código do GM:'); if (code==='123'){ sessionStorage.setItem('gmAuth','ok'); window.location.href='gm.html'; } else if (code!==null){ alert('Código incorreto.'); } });
       headerActions.appendChild(btnGM);
     }
   } catch {}
@@ -703,12 +688,12 @@
     showCheck,
     // randomNameByRace e toggleMusic agora são definidos em módulos separados.
     generateEverything,
-    // GM availability helpers
+    // GM
     getAvailability,
     applyAvailability,
     ALL_CLASSES,
-    loadCustomClasses,
     ALL_RACES,
+    loadCustomClasses,
     // estado e utilitários
     state,
     pending,

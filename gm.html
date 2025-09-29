@@ -12,7 +12,7 @@
     <header class="top">
       <div>
         <h2>Painel de GM</h2>
-        <div class="sub" style="color:#af906a">Configurações globais de Classes e Raças</div>
+        <div class="sub" style="color:#af906a">Configurações globais</div>
       </div>
       <div class="header-actions">
         <a class="ghost" href="index.html">⬅ Voltar</a>
@@ -38,48 +38,35 @@
         <button id="btnSave" class="primary">Salvar (global)</button>
         <button id="btnReload" class="ghost">Recarregar</button>
       </div>
-      <p class="muted" style="margin-top:.5rem;">
-        As alterações são salvas em KV e passam a valer <strong>na hora</strong> para todos.
-      </p>
     </section>
-  
+
     <section id="tabAdd" class="card">
       <h3>Adicionar Classe</h3>
       <div class="grid-2">
-        <label class="check" style="display:block;">
-          <span>Nome da classe</span>
-          <input id="clsName" type="text" placeholder="Ex.: Arqueiro-Sombras" style="width:100%;">
-        </label>
-        <label class="check" style="display:block;">
-          <span>Pontos de Vida (PV) — dado</span>
-          <select id="clsHP" style="width:100%;">
+        <div class="field"><label>Nome da classe</label><input id="clsName" class="input" type="text" placeholder="Ex.: Arqueiro-Sombras"></div>
+        <div class="field"><label>Pontos de Vida (PV) — dado</label>
+          <select id="clsHP" class="input">
             <option value="4">d4</option>
             <option value="6" selected>d6</option>
             <option value="8">d8</option>
             <option value="10">d10</option>
           </select>
-        </label>
+        </div>
       </div>
 
       <h4 style="margin-top:1rem;">Origens (6)</h4>
-      <div id="originsWrap" class="grid-2"></div>
+      <div id="originsWrap" class="grid-3"></div>
 
       <h4 style="margin-top:1rem;">Línguas</h4>
       <div class="grid-2">
         <div>
           <div class="muted" style="margin-bottom:.25rem;">Concedidas pela classe</div>
-          <div id="langGrant" class="grid-2"></div>
+          <div id="langGrant" class="grid-auto"></div>
         </div>
         <div>
           <div class="muted" style="margin-bottom:.25rem;">Extras para escolher</div>
-          <label class="check" style="display:block;">
-            <span>Comuns (+)</span>
-            <input id="langBonusCommon" type="number" min="0" step="1" value="0" style="width:100%;">
-          </label>
-          <label class="check" style="display:block;">
-            <span>Raras (+)</span>
-            <input id="langBonusRare" type="number" min="0" step="1" value="0" style="width:100%;">
-          </label>
+          <div class="field"><label>Comuns (+)</label><input id="langBonusCommon" class="input small-input" type="number" min="0" step="1" value="0"></div>
+          <div class="field"><label>Raras (+)</label><input id="langBonusRare" class="input small-input" type="number" min="0" step="1" value="0"></div>
         </div>
       </div>
 
@@ -88,9 +75,14 @@
         <button id="btnListClasses" class="ghost">Atualizar lista</button>
       </div>
 
-      <div id="customClassList" style="margin-top:1rem;"></div>
-    </section>
+      <div class="row" id="editBanner" style="display:none; gap:.5rem; align-items:center; margin-top:1rem;">
+        <strong>Em edição:</strong> <span id="editingName" class="muted"></span>
+        <button id="btnCancelEdit" class="ghost">Cancelar edição</button>
+      </div>
 
+      <h4 style="margin-top:1rem;">Classes Extras</h4>
+      <div id="customClassList" class="grid-2" style="margin-top:.5rem;"></div>
+    </section>
   </div>
 
   <script src="base.js"></script>

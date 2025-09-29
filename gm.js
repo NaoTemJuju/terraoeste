@@ -1,5 +1,5 @@
 (function(){
-  // Gate simples
+  // Autorização simples
   if (sessionStorage.getItem('gmAuth') !== 'ok'){
     const code = prompt('Código do GM:');
     if (code === '123'){
@@ -14,6 +14,7 @@
   const app = window.app;
   const $ = (sel)=>document.querySelector(sel);
 
+  // ------- Checklist de disponibilidade -------
   const classesList = $("#classesList");
   const racesList = $("#racesList");
   const btnSave = $("#btnSave");
@@ -23,35 +24,24 @@
   const btnTabCR = $("#btnTabCR");
 
   function makeCheck(name, kind, checked){
-    const id = `${kind}-${name}`.replace(/\s+/g,'-');
-    const wrap = document.createElement('label');
-    wrap.className = 'check';
+    const label = document.createElement('label');
+    label.className = 'check';
     const input = document.createElement('input');
     input.type = 'checkbox';
     input.checked = checked;
     input.dataset.kind = kind;
     input.dataset.name = name;
-    input.id = id;
     const span = document.createElement('span');
     span.textContent = name;
-    wrap.append(input, ' ', span);
-    return wrap;
+    label.append(input, ' ', span);
+    return label;
   }
 
-  function readUI(){
+  function readAvailabilityUI(){
     const av = { classes:{}, races:{} };
     classesList.querySelectorAll('input[type=checkbox]').forEach(ch => av.classes[ch.dataset.name] = ch.checked);
     racesList.querySelectorAll('input[type=checkbox]').forEach(ch => av.races[ch.dataset.name] = ch.checked);
     return av;
-  }
-
-  function render(av){
-    classesList.innerHTML = '';
-    racesList.innerHTML = '';
-    const allC = app.ALL_CLASSES || app.CLASSES;
-    const allR = app.ALL_RACES || app.RACES;
-    allC.forEach(c => classesList.appendChild(makeCheck(c,'class', av.classes[c] !== false)));
-    allR.forEach(r => racesList.appendChild(makeCheck(r,'race', av.races[r] !== false)));
   }
 
   async function fetchAvailability(){
@@ -60,28 +50,31 @@
     return {classes:{}, races:{}};
   }
 
-  async function init(){
-    const current = await fetchAvailability();
-    render(current);
+  function renderAvailability(av){
+    classesList.innerHTML = '';
+    racesList.innerHTML = '';
+    const allC = app.ALL_CLASSES || app.CLASSES;
+    const allR = app.ALL_RACES || app.RACES;
+    allC.forEach(c => classesList.appendChild(makeCheck(c,'class', av.classes[c] !== false)));
+    allR.forEach(r => racesList.appendChild(makeCheck(r,'race', av.races[r] !== false)));
   }
 
   btnSave?.addEventListener('click', async () => {
-    const av = readUI();
-    const code = '123';
+    const av = readAvailabilityUI();
     const r = await fetch('/api/availability', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-GM-Code': code },
+      headers: { 'Content-Type': 'application/json', 'X-GM-Code': '123' },
       body: JSON.stringify(av)
     });
     if (r.ok){
       alert('Salvo globalmente!');
+      app.applyAvailability && app.applyAvailability(av);
     } else {
-      alert('Falha ao salvar (verifique o código e permissões).');
+      alert('Falha ao salvar.');
     }
   });
 
   btnReload?.addEventListener('click', () => location.reload());
-
   btnEnableAll?.addEventListener('click', () => {
     classesList.querySelectorAll('input').forEach(ch => ch.checked = true);
     racesList.querySelectorAll('input').forEach(ch => ch.checked = true);
@@ -90,15 +83,11 @@
     classesList.querySelectorAll('input').forEach(ch => ch.checked = false);
     racesList.querySelectorAll('input').forEach(ch => ch.checked = false);
   });
-
   btnTabCR?.addEventListener('click', () => {
     document.getElementById('tabCR').scrollIntoView({behavior:'smooth', block:'start'});
   });
 
-  document.addEventListener('DOMContentLoaded', init);
-})();
-
-  // ====== Adicionar Classe ======
+  // ------- Adicionar/Editar classes personalizadas -------
   const clsName = document.getElementById('clsName');
   const clsHP = document.getElementById('clsHP');
   const originsWrap = document.getElementById('originsWrap');
@@ -108,22 +97,58 @@
   const btnAddClass = document.getElementById('btnAddClass');
   const btnListClasses = document.getElementById('btnListClasses');
   const customClassList = document.getElementById('customClassList');
+  const editBanner = document.getElementById('editBanner');
+  const editingNameEl = document.getElementById('editingName');
+  const btnCancelEdit = document.getElementById('btnCancelEdit');
+
+  let __editingName = null;
+
+  function clearForm(){
+    clsName.value = '';
+    clsHP.value = '6';
+    makeOriginInputs();
+    makeLangGrant();
+    langBonusCommon.value = 0;
+    langBonusRare.value = 0;
+    __editingName = null;
+    if (editBanner) editBanner.style.display = 'none';
+    if (editingNameEl) editingNameEl.textContent = '';
+  }
+
+  function loadClassIntoForm(c){
+    clsName.value = c.name || '';
+    clsHP.value = String(c.hp || '6');
+    makeOriginInputs();
+    const boxes = originsWrap.querySelectorAll('.field');
+    (c.origins||[]).forEach((o,i)=>{
+      const b = boxes[i]; if (!b) return;
+      b.querySelector('input').value = o.titulo || o.title || '';
+      b.querySelector('textarea').value = o.d || o.desc || '';
+    });
+    makeLangGrant();
+    const gset = new Set((c.languages?.grant)||[]);
+    langGrant.querySelectorAll('input[type=checkbox]').forEach(ch => ch.checked = gset.has(ch.value));
+    langBonusCommon.value = (c.languages?.bonus?.common)||0;
+    langBonusRare.value = (c.languages?.bonus?.rare)||0;
+    __editingName = c.name;
+    if (editBanner) editBanner.style.display = '';
+    if (editingNameEl) editingNameEl.textContent = c.name;
+  }
+
+  btnCancelEdit?.addEventListener('click', clearForm);
 
   function makeOriginInputs(){
     originsWrap.innerHTML = '';
     for (let i=0;i<6;i++){
       const box = document.createElement('div');
-      box.className = 'check';
+      box.className = 'field';
       const t = document.createElement('input');
       t.type = 'text';
       t.placeholder = `Título da origem #${i+1}`;
-      t.style.width = '100%';
       const d = document.createElement('textarea');
       d.placeholder = 'Descrição (opcional)';
-      d.rows = 2;
-      d.style.width = '100%';
-      box.append(t);
-      box.append(d);
+      box.appendChild(t);
+      box.appendChild(d);
       originsWrap.appendChild(box);
     }
   }
@@ -136,10 +161,8 @@
       const label = document.createElement('label');
       label.className = 'check';
       const input = document.createElement('input');
-      input.type = 'checkbox';
-      input.value = name;
-      const span = document.createElement('span');
-      span.textContent = name;
+      input.type = 'checkbox'; input.value = name;
+      const span = document.createElement('span'); span.textContent=name;
       label.append(input, ' ', span);
       langGrant.appendChild(label);
     });
@@ -152,21 +175,29 @@
       const data = await r.json();
       const arr = Array.isArray(data.classes) ? data.classes : [];
       if (!arr.length){
-        customClassList.innerHTML = '<em class="muted">Nenhuma classe personalizada.</em>';
+        customClassList.innerHTML = '<em class="muted">Nenhuma classe extra.</em>';
         return;
       }
       const wrap = document.createElement('div');
       wrap.className = 'grid-2';
       arr.forEach(c => {
         const card = document.createElement('div');
-        card.className = 'card';
-        card.style.padding = '12px';
+        card.className = 'card list';
         const h = document.createElement('div');
-        h.innerHTML = `<strong>${c.name}</strong> — PV d${c.hp||'?'}`;
+        h.innerHTML = `<strong>${c.name}</strong> <span class="badge">PV d${c.hp||'?'}</span>`;
         const small = document.createElement('div');
         small.className = 'muted';
         small.textContent = `${(c.origins||[]).length} origem(ns), línguas: ${((c.languages?.grant)||[]).join(', ') || '—'}`;
-        card.append(h, small);
+        const row = document.createElement('div');
+        row.className = 'row'; row.style.gap = '.5rem';
+        const btnE = document.createElement('button'); btnE.className='ghost'; btnE.textContent='Editar'; btnE.addEventListener('click', ()=>loadClassIntoForm(c));
+        const btnD = document.createElement('button'); btnD.className='ghost'; btnD.textContent='Deletar'; btnD.addEventListener('click', async ()=>{
+          if (!confirm(`Remover a classe \"${c.name}\"?`)) return;
+          const r = await fetch(`/api/classes?name=${encodeURIComponent(c.name)}`, { method:'DELETE', headers:{ 'X-GM-Code':'123' } });
+          if (r.ok){ listCustomClasses(); if (__editingName===c.name) clearForm(); } else alert('Falha ao remover.');
+        });
+        row.append(btnE, btnD);
+        card.append(h, small, row);
         wrap.appendChild(card);
       });
       customClassList.innerHTML = '';
@@ -183,26 +214,32 @@
     if (![4,6,8,10,12].includes(hp)){ alert('PV inválido. Use d4, d6, d8, d10, d12.'); return; }
 
     const origins = [];
-    originsWrap.querySelectorAll('div.check').forEach(box => {
+    originsWrap.querySelectorAll('.field').forEach(box => {
       const t = box.querySelector('input')?.value?.trim() || '';
       const d = box.querySelector('textarea')?.value?.trim() || '';
       if (t) origins.push({ titulo: t, d });
     });
-    if (origins.length !== 6){ alert('Preencha as 6 origens (título obrigatório).'); return; }
+    if (origins.length !== 6){ alert('Preencha as 6 origens.'); return; }
 
     const grant = [];
     langGrant.querySelectorAll('input[type=checkbox]').forEach(ch => { if (ch.checked) grant.push(ch.value); });
     const bonus = { common: parseInt(langBonusCommon?.value||'0',10)||0, rare: parseInt(langBonusRare?.value||'0',10)||0 };
 
     const body = { classes:[{ name, hp, origins, languages:{ grant, bonus } }] };
+    if (__editingName && __editingName !== name){
+      await fetch(`/api/classes?name=${encodeURIComponent(__editingName)}`, { method:'DELETE', headers:{ 'X-GM-Code':'123' } });
+    }
     const r = await fetch('/api/classes', {
       method: 'POST',
       headers: { 'Content-Type':'application/json', 'X-GM-Code': '123' },
       body: JSON.stringify(body)
     });
     if (r.ok){
-      alert('Classe salva globalmente!');
+      alert('Salvo globalmente!');
+      clearForm();
       await listCustomClasses();
+      // atualiza listas em memória para refletir imediatamente
+      app.loadCustomClasses && app.loadCustomClasses();
     } else {
       alert('Falha ao salvar a classe.');
     }
@@ -210,7 +247,11 @@
 
   btnListClasses?.addEventListener('click', listCustomClasses);
 
-  // initialize sub-form pieces
-  makeOriginInputs();
-  makeLangGrant();
-  listCustomClasses();
+  // Init
+  (async function init(){
+    renderAvailability(await fetchAvailability());
+    makeOriginInputs();
+    makeLangGrant();
+    listCustomClasses();
+  })();
+})();

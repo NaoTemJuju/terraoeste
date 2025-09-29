@@ -111,13 +111,7 @@
    * Retorna as especificações de bônus para a classe.
    * @param {string} cls
    */
-  function getClassBonusSpec(cls){
-    const extra = (window.CUSTOM_CLASS_SPEC||{});
-    const base = CLASS_SPEC[cls] || {};
-    const ex   = extra[cls] || {};
-    // merge shallowly: bonus/grant/pickOne/pickOneOrNone/byAlignment supported
-    return Object.assign({}, base, ex);
-  }
+  function getClassBonusSpec(cls){ const extra=(window.CUSTOM_CLASS_SPEC||{}); const base=(CLASS_SPEC||{})[cls]||{}; const ex=extra[cls]||{}; return Object.assign({}, base, ex); }
 
   /**
    * Calcula as línguas concedidas, os bônus e as escolhas opcionais

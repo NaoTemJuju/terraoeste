@@ -10,13 +10,11 @@ export async function onRequestOptions({ request }) {
     },
   });
 }
-
 function json(data, init = {}){
   const headers = new Headers(init.headers || {});
   headers.set("content-type","application/json; charset=utf-8");
   return new Response(JSON.stringify(data), { ...init, headers });
 }
-
 function corsify(resp, request){
   const origin = request.headers.get("Origin") || "*";
   resp.headers.set("Access-Control-Allow-Origin", origin);
@@ -24,9 +22,7 @@ function corsify(resp, request){
   resp.headers.set("Cache-Control", "no-store");
   return resp;
 }
-
 const KV_KEY = "availability";
-
 export async function onRequestGet({ env, request }){
   try {
     const raw = await env.AVAIL.get(KV_KEY);
@@ -36,9 +32,7 @@ export async function onRequestGet({ env, request }){
     return corsify(json({ error: "KV_GET_ERROR" }, { status: 500 }), request);
   }
 }
-
 export async function onRequestPost({ env, request }){
-  // Very basic auth: check GM code header
   const code = request.headers.get("X-GM-Code") || "";
   if (code !== "123"){
     return corsify(json({ error:"UNAUTHORIZED" }, { status: 401 }), request);

@@ -10,13 +10,11 @@ export async function onRequestOptions({ request }) {
     },
   });
 }
-
 function json(data, init = {}){
   const headers = new Headers(init.headers || {});
   headers.set("content-type","application/json; charset=utf-8");
   return new Response(JSON.stringify(data), { ...init, headers });
 }
-
 function corsify(resp, request){
   const origin = request.headers.get("Origin") || "*";
   resp.headers.set("Access-Control-Allow-Origin", origin);
@@ -24,9 +22,7 @@ function corsify(resp, request){
   resp.headers.set("Cache-Control", "no-store");
   return resp;
 }
-
 const KV_KEY = "classes";
-
 export async function onRequestGet({ env, request }){
   try {
     const raw = await env.AVAIL.get(KV_KEY);
@@ -36,7 +32,6 @@ export async function onRequestGet({ env, request }){
     return corsify(json({ error: "KV_GET_ERROR" }, { status: 500 }), request);
   }
 }
-
 export async function onRequestPost({ env, request }){
   const code = request.headers.get("X-GM-Code") || "";
   if (code !== "123"){
@@ -55,7 +50,7 @@ export async function onRequestPost({ env, request }){
     const byName = new Map(current.classes.map(c => [c.name, c]));
     for (const c of incoming.classes){
       if (!c || !c.name) continue;
-      byName.set(c.name, c); // upsert by name
+      byName.set(c.name, c);
     }
     const merged = { classes: Array.from(byName.values()) };
     await env.AVAIL.put(KV_KEY, JSON.stringify(merged));
@@ -64,7 +59,6 @@ export async function onRequestPost({ env, request }){
     return corsify(json({ error:"KV_PUT_ERROR" }, { status: 500 }), request);
   }
 }
-
 export async function onRequestDelete({ env, request }){
   const code = request.headers.get("X-GM-Code") || "";
   if (code !== "123"){
