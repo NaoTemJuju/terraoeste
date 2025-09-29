@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GM • Classes e Raças</title>
+  <link rel="icon" type="image/png" href="favicon.ico">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .wrap{max-width:1000px;margin:24px auto;padding:16px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
+    .panel{background:#1a1714;border:1px solid #3b3026;border-radius:14px;padding:16px}
+    .row{display:flex;gap:8px;align-items:center;justify-content:space-between}
+    .muted{color:#af906aa8;font-size:.9em}
+    .pill{display:inline-block;border:1px solid #3b3026;border-radius:9999px;padding:4px 10px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h2>Configurar Classes e Raças</h2>
+    <p class="muted">Marque <span class="pill">Habilitada</span> para permitir a geração/seleção. Itens desabilitados não aparecem no criador nem serão escolhidos pelos botões de Aleatório.</p>
+    <div class="panel">
+      <div class="row" style="margin-bottom:10px">
+        <div>
+          <strong>Classes</strong>
+        </div>
+        <div>
+          <button id="btnEnableAllClasses" class="ghost">Habilitar todas</button>
+          <button id="btnDisableAllClasses" class="ghost">Desabilitar todas</button>
+        </div>
+      </div>
+      <div id="classesArea" class="grid"></div>
+    </div>
+    <div class="panel" style="margin-top:14px">
+      <div class="row" style="margin-bottom:10px">
+        <div>
+          <strong>Raças</strong>
+        </div>
+        <div>
+          <button id="btnEnableAllRaces" class="ghost">Habilitar todas</button>
+          <button id="btnDisableAllRaces" class="ghost">Desabilitar todas</button>
+        </div>
+      </div>
+      <div id="racesArea" class="grid"></div>
+    </div>
+    <div class="row" style="margin-top:16px">
+      <a class="ghost" href="gm.html">Voltar ao Painel</a>
+      <a class="ghost" href="index.html" target="_blank">Abrir Gerador</a>
+    </div>
+  </div>
+  <script src="base.js"></script>
+  <script>
+    // Garante que apenas GMs (autenticados via prompt) vejam esta tela
+    (function(){
+      try {
+        if (localStorage.getItem('gm_auth') !== '1'){
+          alert('Acesso restrito. Retornando ao Gerador.');
+          location.href = 'index.html';
+        }
+      } catch(e){}
+    })();
+
+    // Helpers de storage
+    function loadDisabled(){
+      let cls = [], rc = [];
+      try {
+        cls = JSON.parse(localStorage.getItem('gm_disabled_classes')||'[]');
+        rc  = JSON.parse(localStorage.getItem('gm_disabled_races')||'[]');
+      } catch(e){}
+      return {classes: new Set(cls), races: new Set(rc)};
+    }
+    function saveDisabled(sets){
+      try {
+        localStorage.setItem('gm_disabled_classes', JSON.stringify(Array.from(sets.classes)));
+        localStorage.setItem('gm_disabled_races', JSON.stringify(Array.from(sets.races)));
+      } catch(e){}
+    }
+
+    function render(){
+      const sets = loadDisabled();
+      // Usa listas do app (se base.js estiver carregado). Fallback para listas fixas:
+      const classes = (window.app && window.app.CLASSES) ? window.app.CLASSES : [];
+      const races   = (window.app && window.app.RACES) ? window.app.RACES : [];
+
+      const classesArea = document.getElementById('classesArea');
+      const racesArea   = document.getElementById('racesArea');
+      classesArea.innerHTML = '';
+      racesArea.innerHTML = '';
+
+      const mkItem = (name, type) => {
+        const id = (type + '-' + name).replace(/\s+/g,'_');
+        const wrap = document.createElement('label');
+        wrap.className = 'row';
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.checked = !sets[type].has(name); // checked = habilitado
+        cb.addEventListener('change', () => {
+          if (cb.checked) sets[type].delete(name); else sets[type].add(name);
+          saveDisabled(sets);
+        });
+        const span = document.createElement('span');
+        span.textContent = name;
+        wrap.append(cb, span);
+        const li = document.createElement('div');
+        li.className = 'row';
+        li.appendChild(wrap);
+        return li;
+      };
+
+      classes.forEach(c => classesArea.appendChild(mkItem(c, 'classes')));
+      races.forEach(r => racesArea.appendChild(mkItem(r, 'races')));
+
+      // Bulk actions
+      document.getElementById('btnEnableAllClasses').onclick = () => {
+        sets.classes.clear(); saveDisabled(sets); render();
+      };
+      document.getElementById('btnDisableAllClasses').onclick = () => {
+        sets.classes = new Set(classes); saveDisabled(sets); render();
+      };
+      document.getElementById('btnEnableAllRaces').onclick = () => {
+        sets.races.clear(); saveDisabled(sets); render();
+      };
+      document.getElementById('btnDisableAllRaces').onclick = () => {
+        sets.races = new Set(races); saveDisabled(sets); render();
+      };
+    }
+    document.addEventListener('DOMContentLoaded', render);
+  </script>
+</body>
+</html>

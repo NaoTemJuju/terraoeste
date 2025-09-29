@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Painel de GM</title>
+  <link rel="icon" type="image/png" href="favicon.ico">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .gm-wrap{max-width:960px;margin:24px auto;padding:16px}
+    .gm-card{background:#1a1714;border:1px solid #3b3026;border-radius:14px;padding:16px}
+    .gm-actions{display:flex;gap:12px;flex-wrap:wrap}
+  </style>
+</head>
+<body>
+  <div class="gm-wrap">
+    <h2>Painel de GM</h2>
+    <p>Bem-vindo! Use os atalhos abaixo para configurar o gerador.</p>
+    <div class="gm-card gm-actions">
+      <a class="ghost" target="_blank" href="gm-classes.html">Classes/Raças</a>
+      <a class="ghost" href="index.html">Voltar ao Gerador</a>
+    </div>
+  </div>
+  <script>
+    // Verifica autenticação simples
+    (function(){
+      try {
+        if (localStorage.getItem('gm_auth') !== '1'){
+          alert('Acesso restrito. Retornando ao Gerador.');
+          location.href = 'index.html';
+        }
+      } catch(e){ /* se localStorage não disponível, apenas segue */ }
+    })();
+  </script>
+</body>
+</html>

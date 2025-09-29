@@ -1,0 +1,626 @@
+/*
+ * Base module for Shadowdark Character Generator
+ *
+ * This file contains the core data structures, helper functions and
+ * initialization logic shared across the different step modules. It
+ * exposes a single `app` namespace on the global object (window) so
+ * that other modules can read and update shared state.  The goal of
+ * splitting the original monolithic script into multiple files is to
+ * improve organisation and readability without changing any runtime
+ * behaviour.
+ */
+
+// A lógica de efeitos sonoros foi movida para audio.js. Aqui não definimos window.sfx.
+
+(function(){
+  // ====================== Dados base ======================
+  /**
+   * Atributos utilizados para geração de personagens. A ordem
+   * corresponde aos valores retornados pelas rolagens de dados.
+   * Ex.: Força, Destreza, Constituição, Inteligência, Sabedoria e Carisma.
+   */
+  const ATTRS = ["Força","Destreza","Constituição","Inteligência","Sabedoria","Carisma"];
+
+  /**
+   * Lista de raças disponíveis. Cada raça possui habilidades
+   * específicas definidas em módulos externos (por exemplo, línguas
+   * concedidas em languages.js). A lógica de escolha e aleatoriedade
+   * é tratada em race.js.
+   */
+  const RACES = [
+    "Anão","Elfo","Gnomo","Goblin","Humano","Meio-Elfo","Meio-Orc","Pequenino"
+  ];
+
+  /**
+   * Tabela de dados de classe. A chave do objeto é o nome da classe e
+   * o valor indica o dado de vida utilizado para o cálculo dos pontos
+   * de vida iniciais. A lista de classes é derivada deste objeto.
+   */
+  const CLASS_DICE = {
+    "Assassino":6,"Bárbaro":8,"Bardo":6,"Bruxo":4,"Caçador":6,"Cavaleiro":8,
+    "Druida":6,"Explorador":6,"Feiticeiro":6,"Guerreiro":8,"Mago":4,"Malandro":6,
+    "Pactário":6,"Paladino":8,"Patrulheiro":8,"Sacerdote":6
+  };
+  const CLASSES = Object.keys(CLASS_DICE);
+  // ====== GM: Filtros de habilitação via localStorage ======
+  function __loadDisabledSets(){
+    try{
+      const dc = JSON.parse(localStorage.getItem('gm_disabled_classes')||'[]');
+      const dr = JSON.parse(localStorage.getItem('gm_disabled_races')||'[]');
+      return { classes: new Set(dc), races: new Set(dr) };
+    } catch(e){ return { classes: new Set(), races: new Set() }; }
+  }
+  function getEnabledClasses(){
+    const sets = __loadDisabledSets();
+    return CLASSES.filter(c => !sets.classes.has(c));
+  }
+  function getEnabledRaces(){
+    const sets = __loadDisabledSets();
+    return RACES.filter(r => !sets.races.has(r));
+  }
+
+
+  // ====================== Utilitários ======================
+  /** Seleciona um elemento do DOM utilizando querySelector. */
+  const $ = sel => document.querySelector(sel);
+
+  /**
+   * Cria um elemento DOM parametrizado. Permite definição de
+   * propriedades, atributos, eventos e filhos de forma declarativa.
+   * Utilizado em vários módulos para construção dinâmica da interface.
+   *
+   * @param {string} tag  Nome da tag a ser criada
+   * @param {Object} props Atributos e event listeners para configurar no elemento
+   * @param {...(Node|string)} children Filhos a serem adicionados ao elemento
+   * @returns {HTMLElement} O elemento criado
+   */
+  const el = (tag, props = {}, ...children) => {
+    const e = document.createElement(tag);
+    Object.entries(props).forEach(([k, v]) => {
+      if (k === "class") e.className = v;
+      else if (k === "html") e.innerHTML = v;
+      else if (k.startsWith("on") && typeof v === "function") e.addEventListener(k.substring(2), v);
+      else e.setAttribute(k, v);
+    });
+    children.forEach(c => e.append(c));
+    return e;
+  };
+
+  /**
+   * Retorna um número inteiro aleatório entre `min` e `max`, inclusive.
+   * Utilizado para sorteios de atributos, raças, classes e outras
+   * escolhas aleatórias.
+   */
+  const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+  /**
+   * Rola `n` dados de `sides` lados, acumulando o total e registrando
+   * cada resultado individual no array `rolls`. Retorna um objeto com
+   * propriedades `total` e `rolls`.
+   */
+  const roll = (n, sides) => {
+    let total = 0;
+    const rolls = [];
+    for (let i = 0; i < n; i++) {
+      const r = randInt(1, sides);
+      rolls.push(r);
+      total += r;
+    }
+    return { total, rolls };
+  };
+
+  /** Rola 3d6 e retorna apenas o valor total. */
+  const roll3d6 = () => roll(3, 6).total;
+
+  /**
+   * Calcula o modificador de um valor de atributo.
+   */
+  const modFromScore = s => {
+    if (s <= 3) return -4;
+    if (s <= 5) return -3;
+    if (s <= 7) return -2;
+    if (s <= 9) return -1;
+    if (s <= 11) return 0;
+    if (s <= 13) return 1;
+    if (s <= 15) return 2;
+    if (s <= 17) return 3;
+    return 4;
+  };
+
+  // ---------- Permalinks ----------
+  function encodeObjToHash(obj){
+    const uuid = (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function')
+      ? crypto.randomUUID()
+      : Math.random().toString(36).slice(2);
+    try {
+      localStorage.setItem(`pc_${uuid}`, JSON.stringify(obj));
+      return uuid;
+    } catch(err){
+      try {
+        return btoa(unescape(encodeURIComponent(JSON.stringify(obj))));
+      } catch(e){
+        return uuid;
+      }
+    }
+  }
+
+  function decodeHashToObj(val){
+    if (!val) return null;
+    try {
+      const stored = localStorage.getItem(`pc_${val}`);
+      if (stored) return JSON.parse(stored);
+    } catch(err){}
+    try {
+      return JSON.parse(decodeURIComponent(escape(atob(val))));
+    } catch(e){
+      return null;
+    }
+  }
+
+  const prettyMod = m => (m >= 0 ? `+${m}` : `${m}`);
+
+  function escapeHTML(s) {
+    return String(s).replace(/[&<>"']/g, m => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#039;"
+    }[m]));
+  }
+
+  function renderFinal(result, container) {
+    const attrsRows = ATTRS.map(a => {
+      const o = result.atributos[a];
+      return `<tr><td>${a}</td><td class="score">${o.valor}</td><td class="mod">${prettyMod(o.mod)}</td></tr>`;
+    }).join("");
+    container.innerHTML = `
+        <div class="grid cols-2">
+          <div><strong>Nome</strong><br>${escapeHTML(result.nome || "—")}</div>
+          <div><strong>Raça</strong><br>${result.raca || "—"}</div>
+          <div><strong>Classe</strong><br>${result.classe || "—"}</div>
+          <div><strong>Origem</strong><br>${result.origem || "—"}</div>
+          <div><strong>Alinhamento</strong><br>${result.alinhamento || "—"}</div>
+          <div><strong>Divindade</strong><br>${result.divindade || "—"}</div>
+          <div><strong>Línguas</strong><br>${Array.isArray(result.linguas) ? result.linguas.join(", ") : (result.linguas || "—")}</div>
+          <div><strong>PV</strong><br>${result.pv ?? "—"}</div>
+          <div><strong>Ouro</strong><br>${result.ouro ?? "—"} PO</div>
+        </div>
+        <div style="margin-top:12px"><strong>Atributos</strong></div>
+        <table class="attrs" style="margin-top:6px">
+          <tr><th>Atributo</th><th>Valor</th><th>Mod</th></tr>
+          ${attrsRows}
+        </table>
+      `;
+  }
+
+  function hideCreationUI(){
+    const ids = [
+      "stepName","stepAttrs","stepRace","stepClass","stepOrigin","stepHP",
+      "stepGold","stepAlign","stepDeity","stepLang","stepFinal"
+    ];
+    ids.forEach(id => {
+      const s = document.getElementById(id);
+      if (s) s.style.display = "none";
+    });
+  }
+
+  // ====================== Feedback visual (✔️) ======================
+  /**
+   * Exibe um pequeno ícone de marca de verificação ao lado de um
+   * elemento de botão para indicar que a ação foi confirmada. A marca
+   * desaparece automaticamente após alguns segundos. Caso o elemento
+   * fornecido seja nulo, nada acontece.
+   *
+   * @param {HTMLElement} btn O botão próximo ao qual exibir a marca.
+   */
+  function showCheck(btn){
+    if (!btn) return;
+    // Evita inserir marcas duplicadas consecutivamente
+    // Cria o span com o emoji de check em verde. A marca não é removida
+    // automaticamente para que permaneça visível ao usuário.
+    const mark = document.createElement('span');
+    /*
+     * Utiliza o caractere "✔️" (U+2714 U+FE0F) em vez de "🗸". O
+     * caractere anterior não é amplamente suportado em todas as
+     * plataformas móveis e podia aparecer como um quadrado em branco.
+     * O símbolo "✔️" é mais comum e possui boa compatibilidade.
+     */
+    mark.textContent = '✔';
+    mark.className = 'check-mark';
+    // Aplica estilos diretamente caso a folha de estilos não esteja presente
+    mark.style.marginLeft = '6px';
+    mark.style.color = 'black';
+    mark.style.fontSize = '1.2em';
+    mark.style.display = 'inline-block';
+    mark.style.verticalAlign = 'middle';
+    // Insere logo após o botão
+    if (btn.parentNode) {
+      btn.parentNode.insertBefore(mark, btn.nextSibling);
+    }
+  }
+
+  // A geração de nomes por raça foi movida para nome.js. Consulte esse módulo para obter randomNameByRace.
+
+  // A função toggleMusic foi movida para audio.js.
+
+  // ====================== Gerar tudo automaticamente ======================
+  /**
+   * Gera um personagem completo de forma aleatória. Este atalho
+   * percorre todas as etapas internamente sem exibir a animação de
+   * rolagem de dados ou exigir interações do usuário. Ao final,
+   * apresenta a ficha pronta e o link de compartilhamento.
+   */
+  async function generateEverything(){
+    try {
+      // Rola atributos (garante pelo menos um >14)
+      let scores;
+      do { scores = ATTRS.map(() => roll3d6()); }
+      while (!scores.some(s => s > 14));
+      const mods = scores.map(modFromScore);
+      state.attrs = scores;
+      state.mods  = mods;
+      // Bloqueia alterações posteriores
+      attrsLocked = true;
+      // Escolhe raça e classe aleatórias
+      let __races = getEnabledRaces(); if (!__races.length) __races = RACES; const race = __races[randInt(0, __races.length - 1)];
+      state.race = race;
+      let classKeys = getEnabledClasses(); if (!classKeys.length) classKeys = CLASSES;
+      const cls = classKeys[randInt(0, classKeys.length - 1)];
+      state.cls = cls;
+      // Seleciona uma origem aleatória da classe
+      const origens = (window.ORIGENS_POR_CLASSE?.[cls] || []);
+      if (origens.length > 0){
+        const idx = randInt(0, origens.length - 1);
+        const pick = origens[idx];
+        state.origem = { titulo: pick.titulo, descricao: pick.d };
+      } else {
+        state.origem = null;
+      }
+      // Determina alinhamento (forçado ou aleatório)
+      let align;
+      if (cls === 'Paladino') align = 'Ordeiro';
+      else if (cls === 'Druida') align = 'Neutro';
+      else {
+        const opts = ['Ordeiro','Neutro','Caótico'];
+        align = opts[randInt(0, opts.length - 1)];
+      }
+      state.align = align;
+      state.alignLocked = true;
+      // Escolhe divindade (automática ou aleatória) via módulo deities
+      if (window.deities && typeof window.deities.computeDeityOptions === 'function'){
+        const { auto, options } = window.deities.computeDeityOptions({ cls, alignment: align });
+        if (auto){
+          state.deity = auto;
+        } else if (options && options.length){
+          const pick = options[randInt(0, options.length - 1)];
+          state.deity = pick.name;
+        } else {
+          state.deity = '';
+        }
+        state.deityLocked = true;
+      }
+      // Calcula línguas
+      if (window.langs && typeof window.langs.computeLanguagePools === 'function'){
+        const langState = window.langs.computeLanguagePools({ race, cls, alignment: align });
+        state.langs = langState;
+        const { final, choices } = window.langs.applyRandom(langState);
+        state.langsFinal = final;
+      }
+      // Rola PV
+      if (cls){
+        const sides = CLASS_DICE[cls];
+        const conMod = Array.isArray(state.mods) ? (state.mods[ATTRS.indexOf('Constituição')] || 0) : 0;
+        let base;
+        if (race === 'Anão'){
+          const r1 = roll(1, sides).total;
+          const r2 = roll(1, sides).total;
+          base = Math.max(r1, r2);
+        } else {
+          base = roll(1, sides).total;
+        }
+        const hp = Math.max(1, base + conMod);
+        state.hpBaseRoll = base;
+        state.hp = hp;
+        state.hpDetail = `${cls} d${sides} (${base})${conMod !== 0 ? ' + MOD CON ' + conMod : ''}`;
+      }
+      // Rola Ouro
+      {
+        const g = roll(2,6);
+        state.gold = g.total * 5;
+      }
+      // Define nome aleatório baseado na raça
+      // randomNameByRace é definido em nome.js e anexado ao namespace app
+      const nameGenFn = (window.app && typeof window.app.randomNameByRace === 'function') ? window.app.randomNameByRace : null;
+      const name = nameGenFn ? nameGenFn(race) : '';
+      state.name = name;
+      // Após preencher tudo, finaliza e mostra ficha
+      if (window.app && typeof window.app.finalizeCharacter === 'function'){
+        await window.app.finalizeCharacter();
+        // Ao exibir a ficha, também mostrar o campo de nome para edição
+        const finalNameSec = document.getElementById('finalNameSection');
+        const finalNameHint = document.getElementById('finalNameHint');
+        if (finalNameSec) finalNameSec.style.display = '';
+        if (finalNameHint) finalNameHint.style.display = '';
+        const input = document.getElementById('finalNameInput');
+        if (input) input.value = state.name || '';
+      }
+    } catch(err){
+      console.error('Erro ao gerar personagem aleatoriamente:', err);
+    }
+  }
+
+  function normalizeForView(obj){
+    if (obj && obj.stats && obj.name){
+      const mapAttr = {
+        "Força":"STR", "Destreza":"DEX", "Constituição":"CON",
+        "Inteligência":"INT", "Sabedoria":"WIS", "Carisma":"CHA"
+      };
+      const atributos = {};
+      for (const [pt,en] of Object.entries(mapAttr)){
+        const v = obj.stats?.[en] ?? 10;
+        let m;
+        if (v<=3) m=-4; else if (v<=5) m=-3; else if (v<=7) m=-2; else if (v<=9) m=-1;
+        else if (v<=11) m=0; else if (v<=13) m=1; else if (v<=15) m=2; else if (v<=17) m=3; else m=4;
+        atributos[pt] = { valor: v, mod: m };
+      }
+      let linguas = obj.languages;
+      if (typeof linguas === "string") linguas = linguas.split(",").map(s=>s.trim()).filter(Boolean);
+      if (!Array.isArray(linguas)) linguas = [];
+      return {
+        nome: obj.name || "—",
+        raca: obj.ancestry || "—",
+        classe: obj.class || "—",
+        origem: obj.background || "—",
+        origem_desc: "",
+        alinhamento: obj.alignment || "—",
+        divindade: obj.deity || "—",
+        linguas,
+        atributos,
+        pv: obj.maxHitPoints ?? "—",
+        pv_info: "",
+        ouro: obj.gold ?? 0,
+        criado_em: "" + (obj.created_at || "")
+      };
+    }
+    return obj;
+  }
+
+  // ====================== Estado global ======================
+  const state = {
+    name:"",
+    attrs:null,
+    mods:null,
+    race:null,
+    cls:null,
+    origem:null,
+    hp:null,
+    hpDetail:null,
+    gold:null,
+    align:null,
+    langs:null,
+    deity:null,
+    hpBaseRoll:null
+  };
+
+  const pending = { race:null, cls:null };
+  let attrsLocked = false;
+  let __loadedRawObj = null;
+
+  // ====================== Inicialização da UI ======================
+  function setupSelectOptions(){
+    const raceSel = $("#raceSelect");
+    const classSel = $("#classSelect");
+    if (!raceSel || !classSel) return;
+    const racePlaceholder = el("option",{value:"", html:"Selecionar...", selected:true});
+    const classPlaceholder = el("option",{value:"", html:"Selecionar...", selected:true});
+    raceSel.append(racePlaceholder);
+    classSel.append(classPlaceholder);
+    getEnabledRaces().forEach(r => raceSel.append(el("option",{value:r, html:r})));
+    getEnabledClasses().forEach(c => classSel.append(el("option",{value:c, html:c})));
+  }
+
+  function setupNameInput(){
+    const nomeInput = $("#nome");
+    const btnRollAttrs = $("#btnRollAttrs");
+    if (!nomeInput || !btnRollAttrs) return;
+    nomeInput.addEventListener("input", () => {
+      // Atualiza o estado do nome à medida que o usuário digita, mas não
+      // desabilita mais o botão de rolar atributos. O nome definitivo
+      // poderá ser alterado na etapa final.
+      state.name = nomeInput.value.trim();
+    });
+  }
+
+  /**
+   * Carrega um personagem a partir do hash da URL (permalink).
+   */
+  function tryLoadFromHash(){
+    const hash = location.hash.startsWith("#") ? location.hash.slice(1) : "";
+    if (!hash) return;
+
+    const obj = decodeHashToObj(hash);
+    if (!obj) return;
+
+    __loadedRawObj = obj;
+
+    // Monta exportObj (Foundry) uma única vez
+    try {
+      const a = obj?.atributos || {};
+      const stats = {
+        STR: a["Força"]?.valor ?? 0,
+        DEX: a["Destreza"]?.valor ?? 0,
+        CON: a["Constituição"]?.valor ?? 0,
+        INT: a["Inteligência"]?.valor ?? 0,
+        WIS: a["Sabedoria"]?.valor ?? 0,
+        CHA: a["Carisma"]?.valor ?? 0
+      };
+      const languagesStr = Array.isArray(obj?.linguas) ? obj.linguas.join(", ") : "";
+      const level = 0;
+
+      const exportObj = {
+        name: obj?.nome || "",
+        stats: { ...stats },
+        rolledStats: { ...stats },
+        ancestry: obj?.raca || "",
+        class: obj?.classe || "",
+        level,
+        levels: [{
+          level,
+          talentRolledDesc: "",
+          talentRolledName: "",
+          Rolled12TalentOrTwoStatPoints: "",
+          Rolled12ChosenTalentDesc: "",
+          Rolled12ChosenTalentName: "",
+          HitPointRoll: 0,
+          stoutHitPointRoll: 0
+        }],
+        XP: 0,
+        ambitionTalentLevel: {
+          level: 0,
+          talentRolledDesc: "",
+          talentRolledName: "",
+          Rolled12TalentOrTwoStatPoints: "",
+          Rolled12ChosenTalentDesc: "",
+          Rolled12ChosenTalentName: "",
+          HitPointRoll: 0,
+          stoutHitPointRoll: 0
+        },
+        title: "Aventureiro",
+        alignment: obj?.alinhamento || "",
+        background: obj?.origem || "",
+        deity: obj?.divindade || "",
+        maxHitPoints: obj?.pv || 0,
+        armorClass: 10,
+        gearSlotsTotal: 10,
+        gearSlotsUsed: 0,
+        bonuses: [],
+        goldRolled: obj?.ouro || 0,
+        gold: obj?.ouro || 0,
+        silver: 0,
+        copper: 0,
+        gear: [],
+        treasures: [],
+        magicItems: [],
+        attacks: [],
+        ledger: [{
+          goldChange: obj?.ouro || 0,
+          silverChange: 0,
+          copperChange: 0,
+          desc: "Ouro inicial",
+          notes: ""
+        }],
+        spellsKnown: "None",
+        languages: languagesStr,
+        creationMethod: "Exported by Bot",
+        coreRulesOnly: true,
+        activeSources: ["SD"],
+        edits: []
+      };
+
+      if (!window.app) window.app = {};
+      window.app.__exportObj = exportObj;
+    } catch(e){
+      if (window.app) window.app.__exportObj = undefined;
+    }
+
+    // UI de carregado
+    const loadStateEl = $("#loadState");
+    if (loadStateEl) loadStateEl.textContent = "Personagem carregado";
+    const loadedSection = $("#loadedSection");
+    if (loadedSection) loadedSection.style.display = "";
+
+    const viewObj = normalizeForView(obj);
+    const summaryEl = $("#loadedSummary");
+    if (viewObj && summaryEl){
+      renderFinal(viewObj, summaryEl);
+      hideCreationUI();
+    } else if (summaryEl) {
+      summaryEl.innerHTML = "<em class='muted'>Não foi possível ler os dados do personagem.</em>";
+    }
+  }
+
+  /**
+   * Botões da seção "Resultado carregado".
+   */
+  function setupLoadedButtons(){
+    const btnNewFromLoaded = $("#btnNewFromLoaded");
+    if (btnNewFromLoaded) btnNewFromLoaded.addEventListener("click", () => {
+      location.hash = "";
+      location.reload();
+    });
+
+    const btnCopyLoaded = $("#btnCopyLoaded");
+    if (btnCopyLoaded) btnCopyLoaded.addEventListener("click", () => {
+      navigator.clipboard.writeText(location.href).then(() => alert("Link copiado!"));
+    });
+
+    const btnCopyLoadedJSON = $("#btnCopyLoadedJSON");
+    if (btnCopyLoadedJSON) btnCopyLoadedJSON.addEventListener("click", () => {
+      const exportObj = window.app?.__exportObj;
+      if (!exportObj){ alert("Nenhum JSON carregado."); return; }
+      const pretty = JSON.stringify(exportObj, null, 2);
+      navigator.clipboard.writeText(pretty).then(() => {
+        alert(".json copiado!");
+      }).catch(() => {
+        prompt("Copie o JSON:", pretty);
+      });
+    });
+  }
+
+  // ====================== Bootstrap ======================
+	document.addEventListener('DOMContentLoaded', () => {
+	  setupSelectOptions();
+	  setupNameInput();
+	  tryLoadFromHash();
+	  setupLoadedButtons();
+
+	// === Botão de Geração Aleatória ===
+	const btnGenAll = document.getElementById('btnGenerateAll');
+	if (btnGenAll) {
+	  btnGenAll.addEventListener('click', async () => {
+		// Limpa qualquer "check" anterior antes de gerar o novo personagem
+		const existingCheck = btnGenAll.parentNode.querySelector('.check-mark');
+		if (existingCheck) {
+		  existingCheck.remove(); // Remove o "check" anterior
+		}
+
+		try {
+		  // Gera o personagem
+		  await (window.app && window.app.generateEverything && window.app.generateEverything());
+
+		  // Exibe um novo "check"
+		  window.app && window.app.showCheck && window.app.showCheck(btnGenAll);
+		} catch (err) {
+		  console.error('Erro na geração:', err);
+		}
+	  });
+    }
+
+	});
+
+  // ====================== Exposição pública ======================
+  window.app = {
+    ATTRS,
+    RACES,
+    CLASS_DICE,
+    CLASSES,
+    $, el,
+    randInt, roll, roll3d6, modFromScore,
+    encodeObjToHash, decodeHashToObj,
+    prettyMod,
+    escapeHTML,
+    renderFinal,
+    hideCreationUI,
+    normalizeForView,
+    getEnabledClasses,
+    getEnabledRaces,
+    // Novas utilidades
+    showCheck,
+    // randomNameByRace e toggleMusic agora são definidos em módulos separados.
+    generateEverything,
+    // estado e utilitários
+    state,
+    pending,
+    get attrsLocked(){ return attrsLocked; },
+    set attrsLocked(val){ attrsLocked = val; },
+    get __loadedRawObj(){ return __loadedRawObj; },
+    set __loadedRawObj(val){ __loadedRawObj = val; }
+  };
+})();
