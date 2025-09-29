@@ -550,57 +550,39 @@
   }
 
   
-  // ====================== Disponibilidade (GM) ======================
+  // ====================== Disponibilidade (GM) via Cloudflare KV ======================
   let __availability = { classes:{}, races:{} };
 
-  function mergeAvailability(target, src){
-    if (!src) return target;
-    ["classes","races"].forEach(k => {
-      if (src[k] && typeof src[k] === "object"){
-        target[k] = target[k] || {};
-        Object.keys(src[k]).forEach(name => { target[k][name] = !!src[k][name]; });
-      }
-    });
-    return target;
-  }
   function availabilityDefault(){
     const def = { classes:{}, races:{} };
-    ALL_CLASSES.forEach(c => def.classes[c] = true);
-    ALL_RACES.forEach(r => def.races[r] = true);
+    (ALL_CLASSES||CLASSES).forEach(c => def.classes[c] = true);
+    (ALL_RACES||RACES).forEach(r => def.races[r] = true);
     return def;
   }
+
   function applyAvailability(av){
-    // Mutate arrays in-place so modules that captured references see updates
-    const enabledClasses = ALL_CLASSES.filter(c => av.classes[c] !== false);
-    const enabledRaces   = ALL_RACES.filter(r => av.races[r]   !== false);
+    const enabledClasses = (ALL_CLASSES||CLASSES).filter(c => av.classes[c] !== false);
+    const enabledRaces   = (ALL_RACES||RACES).filter(r => av.races[r]   !== false);
     CLASSES.length = 0; enabledClasses.forEach(c => CLASSES.push(c));
     RACES.length   = 0; enabledRaces.forEach(r => RACES.push(r));
   }
+
   async function loadAvailability(){
-    // 1) defaults
     __availability = availabilityDefault();
-    // 2) localStorage overlay (permite testar sem tornar global)
     try {
-      const loc = localStorage.getItem("gmAvailability");
-      if (loc) mergeAvailability(__availability, JSON.parse(loc));
-    } catch {}
-    // 3) fetch global file (se existir)
-    try {
-      const resp = await fetch("config/availability.json", {cache:"no-store"});
+      const resp = await fetch("/api/availability", { headers: { "cache-control":"no-store" } });
       if (resp.ok){
         const data = await resp.json();
-        mergeAvailability(__availability, data);
+        if (data && typeof data === "object") __availability = Object.assign(availabilityDefault(), data);
       }
     } catch {}
     applyAvailability(__availability);
   }
-  // Expor no app
   function getAvailability(){ return JSON.parse(JSON.stringify(__availability)); }
 
 // ====================== Bootstrap ======================
 	document.addEventListener('DOMContentLoaded', async () => {
   await loadAvailability();
-  // Botão GM no cabeçalho
   try {
     const headerActions = document.querySelector('.header-actions');
     if (headerActions){
@@ -668,7 +650,7 @@
     showCheck,
     // randomNameByRace e toggleMusic agora são definidos em módulos separados.
     generateEverything,
-    // GM availability
+    // GM availability helpers
     getAvailability,
     applyAvailability,
     ALL_CLASSES,

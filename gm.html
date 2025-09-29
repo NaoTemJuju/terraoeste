@@ -22,7 +22,7 @@
     <section class="card">
       <div class="row" style="gap:1rem; align-items:center;">
         <button id="btnTabCR" class="primary">Classes/Raças</button>
-        <span class="muted">Código padrão: 123</span>
+        <span class="muted">Código: 123</span>
       </div>
     </section>
 
@@ -35,13 +35,11 @@
         <button id="btnEnableAll" class="ghost">Habilitar tudo</button>
         <button id="btnDisableAll" class="ghost">Desabilitar tudo</button>
         <span class="spacer"></span>
-        <button id="btnSaveLocal" class="primary">Salvar (navegador)</button>
-        <button id="btnExport" class="ghost">Exportar JSON</button>
+        <button id="btnSave" class="primary">Salvar (global)</button>
         <button id="btnReload" class="ghost">Recarregar</button>
       </div>
       <p class="muted" style="margin-top:.5rem;">
-        Para tornar as alterações <strong>globais</strong> para todos os jogadores,
-        faça o commit do arquivo gerado em <code>config/availability.json</code> no repositório que publica no Cloudflare.
+        As alterações são salvas em KV e passam a valer <strong>na hora</strong> para todos.
       </p>
     </section>
   </div>

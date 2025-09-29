@@ -16,8 +16,7 @@
 
   const classesList = $("#classesList");
   const racesList = $("#racesList");
-  const btnSaveLocal = $("#btnSaveLocal");
-  const btnExport = $("#btnExport");
+  const btnSave = $("#btnSave");
   const btnReload = $("#btnReload");
   const btnEnableAll = $("#btnEnableAll");
   const btnDisableAll = $("#btnDisableAll");
@@ -51,31 +50,34 @@
     racesList.innerHTML = '';
     const allC = app.ALL_CLASSES || app.CLASSES;
     const allR = app.ALL_RACES || app.RACES;
-    allC.forEach(c => classesList.appendChild(makeCheck(c,'class', !!av.classes[c])));
-    allR.forEach(r => racesList.appendChild(makeCheck(r,'race', !!av.races[r])));
+    allC.forEach(c => classesList.appendChild(makeCheck(c,'class', av.classes[c] !== false)));
+    allR.forEach(r => racesList.appendChild(makeCheck(r,'race', av.races[r] !== false)));
+  }
+
+  async function fetchAvailability(){
+    const r = await fetch('/api/availability', { headers:{'cache-control':'no-store'} });
+    if (r.ok) return await r.json();
+    return {classes:{}, races:{}};
   }
 
   async function init(){
-    await new Promise(r => setTimeout(r, 0)); // ensure base loaded availability
-    const current = app.getAvailability ? app.getAvailability() : {classes:{},races:{}};
+    const current = await fetchAvailability();
     render(current);
   }
 
-  btnSaveLocal?.addEventListener('click', () => {
+  btnSave?.addEventListener('click', async () => {
     const av = readUI();
-    localStorage.setItem('gmAvailability', JSON.stringify(av));
-    if (app.applyAvailability) app.applyAvailability(av);
-    alert('Salvo no navegador. Faça export e commit para global.');
-  });
-
-  btnExport?.addEventListener('click', () => {
-    const av = readUI();
-    const blob = new Blob([JSON.stringify(av, null, 2)], {type:'application/json'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'availability.json';
-    a.click();
-    URL.revokeObjectURL(a.href);
+    const code = '123';
+    const r = await fetch('/api/availability', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-GM-Code': code },
+      body: JSON.stringify(av)
+    });
+    if (r.ok){
+      alert('Salvo globalmente!');
+    } else {
+      alert('Falha ao salvar (verifique o código e permissões).');
+    }
   });
 
   btnReload?.addEventListener('click', () => location.reload());
