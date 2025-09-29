@@ -551,6 +551,58 @@
 
   
   // ====================== Disponibilidade (GM) via Cloudflare KV ======================
+  // ====================== Classes Personalizadas (via KV) ======================
+  async function loadCustomClasses(){
+    try {
+      const resp = await fetch("/api/classes", { headers: { "cache-control": "no-store" } });
+      if (!resp.ok) return;
+      const data = await resp.json();
+      if (!data || !Array.isArray(data.classes)) return;
+      const extras = data.classes;
+      // Overlays globais usados por outros módulos
+      const customSpec = {};
+      const customOrigens = {};
+      extras.forEach(cls => {
+        if (!cls || !cls.name) return;
+        const name = String(cls.name);
+        const hp = parseInt(cls.hp, 10);
+        if (!isNaN(hp) && hp > 0) {
+          CLASS_DICE[name] = hp;
+          if (!ALL_CLASSES.includes(name)) ALL_CLASSES.push(name);
+        }
+        if (Array.isArray(cls.origins)) {
+          const arr = cls.origins.slice(0,6).map(o => {
+            if (!o) return null;
+            if (typeof o === "string") return { titulo: o, d: "" };
+            const t = (o.titulo || o.title || "").toString();
+            const d = (o.d || o.desc || o.descricao || "").toString();
+            if (!t) return null;
+            return { titulo: t, d };
+          }).filter(Boolean);
+          if (arr.length) customOrigens[name] = arr;
+        }
+        if (cls.languages && typeof cls.languages === "object"){
+          const spec = {};
+          if (Array.isArray(cls.languages.grant)) spec.grant = cls.languages.grant.slice();
+          if (cls.languages.bonus && typeof cls.languages.bonus === "object"){
+            const bc = parseInt(cls.languages.bonus.common||0,10) || 0;
+            const br = parseInt(cls.languages.bonus.rare||0,10) || 0;
+            if (bc>0 || br>0) spec.bonus = { common: bc, rare: br };
+          }
+          if (Array.isArray(cls.languages.pickOne) && cls.languages.pickOne.length){
+            spec.pickOne = cls.languages.pickOne.slice();
+          }
+          if (Array.isArray(cls.languages.pickOneOrNone) && cls.languages.pickOneOrNone.length){
+            spec.pickOneOrNone = cls.languages.pickOneOrNone.slice();
+          }
+          if (Object.keys(spec).length) customSpec[name] = spec;
+        }
+      });
+      window.CUSTOM_CLASS_SPEC = customSpec;
+      window.CUSTOM_ORIGENS = customOrigens;
+    } catch {}
+  }
+
   let __availability = { classes:{}, races:{} };
 
   function availabilityDefault(){
@@ -582,6 +634,7 @@
 
 // ====================== Bootstrap ======================
 	document.addEventListener('DOMContentLoaded', async () => {
+  await loadCustomClasses();
   await loadAvailability();
   try {
     const headerActions = document.querySelector('.header-actions');
@@ -654,6 +707,7 @@
     getAvailability,
     applyAvailability,
     ALL_CLASSES,
+    loadCustomClasses,
     ALL_RACES,
     // estado e utilitários
     state,

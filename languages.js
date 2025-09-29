@@ -112,7 +112,11 @@
    * @param {string} cls
    */
   function getClassBonusSpec(cls){
-    return CLASS_SPEC[cls] || {};
+    const extra = (window.CUSTOM_CLASS_SPEC||{});
+    const base = CLASS_SPEC[cls] || {};
+    const ex   = extra[cls] || {};
+    // merge shallowly: bonus/grant/pickOne/pickOneOrNone/byAlignment supported
+    return Object.assign({}, base, ex);
   }
 
   /**
@@ -259,6 +263,8 @@
   // Expõe apenas o objeto `langs` no escopo global. Todas as constantes
   // internas permanecem encapsuladas no IIFE.
   window.langs = {
+    COMMON_LANGS: COMMON_LANGS.slice(),
+    RARE_LANGS: RARE_LANGS.slice(),
     getRaceBaseLanguages,
     getClassBonusSpec,
     computeLanguagePools,

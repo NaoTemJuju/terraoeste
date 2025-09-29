@@ -143,7 +143,8 @@
 	  area.innerHTML = "";
 	  section.style.display = "";
 
-	  const lista = ORIGENS_POR_CLASSE[state.cls] || [];
+	  const custom = (window.CUSTOM_ORIGENS && window.CUSTOM_ORIGENS[state.cls]) || [];
+	  const lista = (custom && custom.length) ? custom : (ORIGENS_POR_CLASSE[state.cls] || []);
 
 	  const select = document.createElement("select");
 	  select.id = "originSelect";
