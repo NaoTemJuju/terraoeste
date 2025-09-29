@@ -41,7 +41,6 @@
       </div>
       <!-- Botões de utilidade no cabeçalho: gerar personagem completo e tocar música -->
       <div class="header-actions">
-        <button id="btnGM" class="ghost">GM</button>
         <button id="btnGenerateAll" class="ghost">Gerar Aleatório</button>
         <button id="btnToggleMusic" class="ghost">🎵 Música</button>
       </div>
@@ -218,24 +217,5 @@
   <script src="nome.js"></script>
   <script src="alinhamento.js"></script>
   <script src="final.js"></script>
-
-<script>
-// Botão GM: pede código e navega para o painel
-(function(){
-  const btnGM = document.getElementById('btnGM');
-  if (btnGM){
-    btnGM.addEventListener('click', () => {
-      const code = prompt('Código GM:');
-      if (code === '123'){
-        try { localStorage.setItem('gm_auth','1'); try{localStorage.setItem('gm_code', code);}catch(e){} } catch {}
-        window.location.href = 'gm.html';
-      } else if (code !== null) {
-        alert('Código incorreto.');
-      }
-    });
-  }
-})();
-</script>
-
 </body>
 </html>

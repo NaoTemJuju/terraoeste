@@ -6,34 +6,47 @@
   <title>Painel de GM</title>
   <link rel="icon" type="image/png" href="favicon.ico">
   <link rel="stylesheet" href="style.css">
-  <style>
-    .gm-wrap{max-width:960px;margin:24px auto;padding:16px}
-    .gm-card{background:#1a1714;border:1px solid #3b3026;border-radius:14px;padding:16px}
-    .gm-actions{display:flex;gap:12px;flex-wrap:wrap}
-  </style>
 </head>
 <body>
-  <div class="gm-wrap">
-    <h2>Painel de GM</h2>
-    <p>Bem-vindo! Use os atalhos abaixo para configurar o gerador.</p>
-    <div class="gm-card gm-actions">
-      <button class="ghost" id="btnGoClasses">Classes/Raças</button>
-      <button class="ghost" id="btnBack">Voltar ao Gerador</button>
-    </div>
-  </div>
-  <script>
-    document.getElementById("btnGoClasses").onclick = () => window.open("gm-classes.html","_blank");
-    document.getElementById("btnBack").onclick = () => location.href = "index.html";
+  <div class="container">
+    <header class="top">
+      <div>
+        <h2>Painel de GM</h2>
+        <div class="sub" style="color:#af906a">Configurações globais de Classes e Raças</div>
+      </div>
+      <div class="header-actions">
+        <a class="ghost" href="index.html">⬅ Voltar</a>
+      </div>
+    </header>
 
-    // Verifica autenticação simples
-    (function(){
-      try {
-        if (localStorage.getItem('gm_auth') !== '1'){
-          alert('Acesso restrito. Retornando ao Gerador.');
-          location.href = 'index.html';
-        }
-      } catch(e){ /* se localStorage não disponível, apenas segue */ }
-    })();
-  </script>
+    <section class="card">
+      <div class="row" style="gap:1rem; align-items:center;">
+        <button id="btnTabCR" class="primary">Classes/Raças</button>
+        <span class="muted">Código padrão: 123</span>
+      </div>
+    </section>
+
+    <section id="tabCR" class="card">
+      <h3>Classes</h3>
+      <div id="classesList" class="grid-2"></div>
+      <h3 style="margin-top:1rem;">Raças</h3>
+      <div id="racesList" class="grid-2"></div>
+      <div class="row" style="margin-top:1rem; gap:.5rem; flex-wrap:wrap;">
+        <button id="btnEnableAll" class="ghost">Habilitar tudo</button>
+        <button id="btnDisableAll" class="ghost">Desabilitar tudo</button>
+        <span class="spacer"></span>
+        <button id="btnSaveLocal" class="primary">Salvar (navegador)</button>
+        <button id="btnExport" class="ghost">Exportar JSON</button>
+        <button id="btnReload" class="ghost">Recarregar</button>
+      </div>
+      <p class="muted" style="margin-top:.5rem;">
+        Para tornar as alterações <strong>globais</strong> para todos os jogadores,
+        faça o commit do arquivo gerado em <code>config/availability.json</code> no repositório que publica no Cloudflare.
+      </p>
+    </section>
+  </div>
+
+  <script src="base.js"></script>
+  <script src="gm.js"></script>
 </body>
 </html>

@@ -7,14 +7,14 @@
  * Continuar, a próxima etapa (classe) é revelada.
  */
 (function(){
-  const { RACES, pending, state, randInt, $, getEnabledRaces } = window.app;
+  const { RACES, pending, state, randInt, $ } = window.app;
   const raceSel = $("#raceSelect");
   const btnRandRace = $("#btnRandRace");
   const btnConfirmRace = $("#btnConfirmRace");
   // Sorteia uma raça aleatória
   if (btnRandRace) {
     btnRandRace.addEventListener("click", () => {
-      let __races = getEnabledRaces(); if (!__races.length) __races = RACES; const r = __races[randInt(0, __races.length - 1)];
+      const r = RACES[randInt(0, RACES.length - 1)];
       if (raceSel) {
         raceSel.value = r;
         // Desabilita o placeholder para evitar seleção nula

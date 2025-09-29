@@ -42,49 +42,8 @@
     "Pactário":6,"Paladino":8,"Patrulheiro":8,"Sacerdote":6
   };
   const CLASSES = Object.keys(CLASS_DICE);
-  // ====== GM: Config remota global (Cloudflare Pages Functions + KV) ======
-  let __gmDisabled = { classes: new Set(), races: new Set(), loaded: false };
-  async function loadGMConfig(){
-    try {
-      const res = await fetch('/gm/config', { headers: { 'accept':'application/json' } });
-      if (res.ok){
-        const data = await res.json();
-        const dis = (data && data.disabled) || { classes:[], races:[] };
-        __gmDisabled.classes = new Set(dis.classes || []);
-        __gmDisabled.races   = new Set(dis.races || []);
-        __gmDisabled.loaded  = true;
-      } else {
-        __gmDisabled.loaded = true;
-      }
-    } catch(e){
-      // Em caso de falha de rede, considera tudo habilitado
-      __gmDisabled.loaded = true;
-    }
-  }
-  function getEnabledClasses(){
-    return CLASSES.filter(c => !__gmDisabled.classes.has(c));
-  }
-  function getEnabledRaces(){
-    return RACES.filter(r => !__gmDisabled.races.has(r));
-  }
-
-  // ====== GM: Filtros de habilitação via localStorage ======
-  function __loadDisabledSets(){
-    try{
-      const dc = JSON.parse(localStorage.getItem('gm_disabled_classes')||'[]');
-      const dr = JSON.parse(localStorage.getItem('gm_disabled_races')||'[]');
-      return { classes: new Set(dc), races: new Set(dr) };
-    } catch(e){ return { classes: new Set(), races: new Set() }; }
-  }
-  function getEnabledClasses(){
-    const sets = __loadDisabledSets();
-    return CLASSES.filter(c => !sets.classes.has(c));
-  }
-  function getEnabledRaces(){
-    const sets = __loadDisabledSets();
-    return RACES.filter(r => !sets.races.has(r));
-  }
-
+  const ALL_CLASSES = [...CLASSES];
+  const ALL_RACES = [...RACES];
 
   // ====================== Utilitários ======================
   /** Seleciona um elemento do DOM utilizando querySelector. */
@@ -285,9 +244,9 @@
       // Bloqueia alterações posteriores
       attrsLocked = true;
       // Escolhe raça e classe aleatórias
-      let __races = getEnabledRaces(); if (!__races.length) __races = RACES; const race = __races[randInt(0, __races.length - 1)];
+      const race = RACES[randInt(0, RACES.length - 1)];
       state.race = race;
-      let classKeys = getEnabledClasses(); if (!classKeys.length) classKeys = CLASSES;
+      const classKeys = CLASSES;
       const cls = classKeys[randInt(0, classKeys.length - 1)];
       state.cls = cls;
       // Seleciona uma origem aleatória da classe
@@ -438,8 +397,8 @@
     const classPlaceholder = el("option",{value:"", html:"Selecionar...", selected:true});
     raceSel.append(racePlaceholder);
     classSel.append(classPlaceholder);
-    getEnabledRaces().forEach(r => raceSel.append(el("option",{value:r, html:r})));
-    getEnabledClasses().forEach(c => classSel.append(el("option",{value:c, html:c})));
+    RACES.forEach(r => raceSel.append(el("option",{value:r, html:r})));
+    CLASSES.forEach(c => classSel.append(el("option",{value:c, html:c})));
   }
 
   function setupNameInput(){
@@ -590,10 +549,78 @@
     });
   }
 
-  // ====================== Bootstrap ======================
+  
+  // ====================== Disponibilidade (GM) ======================
+  let __availability = { classes:{}, races:{} };
+
+  function mergeAvailability(target, src){
+    if (!src) return target;
+    ["classes","races"].forEach(k => {
+      if (src[k] && typeof src[k] === "object"){
+        target[k] = target[k] || {};
+        Object.keys(src[k]).forEach(name => { target[k][name] = !!src[k][name]; });
+      }
+    });
+    return target;
+  }
+  function availabilityDefault(){
+    const def = { classes:{}, races:{} };
+    ALL_CLASSES.forEach(c => def.classes[c] = true);
+    ALL_RACES.forEach(r => def.races[r] = true);
+    return def;
+  }
+  function applyAvailability(av){
+    // Mutate arrays in-place so modules that captured references see updates
+    const enabledClasses = ALL_CLASSES.filter(c => av.classes[c] !== false);
+    const enabledRaces   = ALL_RACES.filter(r => av.races[r]   !== false);
+    CLASSES.length = 0; enabledClasses.forEach(c => CLASSES.push(c));
+    RACES.length   = 0; enabledRaces.forEach(r => RACES.push(r));
+  }
+  async function loadAvailability(){
+    // 1) defaults
+    __availability = availabilityDefault();
+    // 2) localStorage overlay (permite testar sem tornar global)
+    try {
+      const loc = localStorage.getItem("gmAvailability");
+      if (loc) mergeAvailability(__availability, JSON.parse(loc));
+    } catch {}
+    // 3) fetch global file (se existir)
+    try {
+      const resp = await fetch("config/availability.json", {cache:"no-store"});
+      if (resp.ok){
+        const data = await resp.json();
+        mergeAvailability(__availability, data);
+      }
+    } catch {}
+    applyAvailability(__availability);
+  }
+  // Expor no app
+  function getAvailability(){ return JSON.parse(JSON.stringify(__availability)); }
+
+// ====================== Bootstrap ======================
 	document.addEventListener('DOMContentLoaded', async () => {
-      // Carrega config global do GM antes de montar selects
-      if (typeof loadGMConfig === 'function') { await loadGMConfig(); }
+  await loadAvailability();
+  // Botão GM no cabeçalho
+  try {
+    const headerActions = document.querySelector('.header-actions');
+    if (headerActions){
+      const btnGM = document.createElement('button');
+      btnGM.id = 'btnGM';
+      btnGM.className = 'ghost';
+      btnGM.textContent = 'GM';
+      btnGM.addEventListener('click', () => {
+        const code = prompt('Código do GM:');
+        if (code === '123'){
+          sessionStorage.setItem('gmAuth','ok');
+          window.location.href = 'gm.html';
+        } else if (code !== null) {
+          alert('Código incorreto.');
+        }
+      });
+      headerActions.appendChild(btnGM);
+    }
+  } catch {}
+
 	  setupSelectOptions();
 	  setupNameInput();
 	  tryLoadFromHash();
@@ -637,15 +664,15 @@
     renderFinal,
     hideCreationUI,
     normalizeForView,
-    loadGMConfig,
-    getEnabledClasses,
-    getEnabledRaces,
-    getEnabledClasses,
-    getEnabledRaces,
     // Novas utilidades
     showCheck,
     // randomNameByRace e toggleMusic agora são definidos em módulos separados.
     generateEverything,
+    // GM availability
+    getAvailability,
+    applyAvailability,
+    ALL_CLASSES,
+    ALL_RACES,
     // estado e utilitários
     state,
     pending,

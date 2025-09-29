@@ -7,14 +7,14 @@
  * origens.js e prepara a interface para rolar pontos de vida e ouro.
  */
 (function(){
-  const { CLASSES, CLASS_DICE, pending, state, randInt, $, getEnabledClasses } = window.app;
+  const { CLASSES, CLASS_DICE, pending, state, randInt, $ } = window.app;
   const classSel = $("#classSelect");
   const btnRandClass = $("#btnRandClass");
   const btnConfirmClass = $("#btnConfirmClass");
   // Sorteia uma classe aleatória
   if (btnRandClass) {
     btnRandClass.addEventListener("click", () => {
-      let __classes = getEnabledClasses(); if (!__classes.length) __classes = CLASSES; const c = __classes[randInt(0, __classes.length - 1)];
+      const c = CLASSES[randInt(0, CLASSES.length - 1)];
       if (classSel) {
         classSel.value = c;
         if (classSel.options.length > 0) classSel.options[0].disabled = true;
