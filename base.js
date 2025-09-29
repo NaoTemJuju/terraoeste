@@ -42,6 +42,32 @@
     "Pactário":6,"Paladino":8,"Patrulheiro":8,"Sacerdote":6
   };
   const CLASSES = Object.keys(CLASS_DICE);
+  // ====== GM: Config remota global (Cloudflare Pages Functions + KV) ======
+  let __gmDisabled = { classes: new Set(), races: new Set(), loaded: false };
+  async function loadGMConfig(){
+    try {
+      const res = await fetch('/gm/config', { headers: { 'accept':'application/json' } });
+      if (res.ok){
+        const data = await res.json();
+        const dis = (data && data.disabled) || { classes:[], races:[] };
+        __gmDisabled.classes = new Set(dis.classes || []);
+        __gmDisabled.races   = new Set(dis.races || []);
+        __gmDisabled.loaded  = true;
+      } else {
+        __gmDisabled.loaded = true;
+      }
+    } catch(e){
+      // Em caso de falha de rede, considera tudo habilitado
+      __gmDisabled.loaded = true;
+    }
+  }
+  function getEnabledClasses(){
+    return CLASSES.filter(c => !__gmDisabled.classes.has(c));
+  }
+  function getEnabledRaces(){
+    return RACES.filter(r => !__gmDisabled.races.has(r));
+  }
+
   // ====== GM: Filtros de habilitação via localStorage ======
   function __loadDisabledSets(){
     try{
@@ -565,7 +591,9 @@
   }
 
   // ====================== Bootstrap ======================
-	document.addEventListener('DOMContentLoaded', () => {
+	document.addEventListener('DOMContentLoaded', async () => {
+      // Carrega config global do GM antes de montar selects
+      if (typeof loadGMConfig === 'function') { await loadGMConfig(); }
 	  setupSelectOptions();
 	  setupNameInput();
 	  tryLoadFromHash();
@@ -609,6 +637,9 @@
     renderFinal,
     hideCreationUI,
     normalizeForView,
+    loadGMConfig,
+    getEnabledClasses,
+    getEnabledRaces,
     getEnabledClasses,
     getEnabledRaces,
     // Novas utilidades

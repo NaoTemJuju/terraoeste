@@ -44,12 +44,15 @@
       <div id="racesArea" class="grid"></div>
     </div>
     <div class="row" style="margin-top:16px">
-      <a class="ghost" href="gm.html">Voltar ao Painel</a>
-      <a class="ghost" href="index.html" target="_blank">Abrir Gerador</a>
+      <button class="ghost" id="btnBack">Voltar ao Painel</button>
+      <button class="ghost" id="btnOpenGen">Abrir Gerador</button>
     </div>
   </div>
   <script src="base.js"></script>
   <script>
+    document.getElementById("btnBack").onclick = () => location.href = "gm.html";
+    document.getElementById("btnOpenGen").onclick = () => window.open("index.html","_blank");
+
     // Garante que apenas GMs (autenticados via prompt) vejam esta tela
     (function(){
       try {
@@ -61,23 +64,21 @@
     })();
 
     // Helpers de storage
-    function loadDisabled(){
-      let cls = [], rc = [];
-      try {
-        cls = JSON.parse(localStorage.getItem('gm_disabled_classes')||'[]');
-        rc  = JSON.parse(localStorage.getItem('gm_disabled_races')||'[]');
-      } catch(e){}
-      return {classes: new Set(cls), races: new Set(rc)};
+    async function apiGet(){
+      const r = await fetch('/gm/config', {headers:{'accept':'application/json'}});
+      if (!r.ok) throw new Error('Falha ao carregar config');
+      return (await r.json()).disabled || {classes:[], races:[]};
     }
-    function saveDisabled(sets){
-      try {
-        localStorage.setItem('gm_disabled_classes', JSON.stringify(Array.from(sets.classes)));
-        localStorage.setItem('gm_disabled_races', JSON.stringify(Array.from(sets.races)));
-      } catch(e){}
+    async function apiSave(disabled){
+      const code = (localStorage.getItem('gm_code')||'').trim() || prompt('Código GM:');
+      if (code) try{ localStorage.setItem('gm_code', code); }catch(e){}
+      const r = await fetch('/gm/config', {method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({ code, disabled })});
+      if (!r.ok) { const t = await r.text(); throw new Error('Falha ao salvar: '+t); }
+      return (await r.json()).disabled;
     }
 
     function render(){
-      const sets = loadDisabled();
+      const current = await apiGet(); const sets = { classes: new Set(current.classes||[]), races: new Set(current.races||[]) };
       // Usa listas do app (se base.js estiver carregado). Fallback para listas fixas:
       const classes = (window.app && window.app.CLASSES) ? window.app.CLASSES : [];
       const races   = (window.app && window.app.RACES) ? window.app.RACES : [];
@@ -96,7 +97,7 @@
         cb.checked = !sets[type].has(name); // checked = habilitado
         cb.addEventListener('change', () => {
           if (cb.checked) sets[type].delete(name); else sets[type].add(name);
-          saveDisabled(sets);
+          await apiSave({ classes: Array.from(sets.classes), races: Array.from(sets.races) });
         });
         const span = document.createElement('span');
         span.textContent = name;
@@ -111,20 +112,20 @@
       races.forEach(r => racesArea.appendChild(mkItem(r, 'races')));
 
       // Bulk actions
-      document.getElementById('btnEnableAllClasses').onclick = () => {
-        sets.classes.clear(); saveDisabled(sets); render();
+      document.getElementById('btnEnableAllClasses').onclick = async () => {
+        sets.classes.clear(); await apiSave({ classes: [], races: Array.from(sets.races) }); render();
       };
-      document.getElementById('btnDisableAllClasses').onclick = () => {
-        sets.classes = new Set(classes); saveDisabled(sets); render();
+      document.getElementById('btnDisableAllClasses').onclick = async () => {
+        sets.classes = new Set(classes); await apiSave({ classes: Array.from(sets.classes), races: Array.from(sets.races) }); render();
       };
-      document.getElementById('btnEnableAllRaces').onclick = () => {
-        sets.races.clear(); saveDisabled(sets); render();
+      document.getElementById('btnEnableAllRaces').onclick = async () => {
+        sets.races.clear(); await apiSave({ classes: Array.from(sets.classes), races: [] }); render();
       };
-      document.getElementById('btnDisableAllRaces').onclick = () => {
-        sets.races = new Set(races); saveDisabled(sets); render();
+      document.getElementById('btnDisableAllRaces').onclick = async () => {
+        sets.races = new Set(races); await apiSave({ classes: Array.from(sets.classes), races: Array.from(sets.races) }); render();
       };
     }
-    document.addEventListener('DOMContentLoaded', render);
+    document.addEventListener('DOMContentLoaded', () => render());
   </script>
 </body>
 </html>

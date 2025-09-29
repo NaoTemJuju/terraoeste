@@ -17,11 +17,14 @@
     <h2>Painel de GM</h2>
     <p>Bem-vindo! Use os atalhos abaixo para configurar o gerador.</p>
     <div class="gm-card gm-actions">
-      <a class="ghost" target="_blank" href="gm-classes.html">Classes/Raças</a>
-      <a class="ghost" href="index.html">Voltar ao Gerador</a>
+      <button class="ghost" id="btnGoClasses">Classes/Raças</button>
+      <button class="ghost" id="btnBack">Voltar ao Gerador</button>
     </div>
   </div>
   <script>
+    document.getElementById("btnGoClasses").onclick = () => window.open("gm-classes.html","_blank");
+    document.getElementById("btnBack").onclick = () => location.href = "index.html";
+
     // Verifica autenticação simples
     (function(){
       try {

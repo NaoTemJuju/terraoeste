@@ -227,7 +227,7 @@
     btnGM.addEventListener('click', () => {
       const code = prompt('Código GM:');
       if (code === '123'){
-        try { localStorage.setItem('gm_auth','1'); } catch {}
+        try { localStorage.setItem('gm_auth','1'); try{localStorage.setItem('gm_code', code);}catch(e){} } catch {}
         window.location.href = 'gm.html';
       } else if (code !== null) {
         alert('Código incorreto.');
