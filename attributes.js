@@ -71,12 +71,8 @@
       if (elapsed >= total) {
         clearInterval(it);
 
-        let scores;
-        // Garante pelo menos um atributo > 14
-        do { scores = ATTRS.map(() => roll3d6()); }
-        while (!scores.some(s => s > 14));
-
-        const mods = scores.map(modFromScore);
+        let scores = ATTRS.map(() => roll3d6());
+const mods = scores.map(modFromScore);
         state.attrs = scores;
         state.mods  = mods;
 
@@ -175,11 +171,8 @@
         if (elapsed >= total) {
           clearInterval(it);
 
-          let scores;
-          do { scores = ATTRS.map(() => roll3d6()); }
-          while (!scores.some(s => s > 14));
-
-          const mods = scores.map(modFromScore);
+          let scores = ATTRS.map(() => roll3d6());
+const mods = scores.map(modFromScore);
           state.attrs = scores;
           state.mods  = mods;
 
