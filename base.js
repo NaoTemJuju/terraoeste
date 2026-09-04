@@ -22,6 +22,26 @@
   const ATTRS = ["Força","Destreza","Constituição","Inteligência","Sabedoria","Carisma"];
 
   /**
+   * O sistema Shadowdark do Foundry VTT (mesmo com a interface em
+   * Português) espera que o campo `alignment` do JSON importado
+   * contenha uma das chaves internas em inglês ("Lawful", "Neutral",
+   * "Chaotic"), pois a localização PT-BR apenas traduz esses valores
+   * na exibição — não são aceitos como chave. Este site trabalha
+   * internamente em Português (Ordeiro/Neutro/Caótico), então
+   * convertendo apenas na hora de montar o JSON de exportação.
+   */
+  const ALIGNMENT_PT_TO_EN = { "Ordeiro":"Lawful", "Neutro":"Neutral", "Caótico":"Chaotic" };
+  const ALIGNMENT_EN_TO_PT = { "Lawful":"Ordeiro", "Neutral":"Neutro", "Chaotic":"Caótico" };
+  function alignmentToEN(pt){
+    if (!pt) return pt || "";
+    return ALIGNMENT_PT_TO_EN[pt] || pt;
+  }
+  function alignmentToPT(en){
+    if (!en) return en || "";
+    return ALIGNMENT_EN_TO_PT[en] || en;
+  }
+
+  /**
    * Lista de raças disponíveis. Cada raça possui habilidades
    * específicas definidas em módulos externos (por exemplo, línguas
    * concedidas em languages.js). A lógica de escolha e aleatoriedade
@@ -354,7 +374,7 @@
         classe: obj.class || "—",
         origem: obj.background || "—",
         origem_desc: "",
-        alinhamento: obj.alignment || "—",
+        alinhamento: alignmentToPT(obj.alignment) || "—",
         divindade: obj.deity || "—",
         linguas,
         atributos,
@@ -468,7 +488,7 @@
           stoutHitPointRoll: 0
         },
         title: "Aventureiro",
-        alignment: obj?.alinhamento || "",
+        alignment: alignmentToEN(obj?.alinhamento || ""),
         background: obj?.origem || "",
         deity: obj?.divindade || "",
         maxHitPoints: obj?.pv || 0,
@@ -684,6 +704,8 @@
     renderFinal,
     hideCreationUI,
     normalizeForView,
+    alignmentToEN,
+    alignmentToPT,
     // Novas utilidades
     showCheck,
     // randomNameByRace e toggleMusic agora são definidos em módulos separados.

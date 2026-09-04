@@ -248,7 +248,7 @@
         stoutHitPointRoll: 0
       },
       title,
-      alignment: align,
+      alignment: window.app.alignmentToEN ? window.app.alignmentToEN(align) : align,
       background,
       deity,
       maxHitPoints: state.hp ?? 1,
@@ -450,7 +450,7 @@
         stoutHitPointRoll: 0
       },
       title: "Aventureiro",
-      alignment: src?.alinhamento || "",
+      alignment: window.app.alignmentToEN ? window.app.alignmentToEN(src?.alinhamento || "") : (src?.alinhamento || ""),
       background: src?.origem || "",
       deity: src?.divindade || "",
       maxHitPoints: src?.pv || 0,
