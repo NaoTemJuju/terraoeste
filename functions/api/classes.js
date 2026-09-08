@@ -34,7 +34,8 @@ export async function onRequestGet({ env, request }){
 }
 export async function onRequestPost({ env, request }){
   const code = request.headers.get("X-GM-Code") || "";
-  if (code !== "123"){
+  const expected = env.GM_CODE || "";
+  if (!expected || code !== expected){
     return corsify(json({ error:"UNAUTHORIZED" }, { status: 401 }), request);
   }
   let incoming;
@@ -61,7 +62,8 @@ export async function onRequestPost({ env, request }){
 }
 export async function onRequestDelete({ env, request }){
   const code = request.headers.get("X-GM-Code") || "";
-  if (code !== "123"){
+  const expected = env.GM_CODE || "";
+  if (!expected || code !== expected){
     return corsify(json({ error:"UNAUTHORIZED" }, { status: 401 }), request);
   }
   const url = new URL(request.url);

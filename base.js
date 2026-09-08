@@ -656,7 +656,9 @@
     if (headerActions){
       const btnGM = document.createElement('button');
       btnGM.id = 'btnGM'; btnGM.className='ghost'; btnGM.textContent='GM';
-      btnGM.addEventListener('click', ()=>{ const code = prompt('Código do GM:'); if (code==='123'){ sessionStorage.setItem('gmAuth','ok'); window.location.href='gm.html'; } else if (code!==null){ alert('Código incorreto.'); } });
+      // A verificação real do código acontece em gm.html/gm.js, contra
+      // env.GM_CODE no servidor — este botão só navega até lá.
+      btnGM.addEventListener('click', ()=>{ window.location.href='gm.html'; });
       headerActions.appendChild(btnGM);
     }
   } catch {}

@@ -310,19 +310,19 @@
       out.innerHTML = `<pre>${JSON.stringify(renderObj, null, 2)}</pre>`;
     }
 
-    // Persistência opcional (Cloudflare)
+    // Persistência da ficha via API própria do site (mesmo domínio,
+    // sem depender de um Worker externo). Se falhar (rede fora do ar,
+    // etc.), cai no fallback local em encodeObjToHash mais abaixo.
     async function saveToCloud(data){
-      const endpoint = window.CF_ENDPOINT || null;
-      if (!endpoint) return null;
       try {
-        const response = await fetch(endpoint, {
+        const response = await fetch('/api/characters', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
         });
         if (!response.ok) return null;
         const result = await response.json();
-        return result.id || result.key || result.uuid || null;
+        return result.id || null;
       } catch(e){
         return null;
       }
@@ -491,10 +491,7 @@
       const id = url.searchParams.get("id");
       if (!id) return;
 
-      const endpoint = window.CF_ENDPOINT || null;
-      if (!endpoint) return;
-
-      const resp = await fetch(`${endpoint}?id=${encodeURIComponent(id)}`);
+      const resp = await fetch(`/api/characters?id=${encodeURIComponent(id)}`);
       if (!resp.ok) return;
 
       const obj = await resp.json();

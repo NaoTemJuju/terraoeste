@@ -5,7 +5,7 @@ export async function onRequestOptions({ request }) {
     headers: {
       "Access-Control-Allow-Origin": origin,
       "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, X-GM-Code",
+      "Access-Control-Allow-Headers": "Content-Type",
       "Vary": "Origin",
     },
   });
@@ -22,33 +22,38 @@ function corsify(resp, request){
   resp.headers.set("Cache-Control", "no-store");
   return resp;
 }
-const KV_KEY = "availability";
+
+// Reaproveita o mesmo namespace KV (binding "AVAIL") já usado por
+// availability.js e classes.js, com um prefixo próprio para não colidir
+// com as outras chaves ("availability", "classes").
+const KEY_PREFIX = "char_";
+
 export async function onRequestGet({ env, request }){
+  const url = new URL(request.url);
+  const id = url.searchParams.get("id");
+  if (!id) return corsify(json({ error: "ID_REQUIRED" }, { status: 400 }), request);
   try {
-    const raw = await env.AVAIL.get(KV_KEY);
-    const data = raw ? JSON.parse(raw) : { classes:{}, races:{} };
-    return corsify(json(data), request);
+    const raw = await env.AVAIL.get(KEY_PREFIX + id);
+    if (!raw) return corsify(json({ error: "NOT_FOUND" }, { status: 404 }), request);
+    return corsify(new Response(raw, { headers: { "content-type": "application/json; charset=utf-8" } }), request);
   } catch (e){
     return corsify(json({ error: "KV_GET_ERROR" }, { status: 500 }), request);
   }
 }
+
 export async function onRequestPost({ env, request }){
-  const code = request.headers.get("X-GM-Code") || "";
-  const expected = env.GM_CODE || "";
-  if (!expected || code !== expected){
-    return corsify(json({ error:"UNAUTHORIZED" }, { status: 401 }), request);
-  }
   let body;
   try {
     body = await request.json();
     if (!body || typeof body !== "object") throw new Error("bad");
   } catch {
-    return corsify(json({ error:"BAD_JSON" }, { status: 400 }), request);
+    return corsify(json({ error: "BAD_JSON" }, { status: 400 }), request);
   }
+  const id = (typeof crypto !== "undefined" && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2);
   try {
-    await env.AVAIL.put(KV_KEY, JSON.stringify(body));
-    return corsify(json({ ok:true }), request);
-  } catch {
-    return corsify(json({ error:"KV_PUT_ERROR" }, { status: 500 }), request);
+    await env.AVAIL.put(KEY_PREFIX + id, JSON.stringify(body));
+    return corsify(json({ ok: true, id }), request);
+  } catch (e){
+    return corsify(json({ error: "KV_PUT_ERROR" }, { status: 500 }), request);
   }
 }

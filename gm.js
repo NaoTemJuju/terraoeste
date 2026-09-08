@@ -1,14 +1,42 @@
-(function(){
-  // Autorização simples
-  if (sessionStorage.getItem('gmAuth') !== 'ok'){
-    const code = prompt('Código do GM:');
-    if (code === '123'){
-      sessionStorage.setItem('gmAuth','ok');
-    } else {
-      alert('Acesso negado.');
+(async function(){
+  // Autorização real: o código digitado é validado pelo servidor
+  // (env.GM_CODE), nunca comparado localmente. Guardamos o código em
+  // sessionStorage só para reenviá-lo nas próximas chamadas desta aba.
+  async function verifyGmCode(code){
+    try {
+      const r = await fetch('/api/gm-auth', {
+        method: 'POST',
+        headers: { 'X-GM-Code': code || '' }
+      });
+      return r.ok;
+    } catch {
+      return false;
+    }
+  }
+
+  let gmCode = sessionStorage.getItem('gmCode');
+  let authorized = gmCode ? await verifyGmCode(gmCode) : false;
+
+  while (!authorized){
+    gmCode = prompt('Código do GM:');
+    if (gmCode === null){
       location.href = 'index.html';
       return;
     }
+    authorized = await verifyGmCode(gmCode);
+    if (!authorized) alert('Código incorreto.');
+  }
+  sessionStorage.setItem('gmCode', gmCode);
+
+  // Se o código guardado nesta aba deixar de ser válido (ex.: foi trocado
+  // no ambiente), limpa e força um novo prompt na próxima ação.
+  function handleAuthFailure(resp){
+    if (resp && resp.status === 401){
+      sessionStorage.removeItem('gmCode');
+      alert('Código de GM inválido ou expirado. Recarregue a página para tentar de novo.');
+      return true;
+    }
+    return false;
   }
 
   const app = window.app;
@@ -63,13 +91,13 @@
     const av = readAvailabilityUI();
     const r = await fetch('/api/availability', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-GM-Code': '123' },
+      headers: { 'Content-Type': 'application/json', 'X-GM-Code': gmCode },
       body: JSON.stringify(av)
     });
     if (r.ok){
       alert('Salvo globalmente!');
       app.applyAvailability && app.applyAvailability(av);
-    } else {
+    } else if (!handleAuthFailure(r)) {
       alert('Falha ao salvar.');
     }
   });
@@ -193,8 +221,8 @@
         const btnE = document.createElement('button'); btnE.className='ghost'; btnE.textContent='Editar'; btnE.addEventListener('click', ()=>loadClassIntoForm(c));
         const btnD = document.createElement('button'); btnD.className='ghost'; btnD.textContent='Deletar'; btnD.addEventListener('click', async ()=>{
           if (!confirm(`Remover a classe \"${c.name}\"?`)) return;
-          const r = await fetch(`/api/classes?name=${encodeURIComponent(c.name)}`, { method:'DELETE', headers:{ 'X-GM-Code':'123' } });
-          if (r.ok){ listCustomClasses(); if (__editingName===c.name) clearForm(); } else alert('Falha ao remover.');
+          const r = await fetch(`/api/classes?name=${encodeURIComponent(c.name)}`, { method:'DELETE', headers:{ 'X-GM-Code': gmCode } });
+          if (r.ok){ listCustomClasses(); if (__editingName===c.name) clearForm(); } else if (!handleAuthFailure(r)) alert('Falha ao remover.');
         });
         row.append(btnE, btnD);
         card.append(h, small, row);
@@ -227,11 +255,11 @@
 
     const body = { classes:[{ name, hp, origins, languages:{ grant, bonus } }] };
     if (__editingName && __editingName !== name){
-      await fetch(`/api/classes?name=${encodeURIComponent(__editingName)}`, { method:'DELETE', headers:{ 'X-GM-Code':'123' } });
+      await fetch(`/api/classes?name=${encodeURIComponent(__editingName)}`, { method:'DELETE', headers:{ 'X-GM-Code': gmCode } });
     }
     const r = await fetch('/api/classes', {
       method: 'POST',
-      headers: { 'Content-Type':'application/json', 'X-GM-Code': '123' },
+      headers: { 'Content-Type':'application/json', 'X-GM-Code': gmCode },
       body: JSON.stringify(body)
     });
     if (r.ok){
@@ -240,7 +268,7 @@
       await listCustomClasses();
       // atualiza listas em memória para refletir imediatamente
       app.loadCustomClasses && app.loadCustomClasses();
-    } else {
+    } else if (!handleAuthFailure(r)) {
       alert('Falha ao salvar a classe.');
     }
   });
