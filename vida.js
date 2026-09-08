@@ -75,14 +75,19 @@
           const bonusStr = bonus === 0 ? "" : ` + MOD CON ${bonusFmt}`;
           
           state.hpBaseRoll = base;
+          // Guarda o "detalhe puro" do dado (sem o bônus de CON), pois neste
+          // momento os Atributos ainda não foram rolados/alocados. O bônus
+          // de CON será somado depois, na etapa de Atributos, e o texto
+          // final (state.hpDetail) será reconstruído lá.
+          state.hpDiceDetail = `${state.cls} d${sides} ${detail}`;
           state.hp = hp;
-          state.hpDetail = `${state.cls} d${sides} ${detail}${bonusStr}`;
+          state.hpDetail = `${state.hpDiceDetail}${bonusStr}`;
           
           // Exibe o resultado
           const hpOut = $("#hpOut");
           if (hpOut) {
             hpOut.style.display = "";
-            hpOut.textContent = `PV: ${hp}  —  ${state.hpDetail}`;
+            hpOut.textContent = `PV: ${hp}  —  ${state.hpDetail}  (provisório; bônus de CON entra após os Atributos)`;
           }
           
           // Feedback visual

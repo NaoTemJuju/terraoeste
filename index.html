@@ -119,7 +119,7 @@
        <div id="hpCountdownContainer"><span id="hpCountdown"></span> </div>
         <div class="progress"><div class="bar" id="hpBar"></div></div>
       </div>
-      <div class="hint">PV = dado da classe <em>+-</em> modificador de Constituição (mínimo 1 PV).</div>
+      <div class="hint">PV = dado da classe <em>+-</em> modificador de Constituição (mínimo 1 PV). O bônus de Constituição só é somado depois, quando você alocar os Atributos.</div>
     </section>
 
     <!-- Etapa 7: Ouro (movida para após PV) -->
@@ -155,11 +155,12 @@
       <div id="diceGifContainer"></div>
 
       <div id="attrsResult" style="display:none">
-        <table class="attrs" id="attrsTable"></table>
-        <div class="hint">Escolha em qual atributo cada valor rolado será alocado.</div>
+        <div class="hint">Arraste cada carta para o atributo desejado (ou toque na carta e depois no atributo). Toque numa caixinha já preenchida para trocar o valor de volta para a pilha.</div>
+        <div id="attrsCardsPool" class="attrs-cards-pool"></div>
+        <div id="attrsSlotsGrid" class="attrs-slots-grid"></div>
         <div class="row" style="margin-top:10px">
           <button id="btnConfirmAttrs" disabled>Continuar</button>
-          <button id="btnRerollAttrs" class="ghost">Rolar Novamente</button>
+          <button id="btnRerollAttrs" class="ghost">Rolar Novamente (1x)</button>
         </div>
       </div>
     </section>

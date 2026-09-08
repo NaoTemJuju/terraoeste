@@ -1,51 +1,39 @@
 /*
  * Módulo de Atributos
  *
- * Agora esta é a ÚLTIMA etapa antes do Nome. O jogador rola 3d6 seis
- * vezes (uma "pool" de 6 valores) e depois escolhe livremente em qual
- * atributo (Força, Destreza, Constituição, Inteligência, Sabedoria e
- * Carisma) cada valor rolado será alocado. Os resultados finais são
- * armazenados no estado global `app.state` e os modificadores
- * calculados utilizando a função `modFromScore` exposta pelo
- * base.js.
+ * Última etapa antes do Nome. O jogador rola 3d6 seis vezes (formando
+ * uma "pool" de 6 cartas) e depois aloca livremente cada carta em um
+ * dos 6 atributos (Força, Destreza, Constituição, Inteligência,
+ * Sabedoria e Carisma), arrastando a cartinha até a caixinha do
+ * atributo (no desktop) ou tocando na carta e depois na caixinha (no
+ * celular). Uma única re-rolagem é permitida.
+ *
+ * Como os Pontos de Vida (PV) agora são rolados ANTES desta etapa, o
+ * bônus de Constituição ainda não existe no momento da rolagem de PV.
+ * Por isso, ao confirmar os atributos aqui, recalculamos o PV final
+ * somando o modificador de Constituição recém-descoberto.
  */
 (function(){
-  // Extraia utilitários e estado compartilhado
   const { ATTRS, state, roll3d6, modFromScore, $, el, prettyMod, showCheck } = window.app;
 
-  // Referências aos elementos da UI desta etapa
   const btnRollAttrs    = $("#btnRollAttrs");
   const btnConfirmAttrs = $("#btnConfirmAttrs");
   const btnRerollAttrs  = $("#btnRerollAttrs");
+  const REROLL_LIMIT = 1;
 
-  // pool: os 6 valores rolados (3d6 cada), em nenhuma ordem de atributo específica
+  // pool: os 6 valores rolados (3d6 cada)
   let pool = [];
-  // assignment[i] = índice em `pool` alocado ao atributo ATTRS[i], ou null se ainda não escolhido
+  // assignment[i] = índice em `pool` alocado ao atributo ATTRS[i], ou null
   let assignment = new Array(ATTRS.length).fill(null);
-
-  // Estado interno para controle de confirmação de re-rolagem
+  // carta atualmente "na mão" (selecionada por toque), aguardando um destino
+  let heldPoolIdx = null;
+  // controla o fluxo de confirmação de re-rolagem (clique duplo)
   let rerollConfirmPending = false;
   let rerollOutsideHandler;
+  let rerollsUsed = 0;
 
-  /**
-   * Retorna true quando todos os 6 atributos já receberam um valor.
-   */
   function isFullyAssigned(){
     return assignment.every(v => v !== null && v !== undefined);
-  }
-
-  /**
-   * Índices de `pool` já usados por outros atributos (excluindo o
-   * próprio atributo `excludeAttrIdx`, para que seu valor atual
-   * continue aparecendo como opção selecionada).
-   */
-  function usedIndices(excludeAttrIdx){
-    const used = new Set();
-    assignment.forEach((poolIdx, attrIdx) => {
-      if (attrIdx === excludeAttrIdx) return;
-      if (poolIdx !== null && poolIdx !== undefined) used.add(poolIdx);
-    });
-    return used;
   }
 
   function updateConfirmState(){
@@ -53,57 +41,149 @@
     btnConfirmAttrs.disabled = window.app.attrsLocked || !isFullyAssigned();
   }
 
-  /**
-   * Renderiza a tabela de atributos com um <select> por linha,
-   * permitindo escolher qual valor rolado vai para cada atributo.
-   */
-  function renderAssignment(){
-    const table = $("#attrsTable");
-    if (!table) return;
+  function updateRerollButtonLabel(){
+    if (!btnRerollAttrs) return;
+    if (rerollsUsed >= REROLL_LIMIT){
+      btnRerollAttrs.disabled = true;
+      btnRerollAttrs.textContent = "Rerolagem já usada";
+    } else {
+      btnRerollAttrs.textContent = "Rolar Novamente (1x)";
+    }
+  }
 
-    table.innerHTML = "";
-    table.append(
-      el("tr",{},
-        el("th",{html:"Atributo"}),
-        el("th",{html:"Valor"}),
-        el("th",{html:"Mod"})
-      )
-    );
+  /**
+   * Renderiza a pilha de cartas ainda não alocadas.
+   */
+  function renderPool(){
+    const poolEl = $("#attrsCardsPool");
+    if (!poolEl) return;
+    poolEl.innerHTML = "";
+
+    pool.forEach((val, poolIdx) => {
+      const isAssigned = assignment.includes(poolIdx);
+      if (isAssigned) return; // já está numa caixinha
+
+      const card = el("div", {
+        class: "attr-card" + (heldPoolIdx === poolIdx ? " selected" : ""),
+        draggable: "true",
+        role: "button",
+        tabindex: "0",
+        "aria-label": `Valor rolado ${val}`,
+        html: String(val)
+      });
+
+      if (window.app.attrsLocked) {
+        card.setAttribute("draggable", "false");
+      } else {
+        card.addEventListener("click", () => {
+          heldPoolIdx = (heldPoolIdx === poolIdx) ? null : poolIdx;
+          renderAll();
+        });
+
+        card.addEventListener("dragstart", (ev) => {
+          card.classList.add("dragging");
+          ev.dataTransfer.setData("text/plain", JSON.stringify({ poolIdx, fromAttrIdx: null }));
+        });
+        card.addEventListener("dragend", () => card.classList.remove("dragging"));
+      }
+
+      poolEl.append(card);
+    });
+
+    // Permite soltar uma carta de volta na pilha (devolver de uma caixinha)
+    poolEl.ondragover = (ev) => { if (!window.app.attrsLocked) ev.preventDefault(); };
+    poolEl.ondrop = (ev) => {
+      ev.preventDefault();
+      if (window.app.attrsLocked) return;
+      let payload;
+      try { payload = JSON.parse(ev.dataTransfer.getData("text/plain")); } catch { return; }
+      if (payload && payload.fromAttrIdx !== null && payload.fromAttrIdx !== undefined) {
+        assignment[payload.fromAttrIdx] = null;
+        renderAll();
+      }
+    };
+  }
+
+  /**
+   * Renderiza as 6 caixinhas de atributo (destino das cartas).
+   */
+  function renderSlots(){
+    const grid = $("#attrsSlotsGrid");
+    if (!grid) return;
+    grid.innerHTML = "";
 
     ATTRS.forEach((attrName, attrIdx) => {
-      const select = el("select", { "aria-label": `Valor para ${attrName}` });
-      select.disabled = window.app.attrsLocked;
+      const poolIdx = assignment[attrIdx];
+      const filled = (poolIdx !== null && poolIdx !== undefined);
+      const locked = window.app.attrsLocked;
 
-      select.append(new Option("--", ""));
-
-      const used = usedIndices(attrIdx);
-      pool.forEach((val, poolIdx) => {
-        if (used.has(poolIdx)) return; // já alocado em outro atributo
-        select.append(new Option(String(val), String(poolIdx)));
+      const slot = el("div", {
+        class: "attr-slot" + (filled ? " filled" : "") + (locked ? " locked" : ""),
+        role: "button",
+        tabindex: "0",
+        "aria-label": `Atributo ${attrName}`
       });
 
-      const current = assignment[attrIdx];
-      select.value = (current !== null && current !== undefined) ? String(current) : "";
+      slot.append(el("div", { class: "slot-label", html: attrName }));
 
-      select.addEventListener("change", () => {
-        const v = select.value;
-        assignment[attrIdx] = (v === "") ? null : Number(v);
-        renderAssignment();
-        updateConfirmState();
-      });
+      if (filled) {
+        const val = pool[poolIdx];
+        slot.append(el("div", { class: "slot-value", html: String(val) }));
+        slot.append(el("div", { class: "slot-mod", html: `Mod ${prettyMod(modFromScore(val))}` }));
 
-      const modVal = (current !== null && current !== undefined)
-        ? prettyMod(modFromScore(pool[current]))
-        : "—";
+        if (!locked) {
+          slot.setAttribute("draggable", "true");
+          slot.addEventListener("dragstart", (ev) => {
+            slot.classList.add("dragging");
+            ev.dataTransfer.setData("text/plain", JSON.stringify({ poolIdx, fromAttrIdx: attrIdx }));
+          });
+          slot.addEventListener("dragend", () => slot.classList.remove("dragging"));
+        }
+      } else {
+        slot.append(el("div", { class: "slot-placeholder", html: "Arraste ou toque numa carta" }));
+      }
 
-      table.append(
-        el("tr",{},
-          el("td",{html:attrName}),
-          el("td",{}, select),
-          el("td",{class:"mod", html: modVal})
-        )
-      );
+      if (!locked) {
+        slot.addEventListener("click", () => {
+          if (heldPoolIdx !== null) {
+            // Coloca a carta da mão aqui (o valor anterior, se houver, volta pra pilha)
+            assignment[attrIdx] = heldPoolIdx;
+            heldPoolIdx = null;
+          } else if (filled) {
+            // Pega a carta desta caixinha de volta pra mão
+            heldPoolIdx = poolIdx;
+            assignment[attrIdx] = null;
+          }
+          renderAll();
+        });
+
+        slot.addEventListener("dragover", (ev) => { ev.preventDefault(); slot.classList.add("dragover"); });
+        slot.addEventListener("dragleave", () => slot.classList.remove("dragover"));
+        slot.addEventListener("drop", (ev) => {
+          ev.preventDefault();
+          slot.classList.remove("dragover");
+          let payload;
+          try { payload = JSON.parse(ev.dataTransfer.getData("text/plain")); } catch { return; }
+          if (!payload) return;
+
+          const displaced = assignment[attrIdx];
+          if (payload.fromAttrIdx !== null && payload.fromAttrIdx !== undefined) {
+            assignment[payload.fromAttrIdx] = displaced; // troca entre duas caixinhas
+          }
+          assignment[attrIdx] = payload.poolIdx;
+          if (heldPoolIdx === payload.poolIdx) heldPoolIdx = null;
+          renderAll();
+        });
+      }
+
+      grid.append(slot);
     });
+  }
+
+  function renderAll(){
+    renderPool();
+    renderSlots();
+    updateConfirmState();
   }
 
   /**
@@ -118,10 +198,9 @@
     let elapsed = 0, total = 5000, tick = 100;
     bar.style.width = "0%";
 
-    const countdownElement = $("#attrsCountdown"); // Elemento do contador
-    let countdownTime = 5; // Começa com 5 segundos
+    const countdownElement = $("#attrsCountdown");
+    let countdownTime = 5;
 
-    // Exibe o GIF de dado à esquerda do texto "Rolando dados..."
     const diceGif = document.createElement("img");
     diceGif.src = "https://images.emojiterra.com/google/noto-emoji/animated-emoji/1f3b2.gif";
     diceGif.alt = "Rolando dados";
@@ -141,9 +220,7 @@
       bar.style.width = width + "%";
 
       const rollNumber = $("#rollNumber");
-      if (rollNumber) {
-        rollNumber.textContent = Math.floor(width);
-      }
+      if (rollNumber) rollNumber.textContent = Math.floor(width);
 
       if (countdownElement) {
         countdownTime = Math.max(0, Math.floor((total - elapsed) / 1000));
@@ -153,19 +230,17 @@
       if (elapsed >= total) {
         clearInterval(it);
 
-        // Rola 3d6 seis vezes, formando a pool de valores disponíveis
         pool = Array.from({ length: ATTRS.length }, () => roll3d6());
         assignment = new Array(ATTRS.length).fill(null);
+        heldPoolIdx = null;
 
-        renderAssignment();
+        renderAll();
 
         $("#rolling").style.display = "none";
         $("#attrsResult").style.display = "";
 
         window.app.attrsLocked = false;
-
-        if (btnRerollAttrs)  btnRerollAttrs.disabled  = false;
-        updateConfirmState();
+        updateRerollButtonLabel();
       }
     }, tick);
   }
@@ -176,10 +251,7 @@
       $("#stepAttrs").style.display = "";
       window.app.attrsLocked = false;
 
-      if (btnRerollAttrs)  btnRerollAttrs.disabled  = false;
       if (btnConfirmAttrs) btnConfirmAttrs.disabled = true;
-
-      // esconde o botão inicial "Rolar Atributos"
       btnRollAttrs.style.display = "none";
 
       doRoll();
@@ -189,14 +261,14 @@
   if (btnRerollAttrs) {
     btnRerollAttrs.addEventListener("click", (ev) => {
       ev.stopPropagation();
-      if (window.app.attrsLocked) return;
+      if (window.app.attrsLocked || rerollsUsed >= REROLL_LIMIT) return;
 
       if (!rerollConfirmPending) {
         rerollConfirmPending = true;
 
         const originalText = btnRerollAttrs.dataset.originalText || btnRerollAttrs.textContent;
         btnRerollAttrs.dataset.originalText = originalText;
-        btnRerollAttrs.textContent = "Confirmar";
+        btnRerollAttrs.textContent = "Confirmar (só resta 1x)";
 
         rerollOutsideHandler = function(e) {
           if (e.target !== btnRerollAttrs) {
@@ -210,13 +282,13 @@
       }
 
       rerollConfirmPending = false;
-      const originalText = btnRerollAttrs.dataset.originalText || "Rolar Novamente";
-      btnRerollAttrs.textContent = originalText;
       if (rerollOutsideHandler) document.removeEventListener('click', rerollOutsideHandler);
+
+      rerollsUsed += 1;
 
       try { window.sfx && window.sfx.play('sfx-dice', { volume: 1, overlap: false }); } catch {}
 
-      doRoll();
+      doRoll(); // doRoll() chama updateRerollButtonLabel() ao final, já refletindo o novo rerollsUsed
     });
   }
 
@@ -224,24 +296,36 @@
     btnConfirmAttrs.addEventListener("click", () => {
       if (!isFullyAssigned()) return;
 
-      // Monta os valores finais na ordem de ATTRS, a partir da alocação escolhida
       const scores = ATTRS.map((_, i) => pool[assignment[i]]);
       const mods = scores.map(modFromScore);
       state.attrs = scores;
       state.mods  = mods;
 
+      // Recalcula o PV agora que o modificador de Constituição é conhecido
+      // (o PV foi rolado antes desta etapa, sem o bônus de CON).
+      if (Number.isFinite(state.hpBaseRoll)) {
+        const conMod = mods[ATTRS.indexOf("Constituição")] || 0;
+        const bonusFmt = conMod > 0 ? `+${conMod}` : `${conMod}`;
+        const bonusStr = conMod === 0 ? "" : ` + MOD CON ${bonusFmt}`;
+        state.hp = Math.max(1, state.hpBaseRoll + conMod);
+        state.hpDetail = `${state.hpDiceDetail || ""}${bonusStr}`;
+
+        const hpOut = $("#hpOut");
+        if (hpOut) {
+          hpOut.style.display = "";
+          hpOut.textContent = `PV: ${state.hp}  —  ${state.hpDetail}`;
+        }
+      }
+
       window.app.attrsLocked = true;
-
-      if (btnRerollAttrs)  btnRerollAttrs.disabled  = true;
+      if (btnRerollAttrs) btnRerollAttrs.disabled = true;
       btnConfirmAttrs.disabled = true;
+      heldPoolIdx = null;
 
-      // Re-renderiza para travar os selects visualmente
-      renderAssignment();
+      renderAll(); // re-renderiza travando cartas e caixinhas
 
-      // Marca visual de confirmação (✔) ao lado do botão Confirmar
       try { showCheck?.(btnConfirmAttrs); } catch {}
 
-      // Avança para a etapa de Nome (agora a próxima etapa do fluxo)
       if (typeof window.app.goToName === "function") {
         window.app.goToName();
       } else {
@@ -268,15 +352,15 @@
       $("#rolling").style.display = "none";
       $("#attrsResult").style.display = "";
       if (btnRollAttrs) btnRollAttrs.style.display = "none";
+      renderAll();
+      updateRerollButtonLabel();
       if (btnRerollAttrs) btnRerollAttrs.disabled = true;
-      renderAssignment();
-      updateConfirmState();
     } else {
       $("#attrsResult").style.display = "none";
       $("#rolling").style.display = "none";
       if (btnRollAttrs) btnRollAttrs.style.display = "";
       if (btnConfirmAttrs) btnConfirmAttrs.disabled = true;
-      if (btnRerollAttrs) btnRerollAttrs.disabled = true;
+      updateRerollButtonLabel();
     }
 
     step.scrollIntoView({ behavior:"smooth", block:"start" });

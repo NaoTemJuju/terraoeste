@@ -383,3 +383,76 @@ button.primary:active:not(:disabled){background:linear-gradient(#7c2624,#5c1c1a)
   .gm-tab{padding:10px 14px; font-size:15px}
   .gm-panel{padding:14px}
 }
+
+/* ===================== ATRIBUTOS — cartas e caixinhas =====================
+   Pool de "cartinhas" horizontais com os valores rolados (3d6 x6) e
+   caixinhas de destino para cada Atributo, com suporte a arrastar-e-soltar
+   (desktop) e toque (celular).
+============================================================================ */
+.attrs-cards-pool{
+  display:flex; flex-wrap:wrap; gap:12px;
+  padding:14px; margin-top:10px;
+  border:1px dashed rgba(59,44,26,.4); border-radius:14px;
+  background:rgba(0,0,0,.03);
+  min-height:86px;
+}
+.attrs-cards-pool:empty::after{
+  content:"Todos os valores já foram alocados.";
+  color:var(--muted); font-style:italic; font-size:14px; align-self:center;
+}
+.attr-card{
+  display:flex; align-items:center; justify-content:center;
+  width:62px; height:78px; border-radius:10px;
+  border:1px solid var(--border);
+  background:linear-gradient(180deg,#fff8e8,#f3e3bd);
+  box-shadow:var(--shadow);
+  font-family:"Droid Serif", Georgia, serif;
+  font-size:26px; font-weight:800; color:var(--ink);
+  cursor:grab; user-select:none; touch-action:none;
+  transition:transform .12s ease, box-shadow .12s ease;
+}
+.attr-card:hover{transform:translateY(-3px)}
+.attr-card:active{cursor:grabbing}
+.attr-card.dragging{opacity:.4}
+.attr-card.selected{
+  border-color:var(--accent-2);
+  box-shadow:0 0 0 3px rgba(140,47,47,.35), var(--shadow);
+  transform:translateY(-3px);
+}
+
+.attrs-slots-grid{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:12px; margin-top:16px;
+}
+.attr-slot{
+  position:relative; border-radius:14px; padding:12px;
+  border:2px solid rgba(59,44,26,.35);
+  background:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,.15));
+  min-height:96px; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:4px;
+  transition:border-color .12s ease, background .12s ease, transform .12s ease;
+}
+.attr-slot .slot-label{
+  font-weight:700; letter-spacing:.5px; color:var(--muted); font-size:14px;
+  text-transform:uppercase;
+}
+.attr-slot .slot-value{
+  font-size:30px; font-weight:800; color:var(--ink); line-height:1;
+}
+.attr-slot .slot-mod{font-size:14px; color:var(--muted)}
+.attr-slot .slot-placeholder{color:#8e857c; font-size:13px; font-style:italic; text-align:center}
+.attr-slot.filled{
+  border-style:solid; border-color:var(--accent);
+  background:linear-gradient(180deg,#fff8e8,#f3e3bd);
+  cursor:pointer;
+}
+.attr-slot.dragover{
+  border-color:var(--accent-2); transform:translateY(-2px);
+  box-shadow:0 0 0 3px rgba(140,47,47,.2);
+}
+.attr-slot.locked{cursor:default; opacity:.9}
+
+@media (max-width:640px){
+  .attr-card{width:54px; height:68px; font-size:22px}
+  .attrs-slots-grid{grid-template-columns:repeat(2,1fr)}
+}
