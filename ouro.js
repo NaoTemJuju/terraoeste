@@ -66,13 +66,10 @@
           // Esconde animação de rolagem
           if (goldRolling) goldRolling.style.display = "none";
           
-          // Após definir o ouro, avança para a etapa de Atributos
-          // (agora a última etapa antes do Nome). Se a função de
-          // navegação de atributos não existir, cai para Nome e,
-          // por fim, para a finalização direta como antes.
-          if (window.app && typeof window.app.goToAttrs === 'function') {
-            try { window.app.goToAttrs(); } catch {}
-          } else if (window.app && typeof window.app.goToName === 'function') {
+          // Após definir o ouro, avança para a etapa de Nome.
+          // Se a função de navegação de nome existir, chama-a;
+          // caso contrário finaliza diretamente como antes.
+          if (window.app && typeof window.app.goToName === 'function') {
             try { window.app.goToName(); } catch {}
           } else if (window.app && typeof window.app.finalizeCharacter === 'function') {
             window.app.finalizeCharacter();
