@@ -53,7 +53,8 @@
   const btnReload = $("#btnReload");
   const btnEnableAll = $("#btnEnableAll");
   const btnDisableAll = $("#btnDisableAll");
-  const btnTabCR = $("#btnTabCR");
+  const btnTabAvail = $("#btnTabAvail");
+  const btnTabClasses = $("#btnTabClasses");
 
   function makeCheck(name, kind, checked){
     const label = document.createElement('label');
@@ -115,9 +116,16 @@
     classesList.querySelectorAll('input').forEach(ch => ch.checked = false);
     racesList.querySelectorAll('input').forEach(ch => ch.checked = false);
   });
-  btnTabCR?.addEventListener('click', () => {
-    document.getElementById('tabCR').scrollIntoView({behavior:'smooth', block:'start'});
-  });
+  // ------- Abas -------
+  function showTab(tabId){
+    document.querySelectorAll('.gm-panel').forEach(p => p.classList.toggle('active', p.id === tabId));
+    document.querySelectorAll('.gm-tab').forEach(btn => {
+      const isActive = btn.getAttribute('aria-controls') === tabId;
+      btn.setAttribute('aria-selected', String(isActive));
+    });
+  }
+  btnTabAvail?.addEventListener('click', () => showTab('panelAvail'));
+  btnTabClasses?.addEventListener('click', () => showTab('panelClasses'));
 
   // ------- Adicionar/Editar classes personalizadas -------
   const clsName = document.getElementById('clsName');
@@ -151,7 +159,7 @@
     clsName.value = c.name || '';
     clsHP.value = String(c.hp || '6');
     makeOriginInputs();
-    const boxes = originsWrap.querySelectorAll('.field');
+    const boxes = originsWrap.querySelectorAll('.gm-origin');
     (c.origins||[]).forEach((o,i)=>{
       const b = boxes[i]; if (!b) return;
       b.querySelector('input').value = o.titulo || o.title || '';
@@ -163,7 +171,7 @@
     langBonusCommon.value = (c.languages?.bonus?.common)||0;
     langBonusRare.value = (c.languages?.bonus?.rare)||0;
     __editingName = c.name;
-    if (editBanner) editBanner.style.display = '';
+    if (editBanner) { editBanner.style.display = ''; editBanner.scrollIntoView({behavior:'smooth', block:'center'}); }
     if (editingNameEl) editingNameEl.textContent = c.name;
   }
 
@@ -173,14 +181,19 @@
     originsWrap.innerHTML = '';
     for (let i=0;i<6;i++){
       const box = document.createElement('div');
-      box.className = 'field';
+      box.className = 'gm-origin';
+      const head = document.createElement('div');
+      head.className = 'gm-origin-head';
+      const num = document.createElement('span');
+      num.className = 'gm-origin-num';
+      num.textContent = String(i+1);
+      head.append(num, `Origem ${i+1}`);
       const t = document.createElement('input');
       t.type = 'text';
       t.placeholder = `Título da origem #${i+1}`;
       const d = document.createElement('textarea');
       d.placeholder = 'Descrição (opcional)';
-      box.appendChild(t);
-      box.appendChild(d);
+      box.append(head, t, d);
       originsWrap.appendChild(box);
     }
   }
@@ -201,41 +214,54 @@
   }
 
   async function listCustomClasses(){
-    customClassList.innerHTML = '<em class="muted">Carregando...</em>';
+    customClassList.innerHTML = '<p class="gm-empty">Carregando...</p>';
     try {
       const r = await fetch('/api/classes', { headers:{'cache-control':'no-store'} });
       const data = await r.json();
       const arr = Array.isArray(data.classes) ? data.classes : [];
       if (!arr.length){
-        customClassList.innerHTML = '<em class="muted">Nenhuma classe extra.</em>';
+        customClassList.innerHTML = '<p class="gm-empty">Nenhuma classe extra cadastrada ainda.</p>';
         return;
       }
-      const wrap = document.createElement('div');
-      wrap.className = 'grid-2';
+      const table = document.createElement('table');
+      table.className = 'gm-table';
+      table.innerHTML = '<thead><tr><th>Classe</th><th>PV</th><th>Origens</th><th>Línguas concedidas</th><th></th></tr></thead>';
+      const tbody = document.createElement('tbody');
       arr.forEach(c => {
-        const card = document.createElement('div');
-        card.className = 'card list';
-        const h = document.createElement('div');
-        h.innerHTML = `<strong>${c.name}</strong> <span class="badge">PV d${c.hp||'?'}</span>`;
-        const small = document.createElement('div');
-        small.className = 'muted';
-        small.textContent = `${(c.origins||[]).length} origem(ns), línguas: ${((c.languages?.grant)||[]).join(', ') || '—'}`;
-        const row = document.createElement('div');
-        row.className = 'row'; row.style.gap = '.5rem';
-        const btnE = document.createElement('button'); btnE.className='ghost'; btnE.textContent='Editar'; btnE.addEventListener('click', ()=>loadClassIntoForm(c));
-        const btnD = document.createElement('button'); btnD.className='ghost'; btnD.textContent='Deletar'; btnD.addEventListener('click', async ()=>{
-          if (!confirm(`Remover a classe \"${c.name}\"?`)) return;
+        const tr = document.createElement('tr');
+
+        const tdName = document.createElement('td');
+        tdName.innerHTML = `<strong>${c.name}</strong>`;
+
+        const tdHP = document.createElement('td');
+        tdHP.innerHTML = `<span class="badge">d${c.hp||'?'}</span>`;
+
+        const tdOrigins = document.createElement('td');
+        tdOrigins.textContent = `${(c.origins||[]).length} de 6`;
+
+        const tdLangs = document.createElement('td');
+        tdLangs.textContent = ((c.languages?.grant)||[]).join(', ') || '—';
+
+        const tdActions = document.createElement('td');
+        tdActions.className = 'actions';
+        const btnE = document.createElement('button'); btnE.className='ghost'; btnE.textContent='Editar';
+        btnE.addEventListener('click', ()=>loadClassIntoForm(c));
+        const btnD = document.createElement('button'); btnD.className='ghost'; btnD.textContent='Excluir';
+        btnD.addEventListener('click', async ()=>{
+          if (!confirm(`Remover a classe "${c.name}"?`)) return;
           const r = await fetch(`/api/classes?name=${encodeURIComponent(c.name)}`, { method:'DELETE', headers:{ 'X-GM-Code': gmCode } });
           if (r.ok){ listCustomClasses(); if (__editingName===c.name) clearForm(); } else if (!handleAuthFailure(r)) alert('Falha ao remover.');
         });
-        row.append(btnE, btnD);
-        card.append(h, small, row);
-        wrap.appendChild(card);
+        tdActions.append(btnE, btnD);
+
+        tr.append(tdName, tdHP, tdOrigins, tdLangs, tdActions);
+        tbody.appendChild(tr);
       });
+      table.appendChild(tbody);
       customClassList.innerHTML = '';
-      customClassList.appendChild(wrap);
+      customClassList.appendChild(table);
     } catch {
-      customClassList.innerHTML = '<em class="muted">Erro ao carregar lista.</em>';
+      customClassList.innerHTML = '<p class="gm-empty">Erro ao carregar a lista.</p>';
     }
   }
 
@@ -246,7 +272,7 @@
     if (![4,6,8,10,12].includes(hp)){ alert('PV inválido. Use d4, d6, d8, d10, d12.'); return; }
 
     const origins = [];
-    originsWrap.querySelectorAll('.field').forEach(box => {
+    originsWrap.querySelectorAll('.gm-origin').forEach(box => {
       const t = box.querySelector('input')?.value?.trim() || '';
       const d = box.querySelector('textarea')?.value?.trim() || '';
       if (t) origins.push({ titulo: t, d });
