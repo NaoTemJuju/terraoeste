@@ -57,15 +57,14 @@
           let base;
           let detail;
           
-          if (state.race === "Anão") {
-            const r1 = roll(1, sides).total;
-            const r2 = roll(1, sides).total;
-            base = Math.max(r1, r2);
-            detail = `(${r1} e ${r2} → vantagem = ${base})`;
-          } else {
-            base = roll(1, sides).total;
-            detail = `(${base})`;
-          }
+		  if (state.race === "Anão") {
+		    base = roll(1, sides).total;
+		    base += 2;
+		    detail = `(${base - 2} + 2 de bônus racial)`;
+		  } else {
+		    base = roll(1, sides).total;
+		    detail = `(${base})`;
+		  }
           
           const bonus = conMod;
           const hp = Math.max(1, base + bonus);
