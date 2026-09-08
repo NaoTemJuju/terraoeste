@@ -7,10 +7,80 @@
  * Continuar, a próxima etapa (classe) é revelada.
  */
 (function(){
-  const { RACES, pending, state, randInt, $ } = window.app;
+  const { RACES, pending, state, randInt, $, el } = window.app;
   const raceSel = $("#raceSelect");
   const btnRandRace = $("#btnRandRace");
   const btnConfirmRace = $("#btnConfirmRace");
+
+  /**
+   * Revela a etapa de Classe (e demais resets de UI) após a raça (e,
+   * se necessário, o talento racial) estarem definidos.
+   */
+  function advanceToClassStep(){
+    const stepClass = $("#stepClass");
+    if (stepClass) {
+      stepClass.style.display = "";
+      stepClass.scrollIntoView({ behavior:"smooth", block:"start" });
+    }
+  }
+
+  /**
+   * Caso a raça escolhida conceda um talento com opções (ex.: Elfo,
+   * Gnomo), exibe os botões de escolha dentro de #raceTalentArea e só
+   * libera a etapa de Classe após a confirmação. Caso contrário,
+   * resolve o talento automaticamente (fixo ou inexistente) e segue
+   * direto para a Classe.
+   */
+  function resolveRaceTalent(race){
+    const area = $("#raceTalentArea");
+    if (!area) { advanceToClassStep(); return; }
+
+    const rt = window.raceTalents;
+    if (!rt || !rt.needsChoice(race)) {
+      state.raceTalentKey = null;
+      area.style.display = "none";
+      area.innerHTML = "";
+      advanceToClassStep();
+      return;
+    }
+
+    // Raça com escolha: monta a UI de seleção.
+    area.innerHTML = "";
+    area.style.display = "";
+    const options = rt.getChoiceOptions(race);
+
+    const label = el("div", { class: "pill" }, `Talento racial (${rt.getRaceTalentSpec(race).label || "escolha"}):`);
+    area.append(label);
+
+    const wrap = el("div", { class: "row" });
+    let selected = null;
+    const btnConfirmTalent = el("button", { disabled: "disabled" }, "Confirmar Talento");
+
+    const optionButtons = options.map(opt => {
+      const b = el("button", { class: "ghost", type: "button" }, opt.name);
+      b.title = opt.desc || "";
+      b.addEventListener("click", () => {
+        selected = opt.key;
+        optionButtons.forEach(ob => ob.classList.remove("selected"));
+        b.classList.add("selected");
+        btnConfirmTalent.disabled = false;
+      });
+      wrap.append(b);
+      return b;
+    });
+
+    wrap.append(btnConfirmTalent);
+    area.append(wrap);
+
+    btnConfirmTalent.addEventListener("click", () => {
+      if (!selected) return;
+      state.raceTalentKey = selected;
+      optionButtons.forEach(ob => ob.disabled = true);
+      btnConfirmTalent.disabled = true;
+      try { window.app && window.app.showCheck && window.app.showCheck(btnConfirmTalent); } catch {}
+      advanceToClassStep();
+    });
+  }
   // Sorteia uma raça aleatória
   if (btnRandRace) {
     btnRandRace.addEventListener("click", () => {
@@ -42,11 +112,8 @@
       btnConfirmRace.disabled = true;
       // Feedback visual
       try { window.app && window.app.showCheck && window.app.showCheck(btnConfirmRace); } catch {}
-      const stepClass = $("#stepClass");
-      if (stepClass) {
-        stepClass.style.display = "";
-        stepClass.scrollIntoView({ behavior:"smooth", block:"start" });
-      }
+      // Resolve o talento racial (pode exigir escolha) antes de liberar a Classe
+      resolveRaceTalent(state.race);
     });
   }
 })();
