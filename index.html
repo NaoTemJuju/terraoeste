@@ -52,37 +52,8 @@
       </div>
     </section>
 
-    <!-- REMOVIDA a etapa isolada com "Rolar Atributos" -->
-    <!-- Etapa 2: Atributos (com o botão dentro do próprio card) -->
-	<!-- Exemplo de estrutura de HTML para exibir o dado animado -->
-	<section id="stepAttrs">
-	  <div class="attrs-head">
-		<h2>ATRIBUTOS</h2>
-		<button id="btnRollAttrs" type="button">Rolar Atributos</button>
-	  </div>
-
-	  <div id="rolling" style="display:none">
-		<div id="attrsCountdownContainer"><strong>Rolando dados...</strong> <span id="attrsCountdown">(5s)</span></div>
-		<div class="progress">
-		  <div class="bar" id="rollBar"></div>
-		</div>
-	  </div>
-
-	  <!-- Contêiner para o dado animado -->
-	  <div id="diceGifContainer"></div>
-
-	  <div id="attrsResult" style="display:none">
-		<table class="attrs" id="attrsTable"></table>
-		<div class="row" style="margin-top:10px">
-		  <button id="btnConfirmAttrs">Continuar</button>
-		  <button id="btnRerollAttrs" class="ghost">Rolar Novamente</button>
-		</div>
-	  </div>
-	</section>
-
-
-    <!-- Etapa 3: Raça -->
-    <section id="stepRace" style="display:none">
+    <!-- Etapa 3: Raça (agora é a primeira etapa do fluxo) -->
+    <section id="stepRace">
       <h2>RAÇA</h2>
       <div class="row">
         <select id="raceSelect" aria-label="Escolher raça"></select>
@@ -166,7 +137,34 @@
       <div class="hint">Este resultado não pode ser rolado novamente para este personagem.</div>
     </section>
 
-    <!-- Etapa 7.5: Nome (após OURO) -->
+    <!-- Etapa 8.75: Atributos (agora é a última etapa antes do Nome) -->
+    <section id="stepAttrs" style="display:none">
+      <div class="attrs-head">
+        <h2>ATRIBUTOS</h2>
+        <button id="btnRollAttrs" type="button">Rolar Atributos</button>
+      </div>
+
+      <div id="rolling" style="display:none">
+        <div id="attrsCountdownContainer"><strong>Rolando dados...</strong> <span id="attrsCountdown">(5s)</span></div>
+        <div class="progress">
+          <div class="bar" id="rollBar"></div>
+        </div>
+      </div>
+
+      <!-- Contêiner para o dado animado -->
+      <div id="diceGifContainer"></div>
+
+      <div id="attrsResult" style="display:none">
+        <table class="attrs" id="attrsTable"></table>
+        <div class="hint">Escolha em qual atributo cada valor rolado será alocado.</div>
+        <div class="row" style="margin-top:10px">
+          <button id="btnConfirmAttrs" disabled>Continuar</button>
+          <button id="btnRerollAttrs" class="ghost">Rolar Novamente</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Etapa 9: Nome (após Atributos) -->
     <section id="stepNameEntry" style="display:none">
       <h2>NOME</h2>
       <div class="name-row">
