@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Painel do Mestre — As Terras do Oeste</title>
+  <link rel="icon" type="image/png" href="favicon.ico">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="gm-page">
+  <!-- Escondido por padrão: só fica visível depois que gm.js confirma o
+       código junto ao servidor (/api/gm-auth). Isso vale tanto pra quem
+       vem pelo botão GM quanto pra quem digita a URL direto. -->
+  <div class="wrap" id="gmRoot" style="visibility:hidden">
+    <header class="gm-topbar">
+      <div>
+        <h1><span class="gm-seal" aria-hidden="true"></span>Painel do Mestre</h1>
+        <div class="sub">Disponibilidade de classes/raças e classes personalizadas</div>
+      </div>
+      <div class="header-actions">
+        <a class="ghost" href="index.html">⬅ Voltar ao criador</a>
+      </div>
+    </header>
+
+    <nav class="gm-tabs" role="tablist" aria-label="Seções do painel">
+      <button id="btnTabAvail" class="gm-tab" role="tab" aria-selected="true" aria-controls="panelAvail">Disponibilidade</button>
+      <button id="btnTabClasses" class="gm-tab" role="tab" aria-selected="false" aria-controls="panelClasses">Classes Personalizadas</button>
+    </nav>
+
+    <!-- ==================== Aba: Disponibilidade ==================== -->
+    <section id="panelAvail" class="gm-panel active" role="tabpanel" aria-labelledby="btnTabAvail">
+      <div class="gm-card">
+        <div class="gm-card-head">
+          <h2>Classes e raças habilitadas</h2>
+          <span class="count">Desmarque o que não estiver liberado nesta mesa</span>
+        </div>
+
+        <div class="gm-columns">
+          <div>
+            <h3>Classes</h3>
+            <div id="classesList" class="gm-checklist"></div>
+          </div>
+          <div>
+            <h3>Raças</h3>
+            <div id="racesList" class="gm-checklist"></div>
+          </div>
+        </div>
+
+        <div class="gm-toolbar">
+          <div class="left">
+            <button id="btnEnableAll" class="ghost">Habilitar tudo</button>
+            <button id="btnDisableAll" class="ghost">Desabilitar tudo</button>
+          </div>
+          <div class="right">
+            <button id="btnReload" class="ghost">Recarregar</button>
+            <button id="btnSave" class="primary">Salvar globalmente</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= Aba: Classes Personalizadas ================= -->
+    <section id="panelClasses" class="gm-panel" role="tabpanel" aria-labelledby="btnTabClasses">
+
+      <div class="gm-card">
+        <div class="gm-card-head">
+          <h2>Classes extras cadastradas</h2>
+          <button id="btnListClasses" class="ghost">Atualizar lista</button>
+        </div>
+        <div id="customClassList"><p class="gm-empty">Carregando...</p></div>
+      </div>
+
+      <div class="gm-card">
+        <div class="gm-card-head">
+          <h2>Adicionar / editar classe</h2>
+        </div>
+
+        <div class="gm-edit-banner" id="editBanner" style="display:none">
+          <strong>Editando:</strong> <span id="editingName" class="muted"></span>
+          <button id="btnCancelEdit" class="ghost">Cancelar edição</button>
+        </div>
+
+        <fieldset class="gm-fieldset">
+          <legend>Identidade</legend>
+          <div class="gm-columns">
+            <div class="field"><label>Nome da classe</label><input id="clsName" type="text" placeholder="Ex.: Arqueiro-Sombras"></div>
+            <div class="field"><label>Pontos de Vida — dado</label>
+              <select id="clsHP">
+                <option value="4">d4</option>
+                <option value="6" selected>d6</option>
+                <option value="8">d8</option>
+                <option value="10">d10</option>
+              </select>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="gm-fieldset">
+          <legend>Origens (as 6 possibilidades desta classe)</legend>
+          <div id="originsWrap" class="gm-origins"></div>
+        </fieldset>
+
+        <fieldset class="gm-fieldset">
+          <legend>Línguas</legend>
+          <div class="gm-lang-grid">
+            <div>
+              <div class="muted" style="margin-bottom:.4rem;">Concedidas automaticamente pela classe</div>
+              <div id="langGrant" class="grid-auto"></div>
+            </div>
+            <div>
+              <div class="muted" style="margin-bottom:.4rem;">Extras para o jogador escolher</div>
+              <div class="field"><label>Comuns (+)</label><input id="langBonusCommon" type="number" min="0" step="1" value="0" style="min-width:80px"></div>
+              <div class="field"><label>Raras (+)</label><input id="langBonusRare" type="number" min="0" step="1" value="0" style="min-width:80px"></div>
+            </div>
+          </div>
+        </fieldset>
+
+        <div class="gm-toolbar" style="border-top:none; margin-top:6px; padding-top:0;">
+          <div class="left"></div>
+          <div class="right">
+            <button id="btnAddClass" class="primary">Salvar classe globalmente</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="base.js"></script>
+  <script src="gm.js"></script>
+</body>
+</html>

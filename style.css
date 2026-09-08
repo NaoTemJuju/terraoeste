@@ -1,0 +1,385 @@
+/* === RPG THEME — West Marches Inspired (v2) ==============================
+Fixes & tweaks:
+- Progress bar now animates width reliably (.progress .bar).
+- Added CSS custom property support: set style="--value: 65" on .progress.
+- Buttons use SOLID borders (no dashed) including .ghost variant.
+- Focus ring improved (no dotted outline).
+- Minor contrast/spacing tweaks.
+============================================================================ */
+
+/* Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Droid+Serif:ital,wght@0,400;0,700;1,400&display=swap');
+
+:root{
+  --paper:#f6eedc; --paper-2:#efe7d1;
+  --ink:#2a241f; --fg:#2a241f; --muted:#6a5f55;
+  --border:#3b2c1a; --accent:#c59a4a; --accent-2:#8c2f2f;
+  --success:#3f7d3f; --danger:#b93636;
+  --shadow:0 6px 18px rgba(30,20,10,.18), inset 0 1px 0 rgba(255,255,255,.25);
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background: url("6fa912a2-ef13-45da-96c6-f39966a378a2.png") repeat;
+  color:var(--ink);
+  font-family:"Droid Serif", Georgia, serif;
+  font-size:18px; line-height:1.5;
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+}
+
+.wrap{
+  max-width:980px; margin:0 auto; padding:36px 24px 84px;
+  background: linear-gradient(0deg,var(--paper) 0%, var(--paper-2) 100%);
+  border:1px solid var(--border); border-radius:16px; box-shadow:var(--shadow);
+}
+
+header{display:flex; align-items:center; justify-content:space-between; gap:16px;
+  margin-bottom:24px; border-bottom:2px solid var(--border); padding-bottom:16px;}
+h1,h2,h3{font-family:"Droid Serif", Georgia, serif; letter-spacing:.5px; color:var(--ink)}
+h1{font-size:clamp(28px,4.2vw,44px); margin:0}
+h2{font-size:clamp(20px,2.8vw,28px); margin:0 0 12px}
+.sub{color:var(--muted); font-size:15px}
+
+section{
+  position:relative; border:1px solid var(--border); border-radius:14px;
+  padding:20px; margin:18px 0;
+  background:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,.15)), rgba(255,255,255,.25);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);
+}
+
+.row{display:flex; flex-wrap:wrap; gap:12px; align-items:center}
+.field{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+.grid{display:grid; gap:12px}
+.cols-2{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+
+/* Inputs & selects */
+input[type="text"], select{
+  background:#f9f3e3; color:var(--ink);
+  border:1px solid var(--border); border-radius:10px;
+  padding:12px 14px; outline:none; min-width:260px; font:inherit;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.25);
+}
+input::placeholder{color:#8e857c}
+select{background-image:linear-gradient(180deg, rgba(0,0,0,.04), rgba(0,0,0,0));}
+
+/* Solid focus ring (no dotted/tracejado) */
+:focus{outline:none}
+input:focus, select:focus, button:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(197,154,74,.28), inset 0 1px 0 rgba(255,255,255,.3);
+}
+
+/* Buttons — SOLID borders (also applied to <a class="ghost"/"primary"> so link-buttons match) */
+button, a.ghost, a.primary{
+  display:inline-flex; align-items:center; justify-content:center;
+  appearance:none; border:1px solid var(--border);
+  background:linear-gradient(#d7ba71,#b08a3a); color:#1f160b;
+  padding:12px 16px; border-radius:999px; cursor:pointer; font-weight:700;
+  letter-spacing:.3px; transition:transform .06s ease, box-shadow .2s ease, background .2s ease;
+  box-shadow:var(--shadow); text-shadow:0 1px 0 rgba(255,255,255,.35);
+  text-decoration:none; line-height:1.2;
+}
+button:hover:not(:disabled), a.ghost:hover, a.primary:hover{transform:translateY(-1px); box-shadow:0 8px 22px rgba(30,20,10,.25)}
+button:active:not(:disabled), a.ghost:active, a.primary:active{transform:translateY(0); background:linear-gradient(#b08a3a,#8e6e29)}
+button:disabled{opacity:.65; cursor:not-allowed}
+
+/* Ghost variant now solid (no dashed) */
+button.ghost, a.ghost{
+  background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,0));
+  color:var(--ink);
+  border-style:solid;   /* <-- changed from dashed */
+}
+
+/* Pills */
+.pill{
+  display:inline-flex; align-items:center; gap:8px;
+  border:1px solid var(--border); padding:10px 12px; border-radius:999px;
+  background:#f9f3e3; color:var(--ink);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.3);
+}
+
+/* Progress (FIXED) -------------------------------------------------------- */
+.progress{
+  --value: 0;                 /* optional: JS may set style="--value: 70" */
+  width:100%; height:12px; background:#e8dcc5;
+  border:1px solid var(--border); border-radius:999px; overflow:hidden; margin-top:10px;
+  box-shadow:inset 0 2px 4px rgba(0,0,0,.12);
+}
+/* Allow either .bar width via inline style or via --value variable */
+.progress .bar,
+.bar{
+  display:block; height:100%;
+  background:linear-gradient(90deg, var(--accent), #fff);
+  /* If inline style sets width, it wins; otherwise use --value */
+  width: calc(var(--value) * 1%);
+  transition: width .25s ease;   /* smoother */
+  will-change: width;
+}
+
+/* Utility to animate from 0 when mounting */
+.progress.animate .bar{ width:0 }
+.progress.animate.start .bar{ width: calc(var(--value) * 1%); }
+
+/* Table & misc */
+.attrs{width:100%; border-collapse:collapse; margin-top:6px; font-size:17px;}
+.attrs th,.attrs td{border-bottom:1px solid rgba(59,44,26,.25); padding:10px 8px; text-align:left}
+.attrs th{font-weight:700; font-family:"Droid Serif", Georgia, serif;}
+.attrs tr:nth-child(even){background-color:rgba(0,0,0,.03)}
+.attrs td.score{font-weight:800}
+.attrs .mod{opacity:.95}
+
+.final{
+  border:2px dashed rgba(59,44,26,.7);
+  margin-top: 12px;
+  padding:16px; border-radius:12px;
+  background:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,.15));
+}
+
+.hint{color:#6e5d49; font-size:14px; margin-top:8px}
+.ok{color:var(--success)} .danger{color:var(--danger)}
+
+a.link{color:var(--accent-2); text-decoration:underline; text-decoration-style:dotted}
+a.link:hover{text-decoration-style:wavy; text-underline-offset:3px}
+
+@media (prefers-reduced-motion: reduce){
+  .progress .bar{transition:none}
+  button{transition:none}
+}
+
+@media (max-width:640px){
+  .wrap{padding:24px 16px 64px}
+}
+
+/* ==================== LÍNGUAS (fix alinhamento) ===========================
+   Mantém a .pill “Concedidas: …” e os botões “Aleatório” e “Continuar”
+   lado a lado, com espaçamento consistente.
+   ------------------------------------------------------------------------ */
+#stepLang .lang-head{
+  display:flex;
+  align-items:center;
+  gap:12px;          /* espaço entre a pill e os botões */
+  flex-wrap:wrap;    /* quebra em telas pequenas */
+}
+#stepLang .lang-actions{
+  display:flex;
+  align-items:center;
+  gap:12px;          /* espaço entre “Aleatório” e “Continuar” */
+}
+/* Fallback caso não exista .lang-actions no HTML */
+#stepLang .lang-head .pill + button{ margin-left:12px; }
+#stepLang .lang-head .pill + button + button{ margin-left:12px; }
+
+@media (max-width:640px){
+  #stepLang .lang-head{ gap:10px }
+  #stepLang .lang-actions{ gap:10px }
+}
+/* ===== LÍNGUAS — alinhamento + espaçamento ================================= */
+
+/* Espaço entre a pill/botões e as escolhas de línguas */
+#stepLang .lang-head{
+  margin-bottom: 14px;          /* espaço abaixo da pill + botões */
+}
+
+/* Cada linha de língua (rótulo + select) vira um grid 2 colunas alinhado */
+#stepLang .field{
+  display: grid;
+  grid-template-columns: 150px 1fr;  /* 1ª col: rótulo fixo | 2ª col: select expande */
+  column-gap: 8px;
+  align-items: flex;
+}
+
+/* Remove variações de margem do rótulo e garante largura fixa */
+#stepLang .field label{
+  margin: 0;
+  min-width: 0;                  /* evita somar largura extra */
+  white-space: nowrap;           /* mantém “Língua Comum #1:” numa linha */
+}
+
+/* Select ocupa toda a segunda coluna, alinhando todos os inícios */
+#stepLang .field select{
+  width: 50%;
+  min-width: 0;                  /* permite encolher no grid */
+}
+
+/* Espaçamento vertical entre linhas */
+#stepLang .field + .field{
+  margin-top: 7px;
+}
+
+/* Responsivo: empilha rótulo acima do select em telas pequenas */
+@media (max-width: 640px){
+  #stepLang .field{
+    grid-template-columns: 1fr;
+    row-gap: 6px;
+  }
+  #stepLang .field label{
+    white-space: normal;
+  }
+}
+/* ===== LÍNGUAS — melhorias no mobile (largura e toque) =================== */
+@media (max-width: 640px){
+  /* Empilha rótulo acima do select e dá mais respiro */
+  #stepLang .field{
+    grid-template-columns: 1fr;
+    row-gap: 10px;
+  }
+
+  /* Rótulo normal, sem quebra forçada */
+  #stepLang .field label{
+    white-space: normal;
+    margin-bottom: 2px;
+  }
+
+  /* Select mais largo e fácil de tocar */
+  #stepLang .field select{
+    width: 100%;          /* ocupa toda a linha no celular */
+    min-width: 0;
+    font-size: 18px;      /* um pouco maior */
+    padding: 14px 16px;   /* área de toque maior */
+    min-height: 48px;     /* altura mínima confortável */
+  }
+
+  /* Espaço extra abaixo da pill e botões */
+  #stepLang .lang-head{
+    margin-bottom: 18px;
+  }
+}
+
+
+.grid-3{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:.75rem;}
+
+.grid-auto{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:.5rem;}
+
+/* ===================== Painel do Mestre (gm.html) =========================
+   Reaproveita a paleta "West Marches" do site (parchment/dourado), mas usa
+   o vermelho de selo de cera (--accent-2) como cor de autoridade do GM nas
+   ações administrativas — pra diferenciar visualmente de uma ficha de
+   jogador sem sair da identidade do site.
+============================================================================ */
+.gm-page .wrap{max-width:1080px}
+
+.gm-topbar{
+  display:flex; align-items:flex-start; justify-content:space-between;
+  gap:16px; padding-bottom:16px; margin-bottom:20px;
+  border-bottom:2px solid var(--border);
+}
+.gm-topbar h1{font-size:clamp(22px,3.2vw,32px); margin:0; display:flex; align-items:center}
+.gm-seal{
+  display:inline-block; width:11px; height:11px; border-radius:50%;
+  background:var(--accent-2); margin-right:12px;
+  box-shadow:0 0 0 3px rgba(140,47,47,.18);
+}
+
+.gm-tabs{display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap}
+.gm-tab{
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.35); color:var(--muted);
+  padding:10px 20px; border-radius:10px; cursor:pointer;
+  font-weight:700; font-family:"Droid Serif",Georgia,serif;
+  box-shadow:none; transform:none;
+}
+.gm-tab:hover:not(:disabled){transform:none; box-shadow:none; background:rgba(255,255,255,.55)}
+.gm-tab[aria-selected="true"]{
+  background:linear-gradient(180deg,var(--paper),var(--paper-2));
+  color:var(--ink); border-color:var(--accent-2);
+  box-shadow:inset 0 0 0 1px var(--accent-2);
+}
+.gm-panel{
+  display:none;
+  border:1px solid var(--border);
+  border-radius:14px; padding:20px;
+  background:linear-gradient(180deg,rgba(255,255,255,.4),rgba(255,255,255,.12));
+  margin-bottom:24px;
+}
+.gm-panel.active{display:block}
+
+.gm-card{
+  border:1px solid var(--border); border-radius:14px; padding:20px;
+  background:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,.15)), rgba(255,255,255,.25);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);
+}
+.gm-card + .gm-card{margin-top:18px}
+.gm-card-head{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; flex-wrap:wrap}
+.gm-card-head h2{margin:0; font-size:clamp(18px,2.2vw,22px)}
+.gm-card-head .count{color:var(--muted); font-size:14px}
+
+.gm-columns{display:grid; grid-template-columns:1fr 1fr; gap:24px}
+@media (max-width:760px){ .gm-columns{grid-template-columns:1fr} }
+
+.gm-checklist{display:grid; gap:4px; max-height:320px; overflow:auto; padding-right:4px; margin-top:8px}
+.gm-checklist .check{
+  display:flex; align-items:center; gap:10px;
+  padding:8px 10px; border-radius:8px; border:1px solid transparent; margin:0;
+}
+.gm-checklist .check:hover{background:rgba(0,0,0,.03); border-color:rgba(59,44,26,.15)}
+.gm-checklist input[type=checkbox]{width:18px; height:18px}
+
+.gm-toolbar{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  flex-wrap:wrap; margin-top:20px; padding-top:16px; border-top:1px solid rgba(59,44,26,.2);
+}
+.gm-toolbar .left, .gm-toolbar .right{display:flex; gap:10px; flex-wrap:wrap}
+
+button.primary{
+  background:linear-gradient(#a8433f,#7c2624); color:#fbe9e4;
+  border-color:#5c1c1a; text-shadow:0 1px 0 rgba(0,0,0,.25);
+}
+button.primary:hover:not(:disabled){box-shadow:0 8px 22px rgba(92,28,26,.35)}
+button.primary:active:not(:disabled){background:linear-gradient(#7c2624,#5c1c1a)}
+
+/* Tabela de classes personalizadas */
+.gm-table{width:100%; border-collapse:collapse; font-size:16px; margin-top:4px}
+.gm-table th{
+  text-align:left; font-family:"Droid Serif",Georgia,serif; font-weight:700;
+  border-bottom:2px solid var(--border); padding:8px 10px; color:var(--muted); font-size:14px;
+}
+.gm-table td{border-bottom:1px solid rgba(59,44,26,.2); padding:12px 10px; vertical-align:top}
+.gm-table tr:last-child td{border-bottom:none}
+.gm-table .badge{
+  display:inline-block; padding:2px 10px; border-radius:999px; font-size:13px;
+  border:1px solid var(--border); background:#f9f3e3; white-space:nowrap;
+}
+.gm-table .actions{display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap}
+.gm-table .actions button{padding:8px 14px; font-size:14px}
+
+/* Formulário de classe */
+.gm-fieldset{border:none; padding:0; margin:0 0 22px}
+.gm-fieldset legend{
+  font-family:"Droid Serif",Georgia,serif; font-weight:700; font-size:16px;
+  color:var(--ink); padding:0 0 8px; border-bottom:1px solid rgba(59,44,26,.25);
+  margin-bottom:14px; width:100%;
+}
+.gm-origins{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:12px}
+.gm-origin{
+  border:1px solid rgba(59,44,26,.25); border-radius:10px; padding:12px;
+  background:rgba(255,255,255,.35); position:relative;
+}
+.gm-origin-num{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:22px; height:22px; border-radius:50%; background:var(--accent-2); color:#fbe9e4;
+  font-size:12px; font-weight:700; margin-right:8px; flex:none;
+}
+.gm-origin .gm-origin-head{display:flex; align-items:center; margin-bottom:8px; font-weight:700; color:var(--muted); font-size:14px}
+.gm-origin input[type=text]{width:100%; min-width:0; margin-bottom:8px}
+.gm-origin textarea{
+  width:100%; min-height:64px; resize:vertical; font:inherit;
+  background:#f9f3e3; border:1px solid var(--border); border-radius:8px; padding:8px 10px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.25);
+}
+
+.gm-lang-grid{display:grid; grid-template-columns:1fr 1fr; gap:24px}
+@media (max-width:760px){ .gm-lang-grid{grid-template-columns:1fr} }
+
+.gm-edit-banner{
+  display:flex; align-items:center; gap:10px; padding:10px 14px; margin-bottom:18px;
+  border:1px solid var(--accent-2); border-radius:10px; background:rgba(140,47,47,.08);
+}
+
+.gm-empty{color:var(--muted); font-style:italic; padding:10px 0; margin:0}
+
+@media (max-width:640px){
+  .gm-tab{padding:10px 14px; font-size:15px}
+  .gm-panel{padding:14px}
+}

@@ -1,0 +1,31 @@
+{
+  "classes": {
+    "Assassino": true,
+    "Bárbaro": true,
+    "Bardo": true,
+    "Bruxo": true,
+    "Caçador": true,
+    "Cavaleiro": true,
+    "Druida": true,
+    "Explorador": true,
+    "Feiticeiro": true,
+    "Guerreiro": true,
+    "Mago": true,
+    "Malandro": true,
+    "Pactário": true,
+    "Paladino": true,
+    "Patrulheiro": true,
+    "Sacerdote": true
+  },
+  "races": {
+    "Anão": true,
+    "Elfo": true,
+    "Gnomo": true,
+    "Goblin": true,
+    "Humano": true,
+    "Meio-Elfo": true,
+    "Meio-Orc": true,
+    "Pequenino": true
+  },
+  "_note": "Edite este arquivo e faça commit para tornar global. Criado por Painel de GM."
+}
