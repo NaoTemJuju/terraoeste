@@ -1,10 +1,11 @@
 /*
  * Módulo de Atributos
  *
- * Responsável por rolar os valores de atributos do personagem (Força,
- * Destreza, Constituição, Inteligência, Sabedoria e Carisma) e
- * permitir que o usuário confirme ou role novamente. Os resultados
- * são armazenados no estado global `app.state` e os modificadores
+ * Agora esta é a ÚLTIMA etapa antes do Nome. O jogador rola 3d6 seis
+ * vezes (uma "pool" de 6 valores) e depois escolhe livremente em qual
+ * atributo (Força, Destreza, Constituição, Inteligência, Sabedoria e
+ * Carisma) cada valor rolado será alocado. Os resultados finais são
+ * armazenados no estado global `app.state` e os modificadores
  * calculados utilizando a função `modFromScore` exposta pelo
  * base.js.
  */
@@ -17,16 +18,99 @@
   const btnConfirmAttrs = $("#btnConfirmAttrs");
   const btnRerollAttrs  = $("#btnRerollAttrs");
 
+  // pool: os 6 valores rolados (3d6 cada), em nenhuma ordem de atributo específica
+  let pool = [];
+  // assignment[i] = índice em `pool` alocado ao atributo ATTRS[i], ou null se ainda não escolhido
+  let assignment = new Array(ATTRS.length).fill(null);
+
   // Estado interno para controle de confirmação de re-rolagem
   let rerollConfirmPending = false;
   let rerollOutsideHandler;
 
   /**
-   * Executa a rolagem de atributos.
+   * Retorna true quando todos os 6 atributos já receberam um valor.
    */
-  function doReroll(){
-    if (window.app.attrsLocked) return;
+  function isFullyAssigned(){
+    return assignment.every(v => v !== null && v !== undefined);
+  }
 
+  /**
+   * Índices de `pool` já usados por outros atributos (excluindo o
+   * próprio atributo `excludeAttrIdx`, para que seu valor atual
+   * continue aparecendo como opção selecionada).
+   */
+  function usedIndices(excludeAttrIdx){
+    const used = new Set();
+    assignment.forEach((poolIdx, attrIdx) => {
+      if (attrIdx === excludeAttrIdx) return;
+      if (poolIdx !== null && poolIdx !== undefined) used.add(poolIdx);
+    });
+    return used;
+  }
+
+  function updateConfirmState(){
+    if (!btnConfirmAttrs) return;
+    btnConfirmAttrs.disabled = window.app.attrsLocked || !isFullyAssigned();
+  }
+
+  /**
+   * Renderiza a tabela de atributos com um <select> por linha,
+   * permitindo escolher qual valor rolado vai para cada atributo.
+   */
+  function renderAssignment(){
+    const table = $("#attrsTable");
+    if (!table) return;
+
+    table.innerHTML = "";
+    table.append(
+      el("tr",{},
+        el("th",{html:"Atributo"}),
+        el("th",{html:"Valor"}),
+        el("th",{html:"Mod"})
+      )
+    );
+
+    ATTRS.forEach((attrName, attrIdx) => {
+      const select = el("select", { "aria-label": `Valor para ${attrName}` });
+      select.disabled = window.app.attrsLocked;
+
+      select.append(new Option("--", ""));
+
+      const used = usedIndices(attrIdx);
+      pool.forEach((val, poolIdx) => {
+        if (used.has(poolIdx)) return; // já alocado em outro atributo
+        select.append(new Option(String(val), String(poolIdx)));
+      });
+
+      const current = assignment[attrIdx];
+      select.value = (current !== null && current !== undefined) ? String(current) : "";
+
+      select.addEventListener("change", () => {
+        const v = select.value;
+        assignment[attrIdx] = (v === "") ? null : Number(v);
+        renderAssignment();
+        updateConfirmState();
+      });
+
+      const modVal = (current !== null && current !== undefined)
+        ? prettyMod(modFromScore(pool[current]))
+        : "—";
+
+      table.append(
+        el("tr",{},
+          el("td",{html:attrName}),
+          el("td",{}, select),
+          el("td",{class:"mod", html: modVal})
+        )
+      );
+    });
+  }
+
+  /**
+   * Executa a animação de rolagem e, ao final, sorteia os 6 valores
+   * (3d6 cada) e reinicia a alocação.
+   */
+  function doRoll(){
     $("#rolling").style.display = "";
     $("#attrsResult").style.display = "none";
 
@@ -41,14 +125,14 @@
     const diceGif = document.createElement("img");
     diceGif.src = "https://images.emojiterra.com/google/noto-emoji/animated-emoji/1f3b2.gif";
     diceGif.alt = "Rolando dados";
-    diceGif.style.width = "20px"; // Ajuste conforme necessário
-    diceGif.style.marginRight = "5px"; // Espaço à direita do gif
+    diceGif.style.width = "20px";
+    diceGif.style.marginRight = "5px";
 
     const countdownContainer = document.querySelector("#attrsCountdownContainer");
     if (countdownContainer) {
-      countdownContainer.innerHTML = ""; // Limpa o conteúdo atual
-      countdownContainer.appendChild(diceGif); // Adiciona o gif à esquerda
-      countdownContainer.innerHTML += "<strong>Rolando dados...</strong> "; // Frase
+      countdownContainer.innerHTML = "";
+      countdownContainer.appendChild(diceGif);
+      countdownContainer.innerHTML += "<strong>Rolando dados...</strong> ";
     }
 
     const it = setInterval(() => {
@@ -56,27 +140,24 @@
       const width = Math.min(100, Math.floor(elapsed / total * 100));
       bar.style.width = width + "%";
 
-      // Atualiza o número ao lado da barra de progresso
       const rollNumber = $("#rollNumber");
       if (rollNumber) {
-        rollNumber.textContent = Math.floor(width);  // Sincroniza número com a barra
+        rollNumber.textContent = Math.floor(width);
       }
 
-      // Atualiza o contador de segundos
       if (countdownElement) {
-        countdownTime = Math.max(0, Math.floor((total - elapsed) / 1000)); // Decrementa o tempo
-        countdownElement.textContent = `(${countdownTime}s)`; // Atualiza exibição do contador
+        countdownTime = Math.max(0, Math.floor((total - elapsed) / 1000));
+        countdownElement.textContent = `(${countdownTime}s)`;
       }
 
       if (elapsed >= total) {
         clearInterval(it);
 
-        let scores = ATTRS.map(() => roll3d6());
-const mods = scores.map(modFromScore);
-        state.attrs = scores;
-        state.mods  = mods;
+        // Rola 3d6 seis vezes, formando a pool de valores disponíveis
+        pool = Array.from({ length: ATTRS.length }, () => roll3d6());
+        assignment = new Array(ATTRS.length).fill(null);
 
-        renderAttrs(scores, mods);
+        renderAssignment();
 
         $("#rolling").style.display = "none";
         $("#attrsResult").style.display = "";
@@ -84,104 +165,24 @@ const mods = scores.map(modFromScore);
         window.app.attrsLocked = false;
 
         if (btnRerollAttrs)  btnRerollAttrs.disabled  = false;
-        if (btnConfirmAttrs) btnConfirmAttrs.disabled = false;
+        updateConfirmState();
       }
     }, tick);
-  }
-
-  /**
-   * Renderiza a tabela de atributos.
-   */
-  function renderAttrs(scores, mods){
-    const table = $("#attrsTable");
-    if (!table) return;
-
-    table.innerHTML = "";
-    table.append(
-      el("tr",{},
-        el("th",{html:"Atributo"}),
-        el("th",{html:"Valor"}),
-        el("th",{html:"Mod"})
-      )
-    );
-
-    ATTRS.forEach((a,i) => {
-      table.append(
-        el("tr",{},
-          el("td",{html:a}),
-          el("td",{class:"score", html:String(scores[i])}),
-          el("td",{class:"mod",   html: prettyMod(mods[i])})
-        )
-      );
-    });
   }
 
   // === Eventos ===
   if (btnRollAttrs) {
     btnRollAttrs.addEventListener("click", () => {
       $("#stepAttrs").style.display = "";
-      $("#rolling").style.display = "";
-      $("#attrsResult").style.display = "none";
       window.app.attrsLocked = false;
 
       if (btnRerollAttrs)  btnRerollAttrs.disabled  = false;
-      if (btnConfirmAttrs) btnConfirmAttrs.disabled = false;
+      if (btnConfirmAttrs) btnConfirmAttrs.disabled = true;
 
       // esconde o botão inicial "Rolar Atributos"
       btnRollAttrs.style.display = "none";
 
-      const bar = $("#rollBar");
-      let elapsed = 0, total = 5000, tick = 100;
-      bar.style.width = "0%";
-
-      const countdownElement = $("#attrsCountdown"); // Elemento do contador
-      let countdownTime = 5; // Começa com 5 segundos
-
-      // Exibe o GIF de dado à esquerda do texto "Rolando dados..."
-      const diceGif = document.createElement("img");
-      diceGif.src = "https://images.emojiterra.com/google/noto-emoji/animated-emoji/1f3b2.gif";
-      diceGif.alt = "Rolando dados";
-      diceGif.style.width = "20px"; // Ajuste conforme necessário
-      diceGif.style.marginRight = "5px"; // Espaço à direita do gif
-
-      const countdownContainer = document.querySelector("#attrsCountdownContainer");
-      if (countdownContainer) {
-        countdownContainer.innerHTML = ""; // Limpa o conteúdo atual
-        countdownContainer.appendChild(diceGif); // Adiciona o gif à esquerda
-        countdownContainer.innerHTML += "<strong>Rolando dados...</strong> "; // Frase
-      }
-
-      const it = setInterval(() => {
-        elapsed += tick;
-        const width = Math.min(100, Math.floor(elapsed / total * 100));
-        bar.style.width = width + "%";
-
-        // Atualiza o número ao lado da barra de progresso
-        const rollNumber = $("#rollNumber");
-        if (rollNumber) {
-          rollNumber.textContent = Math.floor(width);  // Sincroniza número com a barra
-        }
-
-        // Atualiza o contador de segundos
-        if (countdownElement) {
-          countdownTime = Math.max(0, Math.floor((total - elapsed) / 1000)); // Decrementa o tempo
-          countdownElement.textContent = `(${countdownTime}s)`; // Atualiza exibição do contador
-        }
-
-        if (elapsed >= total) {
-          clearInterval(it);
-
-          let scores = ATTRS.map(() => roll3d6());
-const mods = scores.map(modFromScore);
-          state.attrs = scores;
-          state.mods  = mods;
-
-          renderAttrs(scores, mods);
-
-          $("#rolling").style.display = "none";
-          $("#attrsResult").style.display = "";
-        }
-      }, tick);
+      doRoll();
     });
   }
 
@@ -215,25 +216,71 @@ const mods = scores.map(modFromScore);
 
       try { window.sfx && window.sfx.play('sfx-dice', { volume: 1, overlap: false }); } catch {}
 
-      doReroll();
+      doRoll();
     });
   }
 
   if (btnConfirmAttrs) {
     btnConfirmAttrs.addEventListener("click", () => {
+      if (!isFullyAssigned()) return;
+
+      // Monta os valores finais na ordem de ATTRS, a partir da alocação escolhida
+      const scores = ATTRS.map((_, i) => pool[assignment[i]]);
+      const mods = scores.map(modFromScore);
+      state.attrs = scores;
+      state.mods  = mods;
+
       window.app.attrsLocked = true;
 
       if (btnRerollAttrs)  btnRerollAttrs.disabled  = true;
-      if (btnConfirmAttrs) btnConfirmAttrs.disabled = true;
+      btnConfirmAttrs.disabled = true;
 
-      // Marca visual de confirmação (🗸) ao lado do botão Confirmar
+      // Re-renderiza para travar os selects visualmente
+      renderAssignment();
+
+      // Marca visual de confirmação (✔) ao lado do botão Confirmar
       try { showCheck?.(btnConfirmAttrs); } catch {}
 
-      const stepRace = $("#stepRace");
-      if (stepRace) {
-        stepRace.style.display = "";
-        stepRace.scrollIntoView({ behavior:"smooth", block:"start" });
+      // Avança para a etapa de Nome (agora a próxima etapa do fluxo)
+      if (typeof window.app.goToName === "function") {
+        window.app.goToName();
+      } else {
+        const stepFinal = $("#stepFinal");
+        if (stepFinal) {
+          stepFinal.style.display = "";
+          stepFinal.scrollIntoView({ behavior:"smooth", block:"start" });
+        }
       }
     });
   }
+
+  /**
+   * Exibe a etapa de Atributos. Chamada pela etapa de Ouro ao final
+   * do fluxo, já que Atributos agora vem por último, antes do Nome.
+   */
+  function goToAttrs(){
+    const step = $("#stepAttrs");
+    if (!step) return;
+    step.style.display = "";
+
+    if (window.app.attrsLocked && Array.isArray(state.attrs)) {
+      // Já confirmado anteriormente (ex.: reabrindo a etapa)
+      $("#rolling").style.display = "none";
+      $("#attrsResult").style.display = "";
+      if (btnRollAttrs) btnRollAttrs.style.display = "none";
+      if (btnRerollAttrs) btnRerollAttrs.disabled = true;
+      renderAssignment();
+      updateConfirmState();
+    } else {
+      $("#attrsResult").style.display = "none";
+      $("#rolling").style.display = "none";
+      if (btnRollAttrs) btnRollAttrs.style.display = "";
+      if (btnConfirmAttrs) btnConfirmAttrs.disabled = true;
+      if (btnRerollAttrs) btnRerollAttrs.disabled = true;
+    }
+
+    step.scrollIntoView({ behavior:"smooth", block:"start" });
+  }
+
+  window.app.goToAttrs = goToAttrs;
 })();
