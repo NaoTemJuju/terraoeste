@@ -28,6 +28,10 @@
   }
   sessionStorage.setItem('gmCode', gmCode);
 
+  // Só agora, com o código confirmado pelo servidor, o conteúdo aparece.
+  const gmRoot = document.getElementById('gmRoot');
+  if (gmRoot) gmRoot.style.visibility = '';
+
   // Se o código guardado nesta aba deixar de ser válido (ex.: foi trocado
   // no ambiente), limpa e força um novo prompt na próxima ação.
   function handleAuthFailure(resp){

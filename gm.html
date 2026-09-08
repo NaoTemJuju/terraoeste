@@ -8,7 +8,10 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
+  <!-- Escondido por padrão: só fica visível depois que gm.js confirma o
+       código junto ao servidor (/api/gm-auth). Isso vale tanto pra quem
+       vem pelo botão GM quanto pra quem digita a URL direto. -->
+  <div class="container" id="gmRoot" style="visibility:hidden">
     <header class="top">
       <div>
         <h2>Painel de GM</h2>

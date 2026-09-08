@@ -656,9 +656,29 @@
     if (headerActions){
       const btnGM = document.createElement('button');
       btnGM.id = 'btnGM'; btnGM.className='ghost'; btnGM.textContent='GM';
-      // A verificação real do código acontece em gm.html/gm.js, contra
-      // env.GM_CODE no servidor — este botão só navega até lá.
-      btnGM.addEventListener('click', ()=>{ window.location.href='gm.html'; });
+      // Verifica o código ANTES de navegar: se estiver errado, o
+      // usuário nunca chega a sair desta página nem a carregar gm.html.
+      btnGM.addEventListener('click', async ()=>{
+        const code = prompt('Código do GM:');
+        if (code === null) return;
+        btnGM.disabled = true;
+        try {
+          const r = await fetch('/api/gm-auth', {
+            method: 'POST',
+            headers: { 'X-GM-Code': code }
+          });
+          if (r.ok){
+            sessionStorage.setItem('gmCode', code);
+            window.location.href = 'gm.html';
+          } else {
+            alert('Código incorreto.');
+          }
+        } catch {
+          alert('Não foi possível verificar o código agora. Tente novamente.');
+        } finally {
+          btnGM.disabled = false;
+        }
+      });
       headerActions.appendChild(btnGM);
     }
   } catch {}
