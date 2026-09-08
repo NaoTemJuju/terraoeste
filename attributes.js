@@ -326,7 +326,9 @@
 
       try { showCheck?.(btnConfirmAttrs); } catch {}
 
-      if (typeof window.app.goToName === "function") {
+      if (typeof window.app.goToShop === "function") {
+        window.app.goToShop();
+      } else if (typeof window.app.goToName === "function") {
         window.app.goToName();
       } else {
         const stepFinal = $("#stepFinal");

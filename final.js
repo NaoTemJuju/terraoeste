@@ -218,6 +218,16 @@
     const hpRoll  = Number.isFinite(state.hpBaseRoll) ? state.hpBaseRoll : 0;
     const stoutHP = 0;
 
+    // Itens comprados na Lojinha (etapa entre Atributos e Nome). Se o
+    // jogador não passou pela lojinha (ex.: fluxo antigo ou "Gerar
+    // Aleatório"), essas listas ficam vazias e o ouro permanece intacto.
+    const shopGear   = Array.isArray(state.shopGear) ? state.shopGear : [];
+    const shopLedger = Array.isArray(state.shopLedger) ? state.shopLedger : [];
+    const goldFinal   = state.gold ?? 0;
+    const silverFinal = state.silver ?? 0;
+    const copperFinal = state.copper ?? 0;
+    const gearSlotsUsed = shopGear.reduce((sum, g) => sum + (g.slots || 0), 0);
+
     // Objeto para import no Foundry (estrutura em EN)
     const exportObj = {
       name,
@@ -254,23 +264,26 @@
       maxHitPoints: state.hp ?? 1,
       armorClass: 10,
       gearSlotsTotal: 10,
-      gearSlotsUsed: 0,
+      gearSlotsUsed,
       bonuses: [],
-      goldRolled: state.gold ?? 0,
-      gold: state.gold ?? 0,
-      silver: 0,
-      copper: 0,
-      gear: [],
+      goldRolled: state.goldRolled ?? state.gold ?? 0,
+      gold: goldFinal,
+      silver: silverFinal,
+      copper: copperFinal,
+      gear: shopGear,
       treasures: [],
       magicItems: [],
       attacks: [],
-      ledger: (state.gold != null) ? [{
-        goldChange: state.gold,
-        silverChange: 0,
-        copperChange: 0,
-        desc: "Ouro inicial",
-        notes: ""
-      }] : [],
+      ledger: [
+        ...((state.goldRolled ?? state.gold) != null ? [{
+          goldChange: state.goldRolled ?? state.gold,
+          silverChange: 0,
+          copperChange: 0,
+          desc: "Ouro inicial",
+          notes: ""
+        }] : []),
+        ...shopLedger
+      ],
       spellsKnown: "None",
       languages: languagesStr,
       creationMethod: "Exported by Bot",
@@ -298,7 +311,12 @@
       ),
       pv: state.hp ?? 1,
       pv_info: state.hpDetail || "",
-      ouro: state.gold ?? 0,
+      ouro: goldFinal,
+      ouroRolado: state.goldRolled ?? goldFinal,
+      prata: silverFinal,
+      cobre: copperFinal,
+      itens: shopGear,
+      compras: shopLedger,
       criado_em: new Date().toISOString()
     };
 
@@ -420,6 +438,9 @@
     };
     const languagesStr = Array.isArray(src?.linguas) ? src.linguas.join(", ") : "";
     const level = 0;
+    const gear = Array.isArray(src?.itens) ? src.itens : [];
+    const shopLedger = Array.isArray(src?.compras) ? src.compras : [];
+    const gearSlotsUsed = gear.reduce((sum, g) => sum + (g.slots || 0), 0);
 
     return {
       name: src?.nome || "",
@@ -456,23 +477,26 @@
       maxHitPoints: src?.pv || 0,
       armorClass: 10,
       gearSlotsTotal: 10,
-      gearSlotsUsed: 0,
+      gearSlotsUsed,
       bonuses: [],
-      goldRolled: src?.ouro || 0,
+      goldRolled: src?.ouroRolado ?? src?.ouro ?? 0,
       gold: src?.ouro || 0,
-      silver: 0,
-      copper: 0,
-      gear: [],
+      silver: src?.prata || 0,
+      copper: src?.cobre || 0,
+      gear,
       treasures: [],
       magicItems: [],
       attacks: [],
-      ledger: [{
-        goldChange: src?.ouro || 0,
-        silverChange: 0,
-        copperChange: 0,
-        desc: "Ouro inicial",
-        notes: ""
-      }],
+      ledger: [
+        {
+          goldChange: src?.ouroRolado ?? src?.ouro ?? 0,
+          silverChange: 0,
+          copperChange: 0,
+          desc: "Ouro inicial",
+          notes: ""
+        },
+        ...shopLedger
+      ],
       spellsKnown: "None",
       languages: languagesStr,
       creationMethod: "Exported by Bot",
@@ -505,7 +529,7 @@
 
       // Esconde etapas do fluxo e mostra seção de "carregado"
       ["#stepName","#stepAttrs","#stepRace","#stepClass","#stepOrigin",
-       "#stepHP","#stepGold","#stepAlign","#stepDeity","#stepLang","#stepFinal"]
+       "#stepHP","#stepGold","#stepAlign","#stepDeity","#stepLang","#stepShop","#stepNameEntry","#stepFinal"]
        .forEach(sel => { const n = document.querySelector(sel); if (n) n.style.display = "none"; });
 
       const loadSec = $("#loadedSection");

@@ -55,6 +55,7 @@
   const btnDisableAll = $("#btnDisableAll");
   const btnTabAvail = $("#btnTabAvail");
   const btnTabClasses = $("#btnTabClasses");
+  const btnTabShop = $("#btnTabShop");
 
   function makeCheck(name, kind, checked){
     const label = document.createElement('label');
@@ -126,6 +127,7 @@
   }
   btnTabAvail?.addEventListener('click', () => showTab('panelAvail'));
   btnTabClasses?.addEventListener('click', () => showTab('panelClasses'));
+  btnTabShop?.addEventListener('click', () => showTab('panelShop'));
 
   // ------- Adicionar/Editar classes personalizadas -------
   const clsName = document.getElementById('clsName');
@@ -305,11 +307,157 @@
 
   btnListClasses?.addEventListener('click', listCustomClasses);
 
+  // ------- Aba: Loja -------
+  const TYPE_LABELS_GM = { weapon: "Arma", armor: "Armadura", sundry: "Diversos", potion: "Poção" };
+  const CURRENCY_LABEL_GM = { gp: "PO", sp: "PP", cp: "PC" };
+
+  const shopItemList = document.getElementById('shopItemList');
+  const shopItemName = document.getElementById('shopItemName');
+  const shopItemType = document.getElementById('shopItemType');
+  const shopItemCost = document.getElementById('shopItemCost');
+  const shopItemCurrency = document.getElementById('shopItemCurrency');
+  const shopItemSlots = document.getElementById('shopItemSlots');
+  const btnAddShopItem = document.getElementById('btnAddShopItem');
+  const btnListShop = document.getElementById('btnListShop');
+  const editShopBanner = document.getElementById('editShopBanner');
+  const editingShopNameEl = document.getElementById('editingShopName');
+  const btnCancelShopEdit = document.getElementById('btnCancelShopEdit');
+
+  let __editingShopId = null;
+
+  function clearShopForm(){
+    shopItemName.value = '';
+    shopItemType.value = 'sundry';
+    shopItemCost.value = '0';
+    shopItemCurrency.value = 'gp';
+    shopItemSlots.value = '1';
+    __editingShopId = null;
+    if (editShopBanner) editShopBanner.style.display = 'none';
+    if (editingShopNameEl) editingShopNameEl.textContent = '';
+  }
+
+  function slugifyShopId(name){
+    return String(name || '')
+      .normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-zA-Z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .toLowerCase() || ('item-' + Date.now());
+  }
+
+  function loadShopItemIntoForm(it){
+    shopItemName.value = it.name || '';
+    shopItemType.value = it.type || 'sundry';
+    shopItemCost.value = String(it.cost ?? 0);
+    shopItemCurrency.value = it.currency || 'gp';
+    shopItemSlots.value = String(it.slots ?? 1);
+    __editingShopId = it.id;
+    if (editShopBanner) { editShopBanner.style.display = ''; editShopBanner.scrollIntoView({ behavior:'smooth', block:'center' }); }
+    if (editingShopNameEl) editingShopNameEl.textContent = it.name;
+  }
+
+  btnCancelShopEdit?.addEventListener('click', clearShopForm);
+
+  async function fetchShopItems(){
+    const r = await fetch('/api/gear', { headers: { 'cache-control': 'no-store' } });
+    if (!r.ok) return [];
+    const data = await r.json();
+    return Array.isArray(data.items) ? data.items : [];
+  }
+
+  async function listShopItems(){
+    shopItemList.innerHTML = '<p class="gm-empty">Carregando...</p>';
+    try {
+      const items = await fetchShopItems();
+      if (!items.length){
+        shopItemList.innerHTML = '<p class="gm-empty">Nenhum item cadastrado na loja ainda.</p>';
+        return;
+      }
+      const table = document.createElement('table');
+      table.className = 'gm-table';
+      table.innerHTML = '<thead><tr><th>Item</th><th>Tipo</th><th>Custo</th><th>Espaços</th><th></th></tr></thead>';
+      const tbody = document.createElement('tbody');
+
+      items
+        .slice()
+        .sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'))
+        .forEach(it => {
+          const tr = document.createElement('tr');
+
+          const tdName = document.createElement('td');
+          tdName.innerHTML = `<strong>${it.name}</strong>`;
+
+          const tdType = document.createElement('td');
+          tdType.innerHTML = `<span class="badge">${TYPE_LABELS_GM[it.type] || it.type}</span>`;
+
+          const tdCost = document.createElement('td');
+          tdCost.textContent = `${it.cost} ${CURRENCY_LABEL_GM[it.currency] || 'PO'}`;
+
+          const tdSlots = document.createElement('td');
+          tdSlots.textContent = it.slots === 0 ? 'sem peso' : String(it.slots);
+
+          const tdActions = document.createElement('td');
+          tdActions.className = 'actions';
+          const btnE = document.createElement('button'); btnE.className = 'ghost'; btnE.textContent = 'Editar';
+          btnE.addEventListener('click', () => loadShopItemIntoForm(it));
+          const btnD = document.createElement('button'); btnD.className = 'ghost'; btnD.textContent = 'Excluir';
+          btnD.addEventListener('click', async () => {
+            if (!confirm(`Remover "${it.name}" da loja?`)) return;
+            const r = await fetch(`/api/gear?id=${encodeURIComponent(it.id)}`, { method: 'DELETE', headers: { 'X-GM-Code': gmCode } });
+            if (r.ok){ listShopItems(); if (__editingShopId === it.id) clearShopForm(); }
+            else if (!handleAuthFailure(r)) alert('Falha ao remover.');
+          });
+          tdActions.append(btnE, btnD);
+
+          tr.append(tdName, tdType, tdCost, tdSlots, tdActions);
+          tbody.appendChild(tr);
+        });
+
+      table.appendChild(tbody);
+      shopItemList.innerHTML = '';
+      shopItemList.appendChild(table);
+    } catch {
+      shopItemList.innerHTML = '<p class="gm-empty">Erro ao carregar a lista.</p>';
+    }
+  }
+
+  btnAddShopItem?.addEventListener('click', async () => {
+    const name = (shopItemName?.value || '').trim();
+    if (!name){ alert('Informe o nome do item.'); return; }
+    const type = shopItemType?.value || 'sundry';
+    const cost = Math.max(0, parseInt(shopItemCost?.value || '0', 10) || 0);
+    const currency = shopItemCurrency?.value || 'gp';
+    const slots = Math.max(0, parseInt(shopItemSlots?.value || '0', 10) || 0);
+    const id = __editingShopId || `${type}-${slugifyShopId(name)}`;
+
+    // Se o nome mudou o suficiente para gerar um id diferente do item
+    // original em edição, remove o item antigo pra não deixar duplicado.
+    if (__editingShopId && __editingShopId !== id){
+      await fetch(`/api/gear?id=${encodeURIComponent(__editingShopId)}`, { method: 'DELETE', headers: { 'X-GM-Code': gmCode } });
+    }
+
+    const body = { items: [{ id, name, type, cost, currency, slots }] };
+    const r = await fetch('/api/gear', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-GM-Code': gmCode },
+      body: JSON.stringify(body)
+    });
+    if (r.ok){
+      alert('Salvo globalmente!');
+      clearShopForm();
+      await listShopItems();
+    } else if (!handleAuthFailure(r)) {
+      alert('Falha ao salvar o item.');
+    }
+  });
+
+  btnListShop?.addEventListener('click', listShopItems);
+
   // Init
   (async function init(){
     renderAvailability(await fetchAvailability());
     makeOriginInputs();
     makeLangGrant();
     listCustomClasses();
+    listShopItems();
   })();
 })();

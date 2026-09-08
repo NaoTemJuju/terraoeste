@@ -52,6 +52,7 @@
           const r = roll(2, 6);
           const gold = r.total * 5;
           state.gold = gold;
+          state.goldRolled = gold;
           
           // Exibe o ouro
           const goldOut = $("#goldOut");

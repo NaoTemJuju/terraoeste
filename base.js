@@ -175,6 +175,21 @@
       const o = result.atributos[a];
       return `<tr><td>${a}</td><td class="score">${o.valor}</td><td class="mod">${prettyMod(o.mod)}</td></tr>`;
     }).join("");
+
+    const moneyBits = [];
+    if (result.ouro) moneyBits.push(`${result.ouro} PO`);
+    if (result.prata) moneyBits.push(`${result.prata} PP`);
+    if (result.cobre || moneyBits.length === 0) moneyBits.push(`${result.cobre ?? 0} PC`);
+    const moneyStr = moneyBits.join(", ");
+
+    const itens = Array.isArray(result.itens) ? result.itens : [];
+    const itensHTML = itens.length
+      ? `<div style="margin-top:12px"><strong>Itens comprados</strong></div>
+         <ul style="margin-top:6px">
+           ${itens.map(g => `<li>${escapeHTML(g.name)}${g.quantity > 1 ? ` ×${g.quantity}` : ""}</li>`).join("")}
+         </ul>`
+      : "";
+
     container.innerHTML = `
         <div class="grid cols-2">
           <div><strong>Nome</strong><br>${escapeHTML(result.nome || "—")}</div>
@@ -185,8 +200,9 @@
           <div><strong>Divindade</strong><br>${result.divindade || "—"}</div>
           <div><strong>Línguas</strong><br>${Array.isArray(result.linguas) ? result.linguas.join(", ") : (result.linguas || "—")}</div>
           <div><strong>PV</strong><br>${result.pv ?? "—"}</div>
-          <div><strong>Ouro</strong><br>${result.ouro ?? "—"} PO</div>
+          <div><strong>Dinheiro</strong><br>${moneyStr}</div>
         </div>
+        ${itensHTML}
         <div style="margin-top:12px"><strong>Atributos</strong></div>
         <table class="attrs" style="margin-top:6px">
           <tr><th>Atributo</th><th>Valor</th><th>Mod</th></tr>
@@ -198,7 +214,7 @@
   function hideCreationUI(){
     const ids = [
       "stepName","stepAttrs","stepRace","stepClass","stepOrigin","stepHP",
-      "stepGold","stepAlign","stepDeity","stepLang","stepFinal"
+      "stepGold","stepAlign","stepDeity","stepLang","stepShop","stepNameEntry","stepFinal"
     ];
     ids.forEach(id => {
       const s = document.getElementById(id);
@@ -329,6 +345,7 @@
       {
         const g = roll(2,6);
         state.gold = g.total * 5;
+        state.goldRolled = state.gold;
       }
       // Define nome aleatório baseado na raça
       // randomNameByRace é definido em nome.js e anexado ao namespace app
@@ -381,6 +398,9 @@
         pv: obj.maxHitPoints ?? "—",
         pv_info: "",
         ouro: obj.gold ?? 0,
+        prata: obj.silver ?? 0,
+        cobre: obj.copper ?? 0,
+        itens: Array.isArray(obj.gear) ? obj.gear : [],
         criado_em: "" + (obj.created_at || "")
       };
     }
@@ -458,6 +478,9 @@
       };
       const languagesStr = Array.isArray(obj?.linguas) ? obj.linguas.join(", ") : "";
       const level = 0;
+      const gear = Array.isArray(obj?.itens) ? obj.itens : [];
+      const shopLedger = Array.isArray(obj?.compras) ? obj.compras : [];
+      const gearSlotsUsed = gear.reduce((sum, g) => sum + (g.slots || 0), 0);
 
       const exportObj = {
         name: obj?.nome || "",
@@ -494,23 +517,26 @@
         maxHitPoints: obj?.pv || 0,
         armorClass: 10,
         gearSlotsTotal: 10,
-        gearSlotsUsed: 0,
+        gearSlotsUsed,
         bonuses: [],
-        goldRolled: obj?.ouro || 0,
+        goldRolled: obj?.ouroRolado ?? obj?.ouro ?? 0,
         gold: obj?.ouro || 0,
-        silver: 0,
-        copper: 0,
-        gear: [],
+        silver: obj?.prata || 0,
+        copper: obj?.cobre || 0,
+        gear,
         treasures: [],
         magicItems: [],
         attacks: [],
-        ledger: [{
-          goldChange: obj?.ouro || 0,
-          silverChange: 0,
-          copperChange: 0,
-          desc: "Ouro inicial",
-          notes: ""
-        }],
+        ledger: [
+          {
+            goldChange: obj?.ouroRolado ?? obj?.ouro ?? 0,
+            silverChange: 0,
+            copperChange: 0,
+            desc: "Ouro inicial",
+            notes: ""
+          },
+          ...shopLedger
+        ],
         spellsKnown: "None",
         languages: languagesStr,
         creationMethod: "Exported by Bot",

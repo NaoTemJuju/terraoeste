@@ -25,6 +25,7 @@
     <nav class="gm-tabs" role="tablist" aria-label="Seções do painel">
       <button id="btnTabAvail" class="gm-tab" role="tab" aria-selected="true" aria-controls="panelAvail">Disponibilidade</button>
       <button id="btnTabClasses" class="gm-tab" role="tab" aria-selected="false" aria-controls="panelClasses">Classes Personalizadas</button>
+      <button id="btnTabShop" class="gm-tab" role="tab" aria-selected="false" aria-controls="panelShop">Loja</button>
     </nav>
 
     <!-- ==================== Aba: Disponibilidade ==================== -->
@@ -119,6 +120,60 @@
           <div class="left"></div>
           <div class="right">
             <button id="btnAddClass" class="primary">Salvar classe globalmente</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================== Aba: Loja ====================== -->
+    <section id="panelShop" class="gm-panel" role="tabpanel" aria-labelledby="btnTabShop">
+
+      <div class="gm-card">
+        <div class="gm-card-head">
+          <h2>Itens da lojinha</h2>
+          <button id="btnListShop" class="ghost">Atualizar lista</button>
+        </div>
+        <div id="shopItemList"><p class="gm-empty">Carregando...</p></div>
+      </div>
+
+      <div class="gm-card">
+        <div class="gm-card-head">
+          <h2>Adicionar / editar item</h2>
+        </div>
+
+        <div class="gm-edit-banner" id="editShopBanner" style="display:none">
+          <strong>Editando:</strong> <span id="editingShopName" class="muted"></span>
+          <button id="btnCancelShopEdit" class="ghost">Cancelar edição</button>
+        </div>
+
+        <fieldset class="gm-fieldset">
+          <legend>Detalhes do item</legend>
+          <div class="gm-shop-row">
+            <div class="field"><label>Nome</label><input id="shopItemName" type="text" placeholder="Ex.: Corda, 18m"></div>
+            <div class="field"><label>Tipo</label>
+              <select id="shopItemType">
+                <option value="weapon">Arma</option>
+                <option value="armor">Armadura</option>
+                <option value="sundry" selected>Diversos</option>
+                <option value="potion">Poção</option>
+              </select>
+            </div>
+            <div class="field"><label>Custo</label><input id="shopItemCost" type="number" min="0" step="1" value="0" style="min-width:100px"></div>
+            <div class="field"><label>Moeda</label>
+              <select id="shopItemCurrency">
+                <option value="gp" selected>PO</option>
+                <option value="sp">PP</option>
+                <option value="cp">PC</option>
+              </select>
+            </div>
+          </div>
+          <div class="field" style="margin-top:12px"><label>Espaços ocupados</label><input id="shopItemSlots" type="number" min="0" step="1" value="1" style="min-width:100px"></div>
+        </fieldset>
+
+        <div class="gm-toolbar" style="border-top:none; margin-top:6px; padding-top:0;">
+          <div class="left"></div>
+          <div class="right">
+            <button id="btnAddShopItem" class="primary">Salvar item globalmente</button>
           </div>
         </div>
       </div>

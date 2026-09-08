@@ -165,6 +165,29 @@
       </div>
     </section>
 
+    <!-- Etapa 8.9: Lojinha (compra de equipamentos com o ouro inicial) -->
+    <section id="stepShop" style="display:none">
+      <div class="attrs-head">
+        <h2>LOJINHA</h2>
+        <div id="shopWallet" class="pill"></div>
+      </div>
+      <div class="hint">Gaste seu ouro inicial em equipamentos ou siga sem comprar nada. O que sobrar continua com o personagem.</div>
+
+      <div id="shopFilterTabs" class="lang-actions" style="margin:12px 0"></div>
+      <div id="shopList" class="shop-list"></div>
+
+      <div id="shopCartWrap" style="margin-top:18px">
+        <h3 style="margin:0 0 8px">Carrinho</h3>
+        <div id="shopCart" class="shop-cart"></div>
+        <div id="shopCartEmpty" class="muted">Nada no carrinho ainda.</div>
+      </div>
+
+      <div class="row" style="margin-top:14px">
+        <button id="btnConfirmShop">Confirmar Compras e Continuar</button>
+        <button id="btnSkipShop" class="ghost">Não comprar nada</button>
+      </div>
+    </section>
+
     <!-- Etapa 9: Nome (após Atributos) -->
     <section id="stepNameEntry" style="display:none">
       <h2>NOME</h2>
@@ -207,7 +230,9 @@
   <script src="class.js"></script>
   <script src="vida.js"></script>
   <script src="ouro.js"></script>
-  <!-- Módulo de Nome (etapa após Ouro) -->
+  <!-- Módulo da Lojinha (etapa após Atributos, antes do Nome) -->
+  <script src="shop.js"></script>
+  <!-- Módulo de Nome (etapa após a Lojinha) -->
   <script src="nome.js"></script>
   <script src="alinhamento.js"></script>
   <script src="final.js"></script>

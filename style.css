@@ -456,3 +456,41 @@ button.primary:active:not(:disabled){background:linear-gradient(#7c2624,#5c1c1a)
   .attr-card{width:54px; height:68px; font-size:22px}
   .attrs-slots-grid{grid-template-columns:repeat(2,1fr)}
 }
+
+/* ===================== Lojinha (etapa entre Atributos e Nome) =============
+   Reaproveita paleta e componentes existentes (.pill, .ghost, .gm-table),
+   com uma lista compacta de itens + carrinho lateral.
+============================================================================ */
+.shop-list{
+  display:grid; gap:8px; max-height:420px; overflow:auto; padding-right:4px; margin-top:4px;
+}
+.shop-item{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  border:1px solid rgba(59,44,26,.25); border-radius:10px;
+  padding:10px 14px; background:rgba(255,255,255,.35);
+}
+.shop-item-info{display:flex; flex-direction:column; gap:2px; min-width:0}
+.shop-item-name{font-weight:700}
+.shop-item-meta{font-size:14px}
+.shop-item-controls{display:flex; align-items:center; gap:10px; flex-shrink:0}
+.shop-item-controls button{
+  padding:6px 14px; min-width:0; border-radius:999px; font-size:16px; line-height:1;
+}
+.shop-item-qty{
+  min-width:22px; text-align:center; font-weight:800; font-size:17px;
+}
+.shop-cart{display:grid; gap:6px; margin-top:4px}
+.shop-cart-line{
+  display:flex; justify-content:space-between; gap:12px;
+  border-bottom:1px dashed rgba(59,44,26,.25); padding:4px 2px;
+}
+
+/* ===================== Painel do Mestre — Aba Loja =========================
+   Reaproveita .gm-table / .gm-fieldset / .gm-columns já usados nas outras
+   abas do painel, mantendo a mesma identidade visual.
+============================================================================ */
+.gm-shop-row{display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:12px}
+@media (max-width:720px){
+  .gm-shop-row{grid-template-columns:1fr 1fr}
+  .shop-item{flex-wrap:wrap}
+}
