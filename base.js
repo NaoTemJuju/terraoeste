@@ -653,7 +653,8 @@
   await loadAvailability();
   try {
     const headerActions = document.querySelector('.header-actions');
-    if (headerActions){
+    // Na própria aba GM não faz sentido mostrar o botão "GM" de novo.
+    if (headerActions && !document.body.classList.contains('gm-page')){
       const btnGM = document.createElement('button');
       btnGM.id = 'btnGM'; btnGM.className='ghost'; btnGM.textContent='GM';
       // Verifica o código ANTES de navegar: se estiver errado, o

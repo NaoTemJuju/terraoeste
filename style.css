@@ -71,20 +71,22 @@ input:focus, select:focus, button:focus{
   box-shadow:0 0 0 3px rgba(197,154,74,.28), inset 0 1px 0 rgba(255,255,255,.3);
 }
 
-/* Buttons — SOLID borders */
-button{
+/* Buttons — SOLID borders (also applied to <a class="ghost"/"primary"> so link-buttons match) */
+button, a.ghost, a.primary{
+  display:inline-flex; align-items:center; justify-content:center;
   appearance:none; border:1px solid var(--border);
   background:linear-gradient(#d7ba71,#b08a3a); color:#1f160b;
   padding:12px 16px; border-radius:999px; cursor:pointer; font-weight:700;
   letter-spacing:.3px; transition:transform .06s ease, box-shadow .2s ease, background .2s ease;
   box-shadow:var(--shadow); text-shadow:0 1px 0 rgba(255,255,255,.35);
+  text-decoration:none; line-height:1.2;
 }
-button:hover:not(:disabled){transform:translateY(-1px); box-shadow:0 8px 22px rgba(30,20,10,.25)}
-button:active:not(:disabled){transform:translateY(0); background:linear-gradient(#b08a3a,#8e6e29)}
+button:hover:not(:disabled), a.ghost:hover, a.primary:hover{transform:translateY(-1px); box-shadow:0 8px 22px rgba(30,20,10,.25)}
+button:active:not(:disabled), a.ghost:active, a.primary:active{transform:translateY(0); background:linear-gradient(#b08a3a,#8e6e29)}
 button:disabled{opacity:.65; cursor:not-allowed}
 
 /* Ghost variant now solid (no dashed) */
-button.ghost{
+button.ghost, a.ghost{
   background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,0));
   color:var(--ink);
   border-style:solid;   /* <-- changed from dashed */
@@ -270,23 +272,24 @@ a.link:hover{text-decoration-style:wavy; text-underline-offset:3px}
   box-shadow:0 0 0 3px rgba(140,47,47,.18);
 }
 
-.gm-tabs{display:flex; gap:6px; margin-bottom:0; flex-wrap:wrap}
+.gm-tabs{display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap}
 .gm-tab{
-  border:1px solid var(--border); border-bottom:none;
+  border:1px solid var(--border);
   background:rgba(255,255,255,.35); color:var(--muted);
-  padding:10px 20px; border-radius:10px 10px 0 0; cursor:pointer;
+  padding:10px 20px; border-radius:10px; cursor:pointer;
   font-weight:700; font-family:"Droid Serif",Georgia,serif;
   box-shadow:none; transform:none;
 }
 .gm-tab:hover:not(:disabled){transform:none; box-shadow:none; background:rgba(255,255,255,.55)}
 .gm-tab[aria-selected="true"]{
   background:linear-gradient(180deg,var(--paper),var(--paper-2));
-  color:var(--ink); box-shadow:inset 0 3px 0 var(--accent-2);
+  color:var(--ink); border-color:var(--accent-2);
+  box-shadow:inset 0 0 0 1px var(--accent-2);
 }
 .gm-panel{
   display:none;
-  border:1px solid var(--border); border-top:none;
-  border-radius:0 0 14px 14px; padding:20px;
+  border:1px solid var(--border);
+  border-radius:14px; padding:20px;
   background:linear-gradient(180deg,rgba(255,255,255,.4),rgba(255,255,255,.12));
   margin-bottom:24px;
 }
