@@ -1,51 +1,51 @@
 /*! Maestria em Arma por Classe – Shadowdark
  *
- * Define, por classe, quais armas podem ser escolhidas como "Maestria"
- * (WeaponMastery no formato do shadowdarklings). Cada opção guarda o
- * nome exibido ao jogador; o identificador usado no bônus exportado
- * (bonusTo) é o "slug" desse nome (minúsculo, sem acento, espaços
- * viram hífen) — é esse slug que o Foundry usa para substituir o
- * placeholder REPLACEME nas chaves de efeito do talento:
+ * Define, por classe, quais armas podem ser escolhidas como "Maestria".
+ * Isso é puramente informativo: a escolha é salva no personagem e
+ * exibida na ficha final do site, mas NÃO é exportada para o .json
+ * do Foundry (nenhum bônus/efeito é gerado a partir dela).
  *
- *   system.roll.melee.bonus.REPLACEME  -> system.roll.melee.bonus.adaga
- *   system.roll.melee.damage.REPLACEME -> system.roll.melee.damage.adaga
- *
- * (é o mesmo valor que o Foundry preenche sozinho quando o jogador
- * escolhe a maestria "na unha", subindo de nível pelo sistema).
- *
- * O bônus final fica assim:
- * {
- *   "sourceType": "Class",
- *   "sourceName": "Cavaleiro",
- *   "sourceCategory": "Ability",
- *   "name": "WeaponMastery",
- *   "bonusName": "Plus1AttackAndDamagePlusHalfLevel",
- *   "bonusTo": "adaga",
- *   "gainedAtLevel": 1
- * }
- *
- * Para adicionar mais opções no futuro, basta incluir novos objetos
- * { nome } na lista da classe desejada (ou novas classes). Se o slug
- * automático não bater com o nome usado no seu mundo do Foundry,
- * informe manualmente um "bonusTo" para sobrescrever o cálculo.
+ * Para adicionar mais opções no futuro, basta incluir novos nomes na
+ * lista da classe desejada, ou cadastrar novas classes.
  */
 (function () {
-  // ====== Utilitário ======
-  // Gera o slug (ex.: "Adaga" -> "adaga", "Espada Longa" -> "espada-longa")
-  function slugify(str) {
-    return String(str || "")
-      .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // remove acentos
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "");
-  }
-
   // ====== Dados ======
+  const ARMAS_MAESTRIA = [
+    "Adaga",
+    "Adaga (obsidiana)",
+    "Arco curto",
+    "Arco longo",
+    "Azagaia",
+    "Bastão",
+    "Besta",
+    "Boleadeira",
+    "Bumerangue",
+    "Cajado",
+    "Chicote",
+    "Chicote de laminas",
+    "Cimitarra",
+    "Clava",
+    "Clava (obsidiana)",
+    "Espada bastarda",
+    "Espada curta",
+    "Espada grande",
+    "Espada longa",
+    "Funda",
+    "Lança",
+    "Lança (obsidiana)",
+    "Maça",
+    "Maça estrela",
+    "Machadinha",
+    "Machado grande",
+    "Martelo de guerra",
+    "Pique",
+    "Propulsor",
+    "Shuriken",
+    "Zarabatana"
+  ];
+
   const MAESTRIA_POR_CLASSE = {
-    "Cavaleiro": [
-      { nome: "Adaga" }
-    ]
+    "Cavaleiro": ARMAS_MAESTRIA.map(nome => ({ nome }))
   };
 
   // ====== UI da etapa Maestria ======
@@ -112,8 +112,8 @@
         setEmpty();
         return;
       }
-      // bonusTo = slug manual (se informado) ou derivado do nome
-      state.maestria = { nome: o.nome, bonusTo: o.bonusTo || slugify(o.nome) };
+      // Apenas o nome é guardado — informativo, sem impacto no .json exportado.
+      state.maestria = { nome: o.nome };
       btnConfirm.disabled = false;
       select.value = String(idx);
     }
@@ -154,5 +154,4 @@
 
   window.MAESTRIA_POR_CLASSE = MAESTRIA_POR_CLASSE;
   window.attachMasteryStep = attachMasteryStep;
-  window.slugifyMaestria = slugify;
 })();
