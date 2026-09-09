@@ -8,7 +8,8 @@ Fixes & tweaks:
 ============================================================================ */
 
 /* Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Droid+Serif:ital,wght@0,400;0,700;1,400&family=Modern+Antiqua&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Droid+Serif:ital,wght@0,400;0,700;1,400&display=swap');
+@import url('https://fonts.cdnfonts.com/css/jsl-blackletter');
 
 :root{
   --paper:#f6eedc; --paper-2:#efe7d1;
@@ -19,7 +20,7 @@ Fixes & tweaks:
   --shadow-lift:0 14px 30px rgba(30,20,10,.24), inset 0 1px 0 rgba(255,255,255,.3);
   --font-ui:"Montserrat", "Droid Serif", Georgia, serif;
   --font-body:"Droid Serif", Georgia, serif;
-  --font-title:"Modern Antiqua", "Droid Serif", Georgia, serif;
+  --font-title:"JSL Blackletter", "Droid Serif", Georgia, serif;
   --ease:cubic-bezier(.22,.9,.32,1);
 }
 
@@ -54,15 +55,14 @@ h1,h3{font-family:var(--font-body); letter-spacing:.5px; color:var(--ink)}
 h1{font-size:clamp(28px,4.2vw,44px); margin:0; font-weight:700}
 h3{font-weight:700}
 
-/* Cabeçalhos de seção com uma fonte de "logo de aventura" old-school
-   (Modern Antiqua, gratuita) — na mesma vibe torta/grossa do logotipo
-   do Shadowdark, sem copiar a fonte exclusiva da marca deles. Sem
-   barra preta atrás: só o texto, em destaque pelo tamanho e cor. */
+/* Cabeçalhos de seção com a JSL Blackletter (fonte gótica gratuita,
+   parecida em espírito com a lettering usada nos títulos do livro do
+   Shadowdark) — sem fundo, só o texto em destaque. */
 h2{
   font-family:var(--font-title); font-weight:400;
-  font-size:clamp(24px,3.4vw,32px); margin:0 0 14px;
-  letter-spacing:.5px; color:#5a2e1c;
-  text-shadow:0 1px 0 rgba(255,255,255,.4);
+  font-size:clamp(26px,3.6vw,34px); margin:0 0 14px;
+  letter-spacing:1px; color:#1c1712;
+  text-shadow:0 1px 0 rgba(255,255,255,.35);
 }
 .sub{color:var(--muted); font-size:15px; font-family:var(--font-body)}
 
