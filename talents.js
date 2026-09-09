@@ -36,7 +36,7 @@
       talent: {
         name: "Robusto",
         bonusName: "Robusto",
-        desc: "Inicia com +2 PV. Role os pontos de vida a cada nível com Vantagem."
+        desc: "Inicia com +2 PV. Rola os pontos de vida a cada nível com Vantagem."
       }
     },
     "Elfo": {
@@ -53,7 +53,7 @@
           key: "spell",
           name: "Visão Aguçada (Conjuração)",
           bonusName: "Visão Aguçada (Conjuração)",
-          desc: "Você recebe um bônus de +1 em jogadas de ataque com armas à distância, ou um bônus de +1 em testes de conjuração."
+          desc: "+1 em testes de conjuração de magia."
         }
       ]
     },
@@ -65,13 +65,13 @@
           key: "luck",
           name: "Aptidão (Sorte)",
           bonusName: "Aptidão (Sorte)",
-          desc: "Você começa cada sessão com uma ficha de sorte"
+          desc: "Você começa cada sessão com uma ficha de sorte."
         },
         {
           key: "spell",
           name: "Aptidão (Conjuração)",
           bonusName: "Aptidão (Conjuração)",
-          desc: "Você ganha +1 em testes de conjuração."
+          desc: "+1 em testes de conjuração."
         }
       ]
     },
@@ -80,7 +80,7 @@
       talent: {
         name: "Sentidos Apurados",
         bonusName: "Sentidos Apurados",
-        desc: "Você não pode ser surpreendido"
+        desc: "Você não pode ser surpreendido."
       }
     },
     "Humano": {
@@ -155,29 +155,18 @@
    * (mesmo formato usado pelo importador do Foundry para línguas e
    * magias de classe). Retorna um array vazio quando a raça não
    * concede talento (ex.: Meio-Elfo).
-   *
-   * IMPORTANTE: o importador do Foundry (sistema Shadowdark) só
-   * cria/anexa automaticamente um item de Talento a partir de uma
-   * entrada de `bonuses` quando `sourceType` é "Class" — não existe
-   * suporte a `sourceType: "Race"` nesse array, então uma entrada
-   * assim é ignorada silenciosamente e o talento racial nunca é
-   * criado na ficha (o jogador precisa adicionar manualmente).
-   * Por isso usamos "Class" mesmo se tratando de um talento racial:
-   * é o valor que o importador realmente reconhece para criar o
-   * item de Talento sem exigir nenhuma ação manual do usuário.
    */
   function buildBonuses(race, chosenKey){
     const talent = resolveTalent(race, chosenKey);
     if (!talent) return [];
     return [{
-      sourceType: "Class",
+      sourceType: "Race",
       sourceName: race || "",
       sourceCategory: "Talent",
       gainedAtLevel: 1,
       name: talent.name,
       bonusTo: "",
-      bonusName: talent.bonusName,
-      desc: talent.desc || ""
+      bonusName: talent.bonusName
     }];
   }
 
