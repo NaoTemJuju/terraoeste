@@ -99,7 +99,7 @@
       talent: {
         name: "Poderoso",
         bonusName: "Poderoso",
-        desc: "+1 em jogadas de ataque e dano com armas corpo a corpo."
+        desc: "Você recebe um bônus de +1 em jogadas de ataque e dano com armas corpo a corpo."
       }
     },
     "Pequenino": {
