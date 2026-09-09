@@ -47,7 +47,7 @@
           key: "ranged",
           name: "Visão Aguçada (Armas à Distância)",
           bonusName: "Visão Aguçada (Armas à Distância)",
-          desc: "+1 em jogadas de ataque com armas à distância."
+          desc: "Você recebe um bônus de +1 em jogadas de ataque com armas à distância, ou um bônus de +1 em testes de conjuração."
         },
         {
           key: "spell",
