@@ -22,7 +22,7 @@
     <source src="assets/music.ogg" type="audio/mpeg">
   </audio>
   
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 
   <!-- Importa estilos externos -->
   <link rel="stylesheet" href="style.css">
@@ -40,6 +40,18 @@
         <button id="btnToggleMusic" class="ghost">🎵 Música</button>
       </div>
     </header>
+
+    <!-- Trilha de progresso: acompanha automaticamente qual etapa da
+         criação está visível (ver progress.js) -->
+    <div class="progress-rail" id="progressRail" aria-hidden="true">
+      <div class="progress-rail-track">
+        <div class="progress-rail-fill" id="progressFill"></div>
+      </div>
+      <div class="progress-rail-caption">
+        <span id="progressStepLabel">Raça</span>
+        <span id="progressStepText">1/12</span>
+      </div>
+    </div>
 
     <!-- Etapa 0: carregar de permalink (ID único) -->
     <section id="loadedSection" style="display:none">
@@ -233,6 +245,9 @@
 
   <!-- Scripts externos para cada etapa -->
   <script src="base.js"></script>
+
+  <!-- Indicador de progresso das etapas -->
+  <script src="progress.js"></script>
   <!-- Módulo de áudio: define window.sfx, toggleMusic e sons -->
   <script src="audio.js"></script>
   <script src="attributes.js"></script>
