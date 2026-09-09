@@ -155,12 +155,22 @@
    * (mesmo formato usado pelo importador do Foundry para línguas e
    * magias de classe). Retorna um array vazio quando a raça não
    * concede talento (ex.: Meio-Elfo).
+   *
+   * IMPORTANTE: o importador do Foundry (sistema Shadowdark) só
+   * cria/anexa automaticamente um item de Talento a partir de uma
+   * entrada de `bonuses` quando `sourceType` é "Class" — não existe
+   * suporte a `sourceType: "Race"` nesse array, então uma entrada
+   * assim é ignorada silenciosamente e o talento racial nunca é
+   * criado na ficha (o jogador precisa adicionar manualmente).
+   * Por isso usamos "Class" mesmo se tratando de um talento racial:
+   * é o valor que o importador realmente reconhece para criar o
+   * item de Talento sem exigir nenhuma ação manual do usuário.
    */
   function buildBonuses(race, chosenKey){
     const talent = resolveTalent(race, chosenKey);
     if (!talent) return [];
     return [{
-      sourceType: "Race",
+      sourceType: "Class",
       sourceName: race || "",
       sourceCategory: "Talent",
       gainedAtLevel: 1,
