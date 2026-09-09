@@ -2,27 +2,49 @@
  *
  * Define, por classe, quais armas podem ser escolhidas como "Maestria"
  * (WeaponMastery no formato do shadowdarklings). Cada opção guarda o
- * nome em português (exibido ao jogador) e o identificador em inglês
- * usado no bônus exportado (bonusTo), compatível com o formato:
+ * nome exibido ao jogador; o identificador usado no bônus exportado
+ * (bonusTo) é o "slug" desse nome (minúsculo, sem acento, espaços
+ * viram hífen) — é esse slug que o Foundry usa para substituir o
+ * placeholder REPLACEME nas chaves de efeito do talento:
  *
+ *   system.roll.melee.bonus.REPLACEME  -> system.roll.melee.bonus.adaga
+ *   system.roll.melee.damage.REPLACEME -> system.roll.melee.damage.adaga
+ *
+ * (é o mesmo valor que o Foundry preenche sozinho quando o jogador
+ * escolhe a maestria "na unha", subindo de nível pelo sistema).
+ *
+ * O bônus final fica assim:
  * {
  *   "sourceType": "Class",
- *   "sourceName": "Fighter",
+ *   "sourceName": "Cavaleiro",
  *   "sourceCategory": "Ability",
  *   "name": "WeaponMastery",
  *   "bonusName": "Plus1AttackAndDamagePlusHalfLevel",
- *   "bonusTo": "Dagger",
+ *   "bonusTo": "adaga",
  *   "gainedAtLevel": 1
  * }
  *
  * Para adicionar mais opções no futuro, basta incluir novos objetos
- * { nome, bonusTo } na lista da classe desejada, ou novas classes.
+ * { nome } na lista da classe desejada (ou novas classes). Se o slug
+ * automático não bater com o nome usado no seu mundo do Foundry,
+ * informe manualmente um "bonusTo" para sobrescrever o cálculo.
  */
 (function () {
+  // ====== Utilitário ======
+  // Gera o slug (ex.: "Adaga" -> "adaga", "Espada Longa" -> "espada-longa")
+  function slugify(str) {
+    return String(str || "")
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // remove acentos
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
+
   // ====== Dados ======
   const MAESTRIA_POR_CLASSE = {
     "Cavaleiro": [
-      { nome: "Adaga", bonusTo: "Dagger" }
+      { nome: "Adaga" }
     ]
   };
 
@@ -90,7 +112,8 @@
         setEmpty();
         return;
       }
-      state.maestria = { nome: o.nome, bonusTo: o.bonusTo };
+      // bonusTo = slug manual (se informado) ou derivado do nome
+      state.maestria = { nome: o.nome, bonusTo: o.bonusTo || slugify(o.nome) };
       btnConfirm.disabled = false;
       select.value = String(idx);
     }
@@ -131,4 +154,5 @@
 
   window.MAESTRIA_POR_CLASSE = MAESTRIA_POR_CLASSE;
   window.attachMasteryStep = attachMasteryStep;
+  window.slugifyMaestria = slugify;
 })();

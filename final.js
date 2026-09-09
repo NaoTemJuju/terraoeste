@@ -465,13 +465,14 @@
       const opcoes = (window.MAESTRIA_POR_CLASSE && window.MAESTRIA_POR_CLASSE[src.classe]) || [];
       const encontrada = opcoes.find(o => o.nome === src.maestria);
       if (encontrada) {
+        const bonusTo = encontrada.bonusTo || (window.slugifyMaestria ? window.slugifyMaestria(encontrada.nome) : encontrada.nome.toLowerCase());
         bonuses.push({
           sourceType: "Class",
           sourceName: src.classe,
           sourceCategory: "Ability",
           name: "WeaponMastery",
           bonusName: "Plus1AttackAndDamagePlusHalfLevel",
-          bonusTo: encontrada.bonusTo,
+          bonusTo,
           gainedAtLevel: 1
         });
       }
