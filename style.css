@@ -1,93 +1,75 @@
-/* === RPG THEME — Grimório das Terras do Oeste (v3) ========================
-Direção visual: um livro de couro escuro (grimório) aberto sobre a mesa.
-A "capa" (fundo da página, o wrap, o cabeçalho, a trilha de progresso)
-é couro/latão escuro; o conteúdo interativo de cada etapa continua em
-"páginas" de pergaminho claro, mantendo a legibilidade dos formulários.
+/* === RPG THEME — West Marches Inspired (v2) ==============================
+Fixes & tweaks:
+- Progress bar now animates width reliably (.progress .bar).
+- Added CSS custom property support: set style="--value: 65" on .progress.
+- Buttons use SOLID borders (no dashed) including .ghost variant.
+- Focus ring improved (no dotted outline).
+- Minor contrast/spacing tweaks.
 ============================================================================ */
 
-/* Fontes: Cinzel para títulos (traço "gravado"), EB Garamond para o corpo */
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap');
+/* Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Droid+Serif:ital,wght@0,400;0,700;1,400&display=swap');
 
 :root{
-  /* ---- Couro & latão (moldura externa do grimório) ---- */
-  --void:#0b0806;
-  --leather:#1b130c; --leather-2:#26190f;
-  --brass:#a3803f; --brass-bright:#dcb56a;
-  --ink-light:#ece0c4; --muted-dark:#b3a07d;
-  --border-dark:#4a3620;
-
-  /* ---- Pergaminho (páginas / conteúdo interativo) ---- */
   --paper:#f6eedc; --paper-2:#efe7d1;
   --ink:#2a241f; --fg:#2a241f; --muted:#6a5f55;
   --border:#3b2c1a; --accent:#c59a4a; --accent-2:#8c2f2f;
   --success:#3f7d3f; --danger:#b93636;
-  --shadow:0 10px 26px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.25);
+  --shadow:0 8px 22px rgba(30,20,10,.16), inset 0 1px 0 rgba(255,255,255,.25);
+  --shadow-lift:0 14px 30px rgba(30,20,10,.24), inset 0 1px 0 rgba(255,255,255,.3);
+  --font-ui:"Montserrat", "Droid Serif", Georgia, serif;
+  --font-body:"Droid Serif", Georgia, serif;
+  --ease:cubic-bezier(.22,.9,.32,1);
 }
 
 *{box-sizing:border-box}
 html,body{height:100%}
 body{
   margin:0;
-  background:
-    radial-gradient(ellipse 900px 500px at 50% -8%, rgba(163,128,63,.16), transparent 60%),
-    radial-gradient(ellipse 1100px 700px at 50% 115%, rgba(0,0,0,.55), transparent 60%),
-    var(--void);
-  background-attachment:fixed;
+  background: url("6fa912a2-ef13-45da-96c6-f39966a378a2.png") repeat;
   color:var(--ink);
-  font-family:"EB Garamond","Droid Serif",Georgia,serif;
-  font-size:18px; line-height:1.6;
+  font-family:"Droid Serif", Georgia, serif;
+  font-size:18px; line-height:1.5;
   -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
-}
-/* Grão sutil sobre o fundo escuro, para textura de couro sem precisar de imagem */
-body::before{
-  content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
-  opacity:.5; mix-blend-mode:overlay;
-  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.06 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
 }
 
 .wrap{
-  position:relative; z-index:1;
-  max-width:980px; margin:0 auto; padding:32px 28px 84px;
-  background: linear-gradient(180deg,var(--leather-2) 0%, var(--leather) 100%);
-  border:1px solid var(--border-dark); border-radius:14px;
-  box-shadow:
-    0 0 0 6px rgba(0,0,0,.3),
-    0 0 0 7px rgba(163,128,63,.3),
-    0 20px 50px rgba(0,0,0,.55);
+  max-width:980px; margin:0 auto; padding:36px 24px 84px;
+  background: linear-gradient(165deg,var(--paper) 0%, var(--paper-2) 100%);
+  border:1px solid var(--border); border-radius:18px; box-shadow:var(--shadow-lift);
 }
 
 header{display:flex; align-items:center; justify-content:space-between; gap:16px;
-  margin-bottom:22px; padding-bottom:18px; position:relative;}
+  margin-bottom:22px; padding-bottom:18px;
+  border-bottom:1px solid rgba(59,44,26,.28);
+  position:relative;
+}
 header::after{
-  content:""; position:absolute; left:0; right:0; bottom:0; height:2px;
-  background:linear-gradient(90deg, transparent, var(--brass) 18%, var(--brass-bright) 50%, var(--brass) 82%, transparent);
-  opacity:.85;
+  content:""; position:absolute; left:0; bottom:-1px; width:96px; height:3px;
+  background:linear-gradient(90deg,var(--accent-2),var(--accent));
+  border-radius:999px;
 }
-header h1, header h2{
-  font-family:"Cinzel","Droid Serif",Georgia,serif;
-  color:var(--brass-bright); text-shadow:0 1px 0 rgba(0,0,0,.55);
+h1,h2,h3{font-family:var(--font-ui); letter-spacing:.2px; color:var(--ink); font-weight:800}
+h1{font-size:clamp(24px,3.6vw,36px); margin:0; line-height:1.15}
+h2{
+  font-size:clamp(17px,2.1vw,21px); margin:0 0 14px; text-transform:uppercase;
+  letter-spacing:1.2px; color:var(--ink);
+  display:flex; align-items:center; gap:10px;
 }
-header .sub{color:var(--muted-dark) !important}
-header button.ghost, header a.ghost{color:var(--ink-light) !important; border-color:var(--border-dark) !important}
-header button.ghost:hover, header a.ghost:hover{color:var(--ink-light) !important}
-
-h1,h2,h3{font-family:"Cinzel","Droid Serif",Georgia,serif; font-weight:600; letter-spacing:.4px; color:var(--ink)}
-h1{font-size:clamp(28px,4.2vw,44px); margin:0}
-h2{font-size:clamp(20px,2.6vw,26px); margin:0 0 12px}
-.sub{color:var(--muted); font-size:15px}
+h2::before{
+  content:""; display:inline-block; width:8px; height:8px; border-radius:50%;
+  background:linear-gradient(135deg,var(--accent-2),var(--accent));
+  box-shadow:0 0 0 3px rgba(140,47,47,.14);
+  flex:none;
+}
+.sub{color:var(--muted); font-size:14.5px; font-family:var(--font-ui); font-weight:600}
 
 section{
-  position:relative; border:1px solid var(--border); border-radius:10px;
-  padding:22px 24px; margin:18px 0;
-  background:linear-gradient(180deg,var(--paper) 0%, var(--paper-2) 100%);
-  box-shadow:0 14px 28px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.5);
-}
-/* Cada etapa é uma "página" solta dentro do grimório: uma lasca de
-   sombra na borda esquerda sugere a página presa à lombada do livro. */
-section::before{
-  content:""; position:absolute; left:-1px; top:10px; bottom:10px; width:3px;
-  background:linear-gradient(180deg, transparent, rgba(0,0,0,.18) 20%, rgba(0,0,0,.18) 80%, transparent);
-  border-radius:2px;
+  position:relative; border:1px solid rgba(59,44,26,.55); border-radius:16px;
+  padding:22px 22px 20px; margin:20px 0;
+  background:linear-gradient(180deg,rgba(255,255,255,.6),rgba(255,255,255,.18)), rgba(255,255,255,.25);
+  box-shadow:var(--shadow), inset 0 0 0 1px rgba(255,255,255,.22);
+  transition:box-shadow .25s var(--ease);
 }
 
 .row{display:flex; flex-wrap:wrap; gap:12px; align-items:center}
@@ -116,16 +98,16 @@ input:focus, select:focus, button:focus{
 button, a.ghost, a.primary{
   display:inline-flex; align-items:center; justify-content:center;
   appearance:none; border:1px solid var(--border);
-  background:linear-gradient(var(--brass-bright),var(--brass)); color:#1f160b;
-  padding:12px 16px; border-radius:999px; cursor:pointer; font-weight:700;
-  font-family:"EB Garamond","Droid Serif",Georgia,serif;
-  letter-spacing:.3px; transition:transform .06s ease, box-shadow .2s ease, background .2s ease;
+  background:linear-gradient(#dcc07e,#b08a3a); color:#1f160b;
+  padding:12px 18px; border-radius:999px; cursor:pointer; font-weight:700;
+  font-family:var(--font-ui); letter-spacing:.3px; font-size:14.5px;
+  transition:transform .16s var(--ease), box-shadow .2s var(--ease), background .2s var(--ease);
   box-shadow:var(--shadow); text-shadow:0 1px 0 rgba(255,255,255,.35);
   text-decoration:none; line-height:1.2;
 }
-button:hover:not(:disabled), a.ghost:hover, a.primary:hover{transform:translateY(-1px); box-shadow:0 8px 22px rgba(0,0,0,.4)}
-button:active:not(:disabled), a.ghost:active, a.primary:active{transform:translateY(0); background:linear-gradient(var(--brass),#8e6e29)}
-button:disabled{opacity:.65; cursor:not-allowed}
+button:hover:not(:disabled), a.ghost:hover, a.primary:hover{transform:translateY(-2px); box-shadow:var(--shadow-lift)}
+button:active:not(:disabled), a.ghost:active, a.primary:active{transform:translateY(0); background:linear-gradient(#b08a3a,#8e6e29)}
+button:disabled{opacity:.55; cursor:not-allowed; transform:none}
 
 /* Ghost variant now solid (no dashed) */
 button.ghost, a.ghost{
@@ -137,84 +119,91 @@ button.ghost, a.ghost{
 /* Pills */
 .pill{
   display:inline-flex; align-items:center; gap:8px;
-  border:1px solid var(--border); padding:10px 12px; border-radius:999px;
-  background:#f9f3e3; color:var(--ink);
+  border:1px solid var(--border); padding:10px 14px; border-radius:999px;
+  background:#f9f3e3; color:var(--ink); font-family:var(--font-ui); font-weight:600; font-size:14.5px;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.3);
 }
 
-/* Trilha de progresso das etapas (topo do grimório, fora das páginas) ------ */
-.progress-rail{margin:4px 0 26px}
-.progress-rail-track{
-  position:relative; height:6px; border-radius:999px;
-  background:rgba(236,224,196,.1);
-  box-shadow:inset 0 1px 3px rgba(0,0,0,.5);
-  overflow:hidden;
-}
-.progress-rail-fill{
-  height:100%; width:0%;
-  background:linear-gradient(90deg, var(--brass), var(--brass-bright));
-  box-shadow:0 0 10px rgba(220,181,106,.55);
-  transition:width .35s ease;
-}
-.progress-rail-caption{
-  display:flex; align-items:baseline; justify-content:space-between; gap:10px;
-  margin-top:9px;
-  font-family:"Cinzel","Droid Serif",Georgia,serif;
-}
-.progress-rail-caption #progressStepLabel{
-  color:var(--brass-bright); font-size:14px; letter-spacing:.5px; font-weight:600;
-}
-.progress-rail-caption #progressStepText{
-  color:var(--muted-dark); font-size:12px; letter-spacing:.5px;
-}
-@media (prefers-reduced-motion: reduce){
-  .progress-rail-fill{transition:none}
-}
-
-/* Progress (FIXED) -------------------------------------------------------- */
+/* Progress ----------------------------------------------------------------
+   A barra é animada via requestAnimationFrame no JS (base.js), quadro a
+   quadro — por isso NÃO tem transition própria por padrão (transitions
+   competindo com atualizações a cada frame é o que causava o efeito de
+   "engasgado"/baixo FPS). Enquanto está rolando, ganha a classe
+   .bar--rolling, que adiciona um brilho animado (puramente CSS, não afeta
+   o FPS real da barra).
+---------------------------------------------------------------------------- */
 .progress{
   --value: 0;                 /* optional: JS may set style="--value: 70" */
-  width:100%; height:12px; background:#e8dcc5;
-  border:1px solid var(--border); border-radius:999px; overflow:hidden; margin-top:10px;
-  box-shadow:inset 0 2px 4px rgba(0,0,0,.12);
+  width:100%; height:14px; background:#e6d9bd;
+  border:1px solid var(--border); border-radius:999px; overflow:hidden; margin-top:12px;
+  box-shadow:inset 0 2px 5px rgba(0,0,0,.16);
 }
 /* Allow either .bar width via inline style or via --value variable */
 .progress .bar,
 .bar{
   display:block; height:100%;
-  background:linear-gradient(90deg, var(--accent), #fff);
+  background:linear-gradient(90deg, var(--accent-2), var(--accent), #fff2cf);
   /* If inline style sets width, it wins; otherwise use --value */
   width: calc(var(--value) * 1%);
-  transition: width .25s ease;   /* smoother */
+  transition: width .25s ease;   /* usado apenas fora da animação via JS */
   will-change: width;
+  border-radius:999px;
 }
 
 /* Utility to animate from 0 when mounting */
 .progress.animate .bar{ width:0 }
 .progress.animate.start .bar{ width: calc(var(--value) * 1%); }
 
+/* Animação por JS (rAF): sem transition própria + brilho deslizante */
+.bar.bar--rolling{
+  transition:none;
+  background:linear-gradient(90deg, var(--accent-2), var(--accent) 45%, #fff6df 55%, var(--accent));
+  background-size:220% 100%;
+  animation:barShimmer 1s linear infinite;
+}
+@keyframes barShimmer{
+  0%{ background-position:220% 0; }
+  100%{ background-position:-40% 0; }
+}
+
+.roll-dice-icon{
+  width:20px; height:20px; margin-right:7px; vertical-align:middle; flex:none;
+}
+#hpCountdownContainer, #goldCountdownContainer, #attrsCountdownContainer{
+  display:flex; align-items:center; font-family:var(--font-ui); font-size:14.5px;
+  color:var(--muted);
+}
+
+/* Indicador de progresso das etapas (stepper) ------------------------------ */
+.stepper{ margin:2px 0 24px; }
+.stepper-track{
+  width:100%; height:8px; border-radius:999px; overflow:hidden;
+  background:rgba(59,44,26,.14);
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.16);
+}
+.stepper-fill{
+  height:100%; width:0%; border-radius:999px;
+  background:linear-gradient(90deg,var(--accent-2),var(--accent));
+  transition:width .4s var(--ease);
+}
+.stepper-label{
+  margin-top:8px; font-family:var(--font-ui); font-size:12.5px; font-weight:700;
+  letter-spacing:.6px; text-transform:uppercase; color:var(--muted);
+}
+
 /* Table & misc */
 .attrs{width:100%; border-collapse:collapse; margin-top:6px; font-size:17px;}
 .attrs th,.attrs td{border-bottom:1px solid rgba(59,44,26,.25); padding:10px 8px; text-align:left}
-.attrs th{font-weight:700; font-family:"EB Garamond","Droid Serif",Georgia,serif;}
+.attrs th{font-weight:700; font-family:"Droid Serif", Georgia, serif;}
 .attrs tr:nth-child(even){background-color:rgba(0,0,0,.03)}
 .attrs td.score{font-weight:800}
 .attrs .mod{opacity:.95}
 
 .final{
-  position:relative;
-  border:1px solid var(--border);
-  margin-top: 14px;
-  padding:20px 24px; border-radius:10px;
-  background:linear-gradient(180deg,var(--paper) 0%, var(--paper-2) 100%);
-  box-shadow:0 12px 24px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.5);
-}
-/* Selo de cera/latão no canto — marca o documento como "concluído" */
-.final::before{
-  content:""; position:absolute; top:-14px; right:24px; width:32px; height:32px;
-  border-radius:50%;
-  background:radial-gradient(circle at 35% 30%, var(--brass-bright), var(--brass) 55%, #6b4d22 100%);
-  box-shadow:0 3px 7px rgba(0,0,0,.45), inset 0 0 0 2px rgba(0,0,0,.18);
+  border:2px dashed rgba(59,44,26,.7);
+  margin-top: 12px;
+  padding:16px; border-radius:12px;
+  background:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,.15));
 }
 
 .hint{color:#6e5d49; font-size:14px; margin-top:8px}
@@ -225,6 +214,8 @@ a.link:hover{text-decoration-style:wavy; text-underline-offset:3px}
 
 @media (prefers-reduced-motion: reduce){
   .progress .bar{transition:none}
+  .bar.bar--rolling{animation:none}
+  .stepper-fill{transition:none}
   button{transition:none}
 }
 
@@ -342,7 +333,8 @@ a.link:hover{text-decoration-style:wavy; text-underline-offset:3px}
 
 .gm-topbar{
   display:flex; align-items:flex-start; justify-content:space-between;
-  gap:16px; padding-bottom:18px; margin-bottom:20px;
+  gap:16px; padding-bottom:16px; margin-bottom:20px;
+  border-bottom:2px solid var(--border);
 }
 .gm-topbar h1{font-size:clamp(22px,3.2vw,32px); margin:0; display:flex; align-items:center}
 .gm-seal{
@@ -353,13 +345,13 @@ a.link:hover{text-decoration-style:wavy; text-underline-offset:3px}
 
 .gm-tabs{display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap}
 .gm-tab{
-  border:1px solid var(--border-dark);
-  background:rgba(236,224,196,.12); color:var(--muted-dark);
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.35); color:var(--muted);
   padding:10px 20px; border-radius:10px; cursor:pointer;
-  font-weight:700; font-family:"EB Garamond","Droid Serif",Georgia,serif;
+  font-weight:700; font-family:"Droid Serif",Georgia,serif;
   box-shadow:none; transform:none;
 }
-.gm-tab:hover:not(:disabled){transform:none; box-shadow:none; background:rgba(236,224,196,.22)}
+.gm-tab:hover:not(:disabled){transform:none; box-shadow:none; background:rgba(255,255,255,.55)}
 .gm-tab[aria-selected="true"]{
   background:linear-gradient(180deg,var(--paper),var(--paper-2));
   color:var(--ink); border-color:var(--accent-2);
@@ -368,9 +360,8 @@ a.link:hover{text-decoration-style:wavy; text-underline-offset:3px}
 .gm-panel{
   display:none;
   border:1px solid var(--border);
-  border-radius:10px; padding:22px 24px;
-  background:linear-gradient(180deg,var(--paper) 0%, var(--paper-2) 100%);
-  box-shadow:0 14px 28px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.5);
+  border-radius:14px; padding:20px;
+  background:linear-gradient(180deg,rgba(255,255,255,.4),rgba(255,255,255,.12));
   margin-bottom:24px;
 }
 .gm-panel.active{display:block}
@@ -412,7 +403,7 @@ button.primary:active:not(:disabled){background:linear-gradient(#7c2624,#5c1c1a)
 /* Tabela de classes personalizadas */
 .gm-table{width:100%; border-collapse:collapse; font-size:16px; margin-top:4px}
 .gm-table th{
-  text-align:left; font-family:"EB Garamond","Droid Serif",Georgia,serif; font-weight:700;
+  text-align:left; font-family:"Droid Serif",Georgia,serif; font-weight:700;
   border-bottom:2px solid var(--border); padding:8px 10px; color:var(--muted); font-size:14px;
 }
 .gm-table td{border-bottom:1px solid rgba(59,44,26,.2); padding:12px 10px; vertical-align:top}
@@ -427,7 +418,7 @@ button.primary:active:not(:disabled){background:linear-gradient(#7c2624,#5c1c1a)
 /* Formulário de classe */
 .gm-fieldset{border:none; padding:0; margin:0 0 22px}
 .gm-fieldset legend{
-  font-family:"EB Garamond","Droid Serif",Georgia,serif; font-weight:700; font-size:16px;
+  font-family:"Droid Serif",Georgia,serif; font-weight:700; font-size:16px;
   color:var(--ink); padding:0 0 8px; border-bottom:1px solid rgba(59,44,26,.25);
   margin-bottom:14px; width:100%;
 }
@@ -486,7 +477,7 @@ button.primary:active:not(:disabled){background:linear-gradient(#7c2624,#5c1c1a)
   border:1px solid var(--border);
   background:linear-gradient(180deg,#fff8e8,#f3e3bd);
   box-shadow:var(--shadow);
-  font-family:"EB Garamond","Droid Serif",Georgia,serif;
+  font-family:"Droid Serif", Georgia, serif;
   font-size:26px; font-weight:800; color:var(--ink);
   cursor:grab; user-select:none; touch-action:none;
   transition:transform .12s ease, box-shadow .12s ease;

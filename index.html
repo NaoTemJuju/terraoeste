@@ -22,7 +22,7 @@
     <source src="assets/music.ogg" type="audio/mpeg">
   </audio>
   
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
 
   <!-- Importa estilos externos -->
   <link rel="stylesheet" href="style.css">
@@ -41,16 +41,11 @@
       </div>
     </header>
 
-    <!-- Trilha de progresso: acompanha automaticamente qual etapa da
-         criação está visível (ver progress.js) -->
-    <div class="progress-rail" id="progressRail" aria-hidden="true">
-      <div class="progress-rail-track">
-        <div class="progress-rail-fill" id="progressFill"></div>
-      </div>
-      <div class="progress-rail-caption">
-        <span id="progressStepLabel">Raça</span>
-        <span id="progressStepText">1/12</span>
-      </div>
+    <!-- Indicador de progresso: reflete automaticamente qual etapa está
+         visível no momento, sem interferir na lógica de navegação. -->
+    <div id="progressStepper" class="stepper" style="display:none">
+      <div class="stepper-track"><div class="stepper-fill" id="stepperFill"></div></div>
+      <div class="stepper-label" id="stepperText">Início</div>
     </div>
 
     <!-- Etapa 0: carregar de permalink (ID único) -->
@@ -245,9 +240,6 @@
 
   <!-- Scripts externos para cada etapa -->
   <script src="base.js"></script>
-
-  <!-- Indicador de progresso das etapas -->
-  <script src="progress.js"></script>
   <!-- Módulo de áudio: define window.sfx, toggleMusic e sons -->
   <script src="audio.js"></script>
   <script src="attributes.js"></script>

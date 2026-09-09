@@ -214,55 +214,26 @@
     $("#rolling").style.display = "";
     $("#attrsResult").style.display = "none";
 
-    const bar = $("#rollBar");
-    let elapsed = 0, total = 5000, tick = 100;
-    bar.style.width = "0%";
-
-    const countdownElement = $("#attrsCountdown");
-    let countdownTime = 5;
-
-    const diceGif = document.createElement("img");
-    diceGif.src = "https://images.emojiterra.com/google/noto-emoji/animated-emoji/1f3b2.gif";
-    diceGif.alt = "Rolando dados";
-    diceGif.style.width = "20px";
-    diceGif.style.marginRight = "5px";
-
-    const countdownContainer = document.querySelector("#attrsCountdownContainer");
-    if (countdownContainer) {
-      countdownContainer.innerHTML = "";
-      countdownContainer.appendChild(diceGif);
-      countdownContainer.innerHTML += "<strong>Rolando dados...</strong> ";
-    }
-
-    const it = setInterval(() => {
-      elapsed += tick;
-      const width = Math.min(100, Math.floor(elapsed / total * 100));
-      bar.style.width = width + "%";
-
-      const rollNumber = $("#rollNumber");
-      if (rollNumber) rollNumber.textContent = Math.floor(width);
-
-      if (countdownElement) {
-        countdownTime = Math.max(0, Math.floor((total - elapsed) / 1000));
-        countdownElement.textContent = `(${countdownTime}s)`;
-      }
-
-      if (elapsed >= total) {
-        clearInterval(it);
-
+    window.app.runRollAnimation({
+      rollingId: "rolling",
+      barId: "rollBar",
+      countdownContainerId: "attrsCountdownContainer",
+      countdownId: "attrsCountdown",
+      label: "Rolando dados...",
+      totalMs: 5000,
+      onDone: () => {
         pool = Array.from({ length: ATTRS.length }, () => roll3d6());
         assignment = new Array(ATTRS.length).fill(null);
         heldPoolIdx = null;
 
         renderAll();
 
-        $("#rolling").style.display = "none";
         $("#attrsResult").style.display = "";
 
         window.app.attrsLocked = false;
         updateRerollButtonLabel();
       }
-    }, tick);
+    });
   }
 
   // === Eventos ===

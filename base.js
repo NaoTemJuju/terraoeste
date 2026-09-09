@@ -212,6 +212,147 @@
       `;
   }
 
+  // ====================== Animação de rolagem (barra de progresso) ======================
+  /**
+   * Anima uma barra de progresso de forma suave usando
+   * requestAnimationFrame (interpola quadro a quadro, em vez de saltar
+   * de 100 em 100ms via setInterval — o que antes causava a sensação
+   * de "engasgado"/baixo FPS). Garante também que a barra chegue
+   * visualmente a 100% e permaneça assim por um instante antes de
+   * chamar `onDone`, para nunca avançar de etapa com a barra "quase
+   * cheia".
+   *
+   * @param {Object} opts
+   * @param {string} opts.rollingId            id do container da animação (mostrado/escondido)
+   * @param {string} opts.barId                id do elemento .bar
+   * @param {string} opts.countdownContainerId id do container do texto + dado
+   * @param {string} opts.countdownId          id do <span> do contador (Xs)
+   * @param {string} [opts.label]              texto exibido (ex.: "Rolando ouro...")
+   * @param {number} [opts.totalMs]            duração total da animação
+   * @param {Function} [opts.onDone]           chamado quando a barra termina (já em 100%)
+   */
+  function runRollAnimation(opts){
+    const {
+      rollingId, barId, countdownContainerId, countdownId,
+      label = "Rolando...", totalMs = 3000, onDone
+    } = opts || {};
+
+    const rolling = rollingId ? document.getElementById(rollingId) : null;
+    const bar = barId ? document.getElementById(barId) : null;
+    const countdownContainer = countdownContainerId ? document.getElementById(countdownContainerId) : null;
+    const countdownEl = countdownId ? document.getElementById(countdownId) : null;
+
+    if (rolling) rolling.style.display = "";
+    if (bar) {
+      bar.classList.add("bar--rolling");
+      bar.style.width = "0%";
+    }
+
+    // Monta o cabeçalho da animação (ícone do dado + texto + contador),
+    // preservando o <span> do contador dentro do DOM (antes ele era
+    // descartado por engano e o "(5s)...(0s)" nunca aparecia de fato).
+    if (countdownContainer) {
+      countdownContainer.innerHTML = "";
+      const diceGif = document.createElement("img");
+      diceGif.src = "https://images.emojiterra.com/google/noto-emoji/animated-emoji/1f3b2.gif";
+      diceGif.alt = "Rolando dado";
+      diceGif.className = "roll-dice-icon";
+      countdownContainer.appendChild(diceGif);
+
+      const strong = document.createElement("strong");
+      strong.textContent = label + " ";
+      countdownContainer.appendChild(strong);
+
+      if (countdownEl) countdownContainer.appendChild(countdownEl);
+    }
+
+    const start = performance.now();
+
+    function frame(now){
+      const elapsed = Math.min(totalMs, now - start);
+      const pct = (elapsed / totalMs) * 100;
+      if (bar) bar.style.width = pct.toFixed(2) + "%";
+      if (countdownEl) {
+        const remaining = Math.max(0, Math.ceil((totalMs - elapsed) / 1000));
+        countdownEl.textContent = `(${remaining}s)`;
+      }
+
+      if (elapsed < totalMs) {
+        requestAnimationFrame(frame);
+      } else {
+        if (bar) bar.style.width = "100%";
+        // Segura a barra cheia visível por um instante antes de avançar.
+        setTimeout(() => {
+          if (bar) bar.classList.remove("bar--rolling");
+          if (rolling) rolling.style.display = "none";
+          if (typeof onDone === "function") onDone();
+        }, 220);
+      }
+    }
+
+    requestAnimationFrame(frame);
+  }
+
+  // ====================== Indicador de progresso (stepper) ======================
+  /**
+   * Etapas do fluxo de criação, na ordem em que aparecem no HTML.
+   * Usado apenas para exibir "Etapa X de N — Nome" no topo da página;
+   * não interfere em nenhuma lógica de navegação existente.
+   */
+  const STEP_DEFS = [
+    { id: "stepRace",      label: "Raça" },
+    { id: "stepClass",     label: "Classe" },
+    { id: "stepMastery",   label: "Maestria em Arma" },
+    { id: "stepOrigin",    label: "Origem" },
+    { id: "stepAlign",     label: "Alinhamento" },
+    { id: "stepDeity",     label: "Divindade" },
+    { id: "stepLang",      label: "Línguas" },
+    { id: "stepHP",        label: "Pontos de Vida" },
+    { id: "stepGold",      label: "Ouro Inicial" },
+    { id: "stepAttrs",     label: "Atributos" },
+    { id: "stepShop",      label: "Lojinha" },
+    { id: "stepNameEntry", label: "Nome" },
+    { id: "stepFinal",     label: "Ficha Final" }
+  ];
+
+  function initStepper(){
+    const stepperEl = document.getElementById("progressStepper");
+    const fill = document.getElementById("stepperFill");
+    const text = document.getElementById("stepperText");
+    if (!stepperEl || !fill || !text) return;
+
+    function refresh(){
+      const loaded = document.getElementById("loadedSection");
+      if (loaded && loaded.style.display !== "none") {
+        stepperEl.style.display = "none";
+        return;
+      }
+      let lastVisibleIdx = -1;
+      STEP_DEFS.forEach((s, i) => {
+        const el = document.getElementById(s.id);
+        if (el && el.style.display !== "none") lastVisibleIdx = i;
+      });
+      if (lastVisibleIdx === -1) {
+        stepperEl.style.display = "none";
+        return;
+      }
+      stepperEl.style.display = "";
+      const pct = Math.round(((lastVisibleIdx + 1) / STEP_DEFS.length) * 100);
+      fill.style.width = pct + "%";
+      text.textContent = `Etapa ${lastVisibleIdx + 1} de ${STEP_DEFS.length} — ${STEP_DEFS[lastVisibleIdx].label}`;
+    }
+
+    const observer = new MutationObserver(refresh);
+    STEP_DEFS.forEach(s => {
+      const el = document.getElementById(s.id);
+      if (el) observer.observe(el, { attributes: true, attributeFilter: ["style"] });
+    });
+    const loaded = document.getElementById("loadedSection");
+    if (loaded) observer.observe(loaded, { attributes: true, attributeFilter: ["style"] });
+
+    refresh();
+  }
+
   function hideCreationUI(){
     const ids = [
       "stepName","stepAttrs","stepRace","stepClass","stepOrigin","stepHP",
@@ -716,6 +857,7 @@
 	  setupNameInput();
 	  tryLoadFromHash();
 	  setupLoadedButtons();
+	  initStepper();
 
 	// === Botão de Geração Aleatória ===
 	const btnGenAll = document.getElementById('btnGenerateAll');
@@ -759,6 +901,7 @@
     alignmentToPT,
     // Novas utilidades
     showCheck,
+    runRollAnimation,
     // randomNameByRace e toggleMusic agora são definidos em módulos separados.
     generateEverything,
     // GM
