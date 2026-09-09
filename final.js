@@ -240,8 +240,8 @@
       name,
       stats: { ...stats },
       rolledStats: { ...stats },
-      ancestry: window.app.raceToEN ? window.app.raceToEN(ancestry) : ancestry,
-      class: window.app.classToEN ? window.app.classToEN(cls) : cls,
+      ancestry,
+      class: cls,
       level,
       levels: [{
         level,
@@ -457,8 +457,8 @@
       name: src?.nome || "",
       stats: { ...stats },
       rolledStats: { ...stats },
-      ancestry: window.app.raceToEN ? window.app.raceToEN(src?.raca || "") : (src?.raca || ""),
-      class: window.app.classToEN ? window.app.classToEN(src?.classe || "") : (src?.classe || ""),
+      ancestry: src?.raca || "",
+      class: src?.classe || "",
       level,
       levels: [{
         level,

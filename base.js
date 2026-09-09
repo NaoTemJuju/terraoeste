@@ -42,58 +42,6 @@
   }
 
   /**
-   * O mesmo problema do alignment vale para `ancestry` e `class`: o
-   * importador nativo do sistema Shadowdark (Muttley/foundryvtt-shadowdark)
-   * para arquivos do Shadowdarklings.net reconhece essas chaves em
-   * inglês (ex.: "Half-Orc", "Fighter") para anexar automaticamente o
-   * item de Ancestralidade/Classe correto e conceder o talento inato —
-   * mesmo com o Foundry todo traduzido pro PT-BR, pois a tradução só
-   * afeta o texto exibido, não a chave usada na importação.
-   *
-   * Confirmado contra o compêndio oficial (shadowdark.ancestries.json /
-   * shadowdark.classes.json do módulo shadowdark-rpg-br) apenas para as
-   * entradas abaixo. Raças/classes fora dessas tabelas (Gnomo,
-   * Meio-Elfo, e a maioria das classes de expansão/homebrew do site)
-   * não têm uma chave em inglês confirmada — nesses casos a função
-   * devolve o nome em PT sem alterar nada (mesmo comportamento de antes).
-   */
-  const RACE_PT_TO_EN = {
-    "Anão": "Dwarf",
-    "Elfo": "Elf",
-    "Goblin": "Goblin",
-    "Humano": "Human",
-    "Meio-Orc": "Half-Orc",
-    "Pequenino": "Halfling"
-    // "Gnomo" e "Meio-Elfo" não são ancestralidades oficiais do Shadowdark
-    // (não existem no compêndio) — sem chave EN pra mapear.
-  };
-  const CLASS_PT_TO_EN = {
-    "Guerreiro": "Fighter",
-    "Sacerdote": "Priest",
-    "Mago": "Wizard",
-    "Malandro": "Thief"
-    // Demais classes do site (Assassino, Bárbaro, Bardo, Bruxo, Caçador,
-    // Cavaleiro, Druida, Explorador, Feiticeiro, Pactário, Paladino,
-    // Patrulheiro) não constam no compêndio traduzido disponível —
-    // prováveis candidatas (Ranger, Warlock, Witch, Bard...) mas não
-    // confirmadas, então não foram mapeadas para evitar chute errado.
-  };
-  function raceToEN(pt){
-    if (!pt) return pt || "";
-    return RACE_PT_TO_EN[pt] || pt;
-  }
-  function classToEN(pt){
-    if (!pt) return pt || "";
-    return CLASS_PT_TO_EN[pt] || pt;
-  }
-  /** Indica se a raça tem uma ancestralidade oficial EN confirmada
-   *  (diferente de checar `raceToEN(pt) !== pt`, que falha para o
-   *  Goblin, cujo nome é igual em EN e PT). */
-  function hasOfficialRaceEN(pt){
-    return Object.prototype.hasOwnProperty.call(RACE_PT_TO_EN, pt || "");
-  }
-
-  /**
    * Lista de raças disponíveis. Cada raça possui habilidades
    * específicas definidas em módulos externos (por exemplo, línguas
    * concedidas em languages.js). A lógica de escolha e aleatoriedade
@@ -815,9 +763,6 @@
     normalizeForView,
     alignmentToEN,
     alignmentToPT,
-    raceToEN,
-    classToEN,
-    hasOfficialRaceEN,
     // Novas utilidades
     showCheck,
     // randomNameByRace e toggleMusic agora são definidos em módulos separados.
