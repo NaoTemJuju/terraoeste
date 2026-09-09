@@ -155,10 +155,22 @@
    * (mesmo formato usado pelo importador do Foundry para línguas e
    * magias de classe). Retorna um array vazio quando a raça não
    * concede talento (ex.: Meio-Elfo).
+   *
+   * IMPORTANTE: para raças que têm uma ancestralidade oficial
+   * equivalente em inglês (ver RACE_PT_TO_EN em base.js — Anão, Elfo,
+   * Goblin, Humano, Meio-Orc, Pequenino), o importador nativo do
+   * Foundry já anexa o talento correto sozinho a partir do campo
+   * `ancestry` do JSON. Uma entrada manual aqui, nesses casos, é
+   * redundante e foi o que causava o aviso de "personagem parcial"
+   * (bonusName não reconhecido pelo importador). Por isso, só geramos
+   * a entrada manual quando NÃO existe uma chave em inglês confirmada
+   * (hoje, só o Gnomo se enquadra nisso).
    */
   function buildBonuses(race, chosenKey){
     const talent = resolveTalent(race, chosenKey);
     if (!talent) return [];
+    const hasOfficialEN = !!(window.app && window.app.hasOfficialRaceEN && window.app.hasOfficialRaceEN(race));
+    if (hasOfficialEN) return [];
     return [{
       sourceType: "Race",
       sourceName: race || "",
