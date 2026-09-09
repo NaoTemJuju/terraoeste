@@ -195,6 +195,7 @@
           <div><strong>Nome</strong><br>${escapeHTML(result.nome || "—")}</div>
           <div><strong>Raça</strong><br>${result.raca || "—"}</div>
           <div><strong>Classe</strong><br>${result.classe || "—"}</div>
+          ${result.maestria ? `<div><strong>Maestria em Arma</strong><br>${escapeHTML(result.maestria)}</div>` : ""}
           <div><strong>Origem</strong><br>${result.origem || "—"}</div>
           <div><strong>Alinhamento</strong><br>${result.alinhamento || "—"}</div>
           <div><strong>Divindade</strong><br>${result.divindade || "—"}</div>
@@ -415,6 +416,7 @@
     race:null,
     cls:null,
     origem:null,
+    maestria:null,
     hp:null,
     hpDetail:null,
     gold:null,

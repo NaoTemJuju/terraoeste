@@ -228,6 +228,21 @@
     const copperFinal = state.copper ?? 0;
     const gearSlotsUsed = shopGear.reduce((sum, g) => sum + (g.slots || 0), 0);
 
+    // Bônus de Maestria em Arma (ex.: Cavaleiro), no formato usado
+    // pelo shadowdarklings, para ser incluído no .json exportado.
+    const bonuses = [];
+    if (state.maestria && state.maestria.bonusTo) {
+      bonuses.push({
+        sourceType: "Class",
+        sourceName: cls,
+        sourceCategory: "Ability",
+        name: "WeaponMastery",
+        bonusName: "Plus1AttackAndDamagePlusHalfLevel",
+        bonusTo: state.maestria.bonusTo,
+        gainedAtLevel: 1
+      });
+    }
+
     // Objeto para import no Foundry (estrutura em EN)
     const exportObj = {
       name,
@@ -265,7 +280,7 @@
       armorClass: 10,
       gearSlotsTotal: 10,
       gearSlotsUsed,
-      bonuses: [],
+      bonuses,
       goldRolled: state.goldRolled ?? state.gold ?? 0,
       gold: goldFinal,
       silver: silverFinal,
@@ -301,6 +316,7 @@
       nome: state.name || "Aventureiro",
       raca: state.race || "",
       classe: state.cls || "",
+      maestria: state.maestria ? state.maestria.nome : null,
       origem: state.origem ? state.origem.titulo : null,
       origem_desc: state.origem ? state.origem.descricao : null,
       alinhamento: state.align || "",
@@ -442,6 +458,25 @@
     const shopLedger = Array.isArray(src?.compras) ? src.compras : [];
     const gearSlotsUsed = gear.reduce((sum, g) => sum + (g.slots || 0), 0);
 
+    // Reconstrói o bônus de Maestria em Arma a partir do nome salvo,
+    // procurando o bonusTo (EN) correspondente na tabela de mastery.js.
+    const bonuses = [];
+    if (src?.maestria && src?.classe) {
+      const opcoes = (window.MAESTRIA_POR_CLASSE && window.MAESTRIA_POR_CLASSE[src.classe]) || [];
+      const encontrada = opcoes.find(o => o.nome === src.maestria);
+      if (encontrada) {
+        bonuses.push({
+          sourceType: "Class",
+          sourceName: src.classe,
+          sourceCategory: "Ability",
+          name: "WeaponMastery",
+          bonusName: "Plus1AttackAndDamagePlusHalfLevel",
+          bonusTo: encontrada.bonusTo,
+          gainedAtLevel: 1
+        });
+      }
+    }
+
     return {
       name: src?.nome || "",
       stats: { ...stats },
@@ -478,7 +513,7 @@
       armorClass: 10,
       gearSlotsTotal: 10,
       gearSlotsUsed,
-      bonuses: [],
+      bonuses,
       goldRolled: src?.ouroRolado ?? src?.ouro ?? 0,
       gold: src?.ouro || 0,
       silver: src?.prata || 0,

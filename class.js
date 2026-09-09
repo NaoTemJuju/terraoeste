@@ -43,12 +43,14 @@
       // Feedback visual
       try { window.app && window.app.showCheck && window.app.showCheck(btnConfirmClass); } catch {}
       // Reseta visibilidade das seções subsequentes
+      const stepMastery = $("#stepMastery");
       const stepOrigin = $("#stepOrigin");
       const stepHP    = $("#stepHP");
       const stepGold  = $("#stepGold");
       const stepAlign = $("#stepAlign");
       const stepFinal = $("#stepFinal");
-      if (stepOrigin) stepOrigin.style.display = "";
+      if (stepMastery) stepMastery.style.display = "none";
+      if (stepOrigin) stepOrigin.style.display = "none";
       if (stepHP)    stepHP.style.display = "none";
       if (stepGold)  stepGold.style.display = "none";
       if (stepAlign) stepAlign.style.display = "none";
@@ -61,30 +63,43 @@
       if (btnRollHP) btnRollHP.disabled = false;
       if (goldOut) goldOut.style.display = "none";
       if (btnRollGold) btnRollGold.disabled = false;
-      // Chama a etapa de origem definida em origens.js
-      if (typeof window.attachOriginStep === "function") {
-        window.attachOriginStep(state, () => {
-          // Callback após confirmação da origem
-          // Em vez de exibir PV diretamente, avançamos para alinhamento
-          // Limpa HP e Ouro e oculta suas seções até o final do fluxo
-          state.hp = null;
-          if (hpOut) hpOut.style.display = "none";
-          if (btnRollHP) btnRollHP.disabled = false;
-          state.gold = null;
-          if (goldOut) goldOut.style.display = "none";
-          if (btnRollGold) btnRollGold.disabled = false;
-          // Avança para a etapa de alinhamento
-          if (typeof window.app.showAlignmentStep === 'function') {
-            window.app.showAlignmentStep();
-          } else if (stepAlign) {
-            stepAlign.style.display = '';
-            stepAlign.scrollIntoView({ behavior:'smooth', block:'start' });
-          }
-          // Garante que etapas posteriores não apareçam prematuramente
-          if (stepHP) stepHP.style.display = 'none';
-          if (stepGold) stepGold.style.display = 'none';
-          if (stepFinal) stepFinal.style.display = 'none';
-        });
+
+      // Após a Maestria (se houver para a classe), segue para Origem
+      function goToOriginStep(){
+        if (stepOrigin) stepOrigin.style.display = "";
+        if (typeof window.attachOriginStep === "function") {
+          window.attachOriginStep(state, () => {
+            // Callback após confirmação da origem
+            // Em vez de exibir PV diretamente, avançamos para alinhamento
+            // Limpa HP e Ouro e oculta suas seções até o final do fluxo
+            state.hp = null;
+            if (hpOut) hpOut.style.display = "none";
+            if (btnRollHP) btnRollHP.disabled = false;
+            state.gold = null;
+            if (goldOut) goldOut.style.display = "none";
+            if (btnRollGold) btnRollGold.disabled = false;
+            // Avança para a etapa de alinhamento
+            if (typeof window.app.showAlignmentStep === 'function') {
+              window.app.showAlignmentStep();
+            } else if (stepAlign) {
+              stepAlign.style.display = '';
+              stepAlign.scrollIntoView({ behavior:'smooth', block:'start' });
+            }
+            // Garante que etapas posteriores não apareçam prematuramente
+            if (stepHP) stepHP.style.display = 'none';
+            if (stepGold) stepGold.style.display = 'none';
+            if (stepFinal) stepFinal.style.display = 'none';
+          });
+        }
+      }
+
+      // Etapa de Maestria em Arma (mastery.js): só aparece para classes
+      // com opções cadastradas (ex.: Cavaleiro). Para as demais, a
+      // etapa é pulada automaticamente e segue direto para Origem.
+      if (typeof window.attachMasteryStep === "function") {
+        window.attachMasteryStep(state, goToOriginStep);
+      } else {
+        goToOriginStep();
       }
     });
   }
