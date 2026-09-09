@@ -421,7 +421,7 @@ button.primary:active:not(:disabled){background:linear-gradient(#7c2624,#5c1c1a)
 }
 
 .attrs-slots-grid{
-  display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  display:grid; grid-template-columns:repeat(6,1fr);
   gap:12px; margin-top:16px;
 }
 .attr-slot{
@@ -451,6 +451,10 @@ button.primary:active:not(:disabled){background:linear-gradient(#7c2624,#5c1c1a)
   box-shadow:0 0 0 3px rgba(140,47,47,.2);
 }
 .attr-slot.locked{cursor:default; opacity:.9}
+
+@media (max-width:900px){
+  .attrs-slots-grid{grid-template-columns:repeat(3,1fr)}
+}
 
 @media (max-width:640px){
   .attr-card{width:54px; height:68px; font-size:22px}

@@ -43,12 +43,32 @@
 
   function updateRerollButtonLabel(){
     if (!btnRerollAttrs) return;
+    const hint = $("#attrsRerollHint");
+    const eligible = poolQualifiesForReroll();
+
     if (rerollsUsed >= REROLL_LIMIT){
       btnRerollAttrs.disabled = true;
       btnRerollAttrs.textContent = "Rerolagem já usada";
-    } else {
+      if (hint) hint.style.display = "none";
+    } else if (!eligible){
+      // Veio pelo menos 1 atributo 14+: não tem direito à rerolagem.
+      btnRerollAttrs.disabled = true;
       btnRerollAttrs.textContent = "Rolar Novamente (1x)";
+      if (hint) hint.style.display = "none";
+    } else {
+      // Nenhum atributo 14+: pode rolar novamente se quiser.
+      btnRerollAttrs.disabled = false;
+      btnRerollAttrs.textContent = "Rolar Novamente (1x)";
+      if (hint) hint.style.display = "";
     }
+  }
+
+  /**
+   * Só tem direito à rerolagem se NENHUM dos 6 valores rolados for
+   * 14 ou mais (ou seja, a pool inteira precisa estar abaixo de 14).
+   */
+  function poolQualifiesForReroll(){
+    return pool.length > 0 && pool.every(v => v < 14);
   }
 
   /**
@@ -261,7 +281,7 @@
   if (btnRerollAttrs) {
     btnRerollAttrs.addEventListener("click", (ev) => {
       ev.stopPropagation();
-      if (window.app.attrsLocked || rerollsUsed >= REROLL_LIMIT) return;
+      if (window.app.attrsLocked || rerollsUsed >= REROLL_LIMIT || !poolQualifiesForReroll()) return;
 
       if (!rerollConfirmPending) {
         rerollConfirmPending = true;
