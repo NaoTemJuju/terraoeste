@@ -9,7 +9,7 @@ Fixes & tweaks:
 
 /* Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Droid+Serif:ital,wght@0,400;0,700;1,400&display=swap');
-@import url('https://fonts.cdnfonts.com/css/jsl-blackletter');
+@import url('https://fonts.cdnfonts.com/css/enchanted-land');
 
 :root{
   --paper:#f6eedc; --paper-2:#efe7d1;
@@ -20,7 +20,7 @@ Fixes & tweaks:
   --shadow-lift:0 14px 30px rgba(30,20,10,.24), inset 0 1px 0 rgba(255,255,255,.3);
   --font-ui:"Montserrat", "Droid Serif", Georgia, serif;
   --font-body:"Droid Serif", Georgia, serif;
-  --font-title:"JSL Blackletter", "Droid Serif", Georgia, serif;
+  --font-title:"Enchanted Land", "Droid Serif", Georgia, serif;
   --ease:cubic-bezier(.22,.9,.32,1);
 }
 
@@ -55,13 +55,13 @@ h1,h3{font-family:var(--font-body); letter-spacing:.5px; color:var(--ink)}
 h1{font-size:clamp(28px,4.2vw,44px); margin:0; font-weight:700}
 h3{font-weight:700}
 
-/* Cabeçalhos de seção com a JSL Blackletter (fonte gótica gratuita,
-   parecida em espírito com a lettering usada nos títulos do livro do
-   Shadowdark) — sem fundo, só o texto em destaque. */
+/* Cabeçalhos de seção com Enchanted Land (fonte gratuita, estilo
+   storybook/fantasia) — sem fundo, e em caixa normal (a própria fonte
+   não é feita pra maiúsculas o tempo todo). */
 h2{
   font-family:var(--font-title); font-weight:400;
-  font-size:clamp(26px,3.6vw,34px); margin:0 0 14px;
-  letter-spacing:1px; color:#1c1712;
+  font-size:clamp(28px,4vw,38px); margin:0 0 12px;
+  letter-spacing:.3px; color:#1c1712;
   text-shadow:0 1px 0 rgba(255,255,255,.35);
 }
 .sub{color:var(--muted); font-size:15px; font-family:var(--font-body)}
