@@ -46,23 +46,27 @@ header{display:flex; align-items:center; justify-content:space-between; gap:16px
 }
 header::after{
   content:""; position:absolute; left:0; bottom:-1px; width:96px; height:3px;
-  background:linear-gradient(90deg,var(--accent-2),var(--accent));
+  background:linear-gradient(90deg,var(--accent),#fff2cf);
   border-radius:999px;
 }
-h1,h2,h3{font-family:var(--font-ui); letter-spacing:.2px; color:var(--ink); font-weight:800}
-h1{font-size:clamp(24px,3.6vw,36px); margin:0; line-height:1.15}
+h1,h3{font-family:var(--font-body); letter-spacing:.5px; color:var(--ink)}
+h1{font-size:clamp(28px,4.2vw,44px); margin:0; font-weight:700}
+h3{font-weight:700}
+
+/* Cabeçalhos de seção no estilo autêntico do livro do Shadowdark:
+   barra preta, texto branco em Montserrat (a fonte oficial usada no
+   livro é justamente a Montserrat) — só aqui, o resto do site
+   continua na serifada de sempre. */
 h2{
-  font-size:clamp(17px,2.1vw,21px); margin:0 0 14px; text-transform:uppercase;
-  letter-spacing:1.2px; color:var(--ink);
-  display:flex; align-items:center; gap:10px;
+  font-family:var(--font-ui); font-weight:700;
+  font-size:clamp(15px,1.9vw,18px); margin:0 0 16px;
+  text-transform:uppercase; letter-spacing:1.4px;
+  color:#f4ead2;
+  background:#1c1712;
+  padding:10px 16px; border-radius:8px;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06), 0 3px 8px rgba(0,0,0,.25);
 }
-h2::before{
-  content:""; display:inline-block; width:8px; height:8px; border-radius:50%;
-  background:linear-gradient(135deg,var(--accent-2),var(--accent));
-  box-shadow:0 0 0 3px rgba(140,47,47,.14);
-  flex:none;
-}
-.sub{color:var(--muted); font-size:14.5px; font-family:var(--font-ui); font-weight:600}
+.sub{color:var(--muted); font-size:15px; font-family:var(--font-body)}
 
 section{
   position:relative; border:1px solid rgba(59,44,26,.55); border-radius:16px;
@@ -100,7 +104,7 @@ button, a.ghost, a.primary{
   appearance:none; border:1px solid var(--border);
   background:linear-gradient(#dcc07e,#b08a3a); color:#1f160b;
   padding:12px 18px; border-radius:999px; cursor:pointer; font-weight:700;
-  font-family:var(--font-ui); letter-spacing:.3px; font-size:14.5px;
+  letter-spacing:.3px; font:inherit;
   transition:transform .16s var(--ease), box-shadow .2s var(--ease), background .2s var(--ease);
   box-shadow:var(--shadow); text-shadow:0 1px 0 rgba(255,255,255,.35);
   text-decoration:none; line-height:1.2;
@@ -119,8 +123,8 @@ button.ghost, a.ghost{
 /* Pills */
 .pill{
   display:inline-flex; align-items:center; gap:8px;
-  border:1px solid var(--border); padding:10px 14px; border-radius:999px;
-  background:#f9f3e3; color:var(--ink); font-family:var(--font-ui); font-weight:600; font-size:14.5px;
+  border:1px solid var(--border); padding:10px 12px; border-radius:999px;
+  background:#f9f3e3; color:var(--ink); font:inherit;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.3);
 }
 
@@ -142,7 +146,7 @@ button.ghost, a.ghost{
 .progress .bar,
 .bar{
   display:block; height:100%;
-  background:linear-gradient(90deg, var(--accent-2), var(--accent), #fff2cf);
+  background:linear-gradient(90deg, var(--accent), #fff8e6);
   /* If inline style sets width, it wins; otherwise use --value */
   width: calc(var(--value) * 1%);
   transition: width .25s ease;   /* usado apenas fora da animação via JS */
@@ -154,10 +158,10 @@ button.ghost, a.ghost{
 .progress.animate .bar{ width:0 }
 .progress.animate.start .bar{ width: calc(var(--value) * 1%); }
 
-/* Animação por JS (rAF): sem transition própria + brilho deslizante */
+/* Animação por JS (rAF): sem transition própria + brilho deslizante (amarelo → branco) */
 .bar.bar--rolling{
   transition:none;
-  background:linear-gradient(90deg, var(--accent-2), var(--accent) 45%, #fff6df 55%, var(--accent));
+  background:linear-gradient(90deg, var(--accent) 0%, #fff8e6 50%, var(--accent) 100%);
   background-size:220% 100%;
   animation:barShimmer 1s linear infinite;
 }
@@ -170,7 +174,7 @@ button.ghost, a.ghost{
   width:20px; height:20px; margin-right:7px; vertical-align:middle; flex:none;
 }
 #hpCountdownContainer, #goldCountdownContainer, #attrsCountdownContainer{
-  display:flex; align-items:center; font-family:var(--font-ui); font-size:14.5px;
+  display:flex; align-items:center; font-family:var(--font-body); font-size:15px;
   color:var(--muted);
 }
 
@@ -183,12 +187,12 @@ button.ghost, a.ghost{
 }
 .stepper-fill{
   height:100%; width:0%; border-radius:999px;
-  background:linear-gradient(90deg,var(--accent-2),var(--accent));
+  background:linear-gradient(90deg,var(--accent),#fff8e6);
   transition:width .4s var(--ease);
 }
 .stepper-label{
-  margin-top:8px; font-family:var(--font-ui); font-size:12.5px; font-weight:700;
-  letter-spacing:.6px; text-transform:uppercase; color:var(--muted);
+  margin-top:8px; font-family:var(--font-body); font-size:13px; font-weight:700;
+  letter-spacing:.3px; color:var(--muted);
 }
 
 /* Table & misc */
