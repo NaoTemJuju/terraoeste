@@ -36,7 +36,7 @@
       talent: {
         name: "Robusto",
         bonusName: "Robusto",
-        desc: "Inicia com +2 PV. Rola os pontos de vida a cada nível com Vantagem."
+        desc: "Inicia com +2 PV. Role os pontos de vida a cada nível com Vantagem."
       }
     },
     "Elfo": {
@@ -53,7 +53,7 @@
           key: "spell",
           name: "Visão Aguçada (Conjuração)",
           bonusName: "Visão Aguçada (Conjuração)",
-          desc: "+1 em testes de conjuração de magia."
+          desc: "Você recebe um bônus de +1 em jogadas de ataque com armas à distância, ou um bônus de +1 em testes de conjuração."
         }
       ]
     },
@@ -65,13 +65,13 @@
           key: "luck",
           name: "Aptidão (Sorte)",
           bonusName: "Aptidão (Sorte)",
-          desc: "Você começa cada sessão com uma ficha de sorte."
+          desc: "Você começa cada sessão com uma ficha de sorte"
         },
         {
           key: "spell",
           name: "Aptidão (Conjuração)",
           bonusName: "Aptidão (Conjuração)",
-          desc: "+1 em testes de conjuração."
+          desc: "Você ganha +1 em testes de conjuração."
         }
       ]
     },
@@ -80,7 +80,7 @@
       talent: {
         name: "Sentidos Apurados",
         bonusName: "Sentidos Apurados",
-        desc: "Você não pode ser surpreendido."
+        desc: "Você não pode ser surpreendido"
       }
     },
     "Humano": {
@@ -166,7 +166,8 @@
       gainedAtLevel: 1,
       name: talent.name,
       bonusTo: "",
-      bonusName: talent.bonusName
+      bonusName: talent.bonusName,
+      desc: talent.desc || ""
     }];
   }
 
