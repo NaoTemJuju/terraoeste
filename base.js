@@ -171,9 +171,6 @@
   }
 
   function renderFinal(result, container) {
-    const raceTalentInfo = (window.raceTalents && typeof window.raceTalents.resolveTalent === 'function' && result.raca)
-      ? window.raceTalents.resolveTalent(result.raca, result.raca_talento_key)
-      : null;
     const attrsRows = ATTRS.map(a => {
       const o = result.atributos[a];
       return `<tr><td>${a}</td><td class="score">${o.valor}</td><td class="mod">${prettyMod(o.mod)}</td></tr>`;
@@ -196,7 +193,7 @@
     container.innerHTML = `
         <div class="grid cols-2">
           <div><strong>Nome</strong><br>${escapeHTML(result.nome || "—")}</div>
-          <div><strong>Raça</strong><br>${result.raca || "—"}${raceTalentInfo ? ` <span class="muted">(${escapeHTML(raceTalentInfo.name)})</span>` : ""}</div>
+          <div><strong>Raça</strong><br>${result.raca || "—"}</div>
           <div><strong>Classe</strong><br>${result.classe || "—"}</div>
           <div><strong>Origem</strong><br>${result.origem || "—"}</div>
           <div><strong>Alinhamento</strong><br>${result.alinhamento || "—"}</div>
@@ -285,10 +282,6 @@
       // Escolhe raça e classe aleatórias
       const race = RACES[randInt(0, RACES.length - 1)];
       state.race = race;
-      // Talento racial: sorteia a opção quando a raça exige escolha (ex.: Elfo, Gnomo)
-      state.raceTalentKey = (window.raceTalents && typeof window.raceTalents.randomChoiceKey === 'function')
-        ? window.raceTalents.randomChoiceKey(race)
-        : null;
       const classKeys = CLASSES;
       const cls = classKeys[randInt(0, classKeys.length - 1)];
       state.cls = cls;
@@ -420,7 +413,6 @@
     attrs:null,
     mods:null,
     race:null,
-    raceTalentKey:null,
     cls:null,
     origem:null,
     hp:null,

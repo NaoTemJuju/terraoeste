@@ -92,13 +92,6 @@ button.ghost, a.ghost{
   border-style:solid;   /* <-- changed from dashed */
 }
 
-/* Botão de opção selecionada (ex.: escolha de talento racial) */
-button.ghost.selected{
-  background:linear-gradient(180deg,#e8c874,#b08a3a);
-  color:#2a1e0f;
-  border-color:#8e6e29;
-}
-
 /* Pills */
 .pill{
   display:inline-flex; align-items:center; gap:8px;

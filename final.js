@@ -228,13 +228,6 @@
     const copperFinal = state.copper ?? 0;
     const gearSlotsUsed = shopGear.reduce((sum, g) => sum + (g.slots || 0), 0);
 
-    // Talento racial (ancestralidade) concedido pela raça escolhida. Para
-    // raças com opções (Elfo, Gnomo) usa a escolha feita em race.js
-    // (state.raceTalentKey); para as demais, resolve automaticamente.
-    const raceBonuses = (window.raceTalents && typeof window.raceTalents.buildBonuses === 'function')
-      ? window.raceTalents.buildBonuses(ancestry, state.raceTalentKey)
-      : [];
-
     // Objeto para import no Foundry (estrutura em EN)
     const exportObj = {
       name,
@@ -272,7 +265,7 @@
       armorClass: 10,
       gearSlotsTotal: 10,
       gearSlotsUsed,
-      bonuses: [...raceBonuses],
+      bonuses: [],
       goldRolled: state.goldRolled ?? state.gold ?? 0,
       gold: goldFinal,
       silver: silverFinal,
@@ -307,7 +300,6 @@
     const renderObj = {
       nome: state.name || "Aventureiro",
       raca: state.race || "",
-      raca_talento_key: state.raceTalentKey || null,
       classe: state.cls || "",
       origem: state.origem ? state.origem.titulo : null,
       origem_desc: state.origem ? state.origem.descricao : null,
@@ -449,9 +441,6 @@
     const gear = Array.isArray(src?.itens) ? src.itens : [];
     const shopLedger = Array.isArray(src?.compras) ? src.compras : [];
     const gearSlotsUsed = gear.reduce((sum, g) => sum + (g.slots || 0), 0);
-    const raceBonuses = (window.raceTalents && typeof window.raceTalents.buildBonuses === 'function')
-      ? window.raceTalents.buildBonuses(src?.raca || "", src?.raca_talento_key)
-      : [];
 
     return {
       name: src?.nome || "",
@@ -489,7 +478,7 @@
       armorClass: 10,
       gearSlotsTotal: 10,
       gearSlotsUsed,
-      bonuses: [...raceBonuses],
+      bonuses: [],
       goldRolled: src?.ouroRolado ?? src?.ouro ?? 0,
       gold: src?.ouro || 0,
       silver: src?.prata || 0,
