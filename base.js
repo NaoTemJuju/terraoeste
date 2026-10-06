@@ -61,6 +61,7 @@
     "Druida":6,"Explorador":6,"Feiticeiro":6,"Guerreiro":8,"Mago":4,"Malandro":6,
     "Pactário":6,"Paladino":8,"Patrulheiro":8,"Sacerdote":6
   };
+  const GEAR_SLOTS_TOTAL = 10;
   const CLASSES = Object.keys(CLASS_DICE);
   const ALL_CLASSES = [...CLASSES];
   const ALL_RACES = [...RACES];
@@ -315,6 +316,15 @@
     { id: "stepFinal",     label: "Ficha Final" }
   ];
 
+  function effectiveSteps(){
+    const cls = state.cls;
+    const customMastery = window.CUSTOM_MAESTRIAS && window.CUSTOM_MAESTRIAS[cls];
+    const mastery = window.MAESTRIA_POR_CLASSE && window.MAESTRIA_POR_CLASSE[cls];
+    const hasMastery = (Array.isArray(customMastery) && customMastery.length > 0)
+      || (Array.isArray(mastery) && mastery.length > 0);
+    return STEP_DEFS.filter(step => step.id !== "stepMastery" || hasMastery);
+  }
+
   function initStepper(){
     const stepperEl = document.getElementById("progressStepper");
     const fill = document.getElementById("stepperFill");
@@ -327,8 +337,9 @@
         stepperEl.style.display = "none";
         return;
       }
+      const steps = effectiveSteps();
       let lastVisibleIdx = -1;
-      STEP_DEFS.forEach((s, i) => {
+      steps.forEach((s, i) => {
         const el = document.getElementById(s.id);
         if (el && el.style.display !== "none") lastVisibleIdx = i;
       });
@@ -337,9 +348,9 @@
         return;
       }
       stepperEl.style.display = "";
-      const pct = Math.round(((lastVisibleIdx + 1) / STEP_DEFS.length) * 100);
+      const pct = Math.round(((lastVisibleIdx + 1) / steps.length) * 100);
       fill.style.width = pct + "%";
-      text.textContent = `Etapa ${lastVisibleIdx + 1} de ${STEP_DEFS.length} — ${STEP_DEFS[lastVisibleIdx].label}`;
+      text.textContent = `Etapa ${lastVisibleIdx + 1} de ${steps.length} — ${steps[lastVisibleIdx].label}`;
     }
 
     const observer = new MutationObserver(refresh);
@@ -659,7 +670,7 @@
         deity: obj?.divindade || "",
         maxHitPoints: obj?.pv || 0,
         armorClass: 10,
-        gearSlotsTotal: 10,
+        gearSlotsTotal: GEAR_SLOTS_TOTAL,
         gearSlotsUsed,
         bonuses: [],
         goldRolled: obj?.ouroRolado ?? obj?.ouro ?? 0,
@@ -716,8 +727,10 @@
   function setupLoadedButtons(){
     const btnNewFromLoaded = $("#btnNewFromLoaded");
     if (btnNewFromLoaded) btnNewFromLoaded.addEventListener("click", () => {
-      location.hash = "";
-      location.reload();
+      const cleanUrl = new URL(location.href);
+      cleanUrl.searchParams.delete("id");
+      cleanUrl.hash = "";
+      location.assign(cleanUrl.toString());
     });
 
     const btnCopyLoaded = $("#btnCopyLoaded");
@@ -888,6 +901,7 @@
     ATTRS,
     RACES,
     CLASS_DICE,
+    GEAR_SLOTS_TOTAL,
     CLASSES,
     $, el,
     randInt, roll, roll3d6, modFromScore,

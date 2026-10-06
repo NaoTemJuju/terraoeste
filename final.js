@@ -9,6 +9,7 @@
  */
 (function(){
   const { state, $, el } = window.app;
+  const GEAR_SLOTS_TOTAL = Number(window.app.GEAR_SLOTS_TOTAL) || 10;
 
   // =====================
   // Navegar para Línguas
@@ -266,7 +267,7 @@
       deity,
       maxHitPoints: state.hp ?? 1,
       armorClass: 10,
-      gearSlotsTotal: 10,
+      gearSlotsTotal: GEAR_SLOTS_TOTAL,
       gearSlotsUsed,
       bonuses: [],
       goldRolled: state.goldRolled ?? state.gold ?? 0,
@@ -483,7 +484,7 @@
       deity: src?.divindade || "",
       maxHitPoints: src?.pv || 0,
       armorClass: 10,
-      gearSlotsTotal: 10,
+      gearSlotsTotal: GEAR_SLOTS_TOTAL,
       gearSlotsUsed,
       bonuses: [],
       goldRolled: src?.ouroRolado ?? src?.ouro ?? 0,
@@ -566,10 +567,6 @@
 
       // "Copiar .json" é configurado em base.js usando window.app.__exportObj
 
-      const btnNewFromLoaded = $("#btnNewFromLoaded");
-      if (btnNewFromLoaded) btnNewFromLoaded.onclick = () => {
-        location.href = location.origin + location.pathname;
-      };
     } catch(e){
       console.error("Erro ao carregar personagem pelo id", e);
     }

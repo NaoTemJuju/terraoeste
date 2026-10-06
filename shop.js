@@ -14,6 +14,7 @@
 (function(){
   if (!window.app) window.app = {};
   const { state, $, el, showCheck } = window.app;
+  const GEAR_SLOTS_TOTAL = Number(window.app.GEAR_SLOTS_TOTAL) || 10;
 
   const TYPE_LABELS = { weapon: "Armas", armor: "Armaduras", sundry: "Diversos", potion: "Poções" };
   const TYPE_ORDER = ["weapon","armor","sundry","potion"];
@@ -62,6 +63,9 @@
       return sum + qty * itemUnitCopper(item);
     }, 0);
   }
+  function cartSlotsUsed(){
+    return catalog.reduce((sum, item) => sum + (cart[item.id] || 0) * (Number(item.slots) || 0), 0);
+  }
   function remainingCopper(){
     return baseWalletCopper() - cartTotalCopper();
   }
@@ -84,6 +88,14 @@
     if (!walletEl) return;
     const rem = fromCopper(remainingCopper());
     walletEl.textContent = `Restante: ${formatMoney(rem.gp, rem.sp, rem.cp)}`;
+  }
+
+  function renderCapacity(){
+    const capacityEl = $("#shopCapacity");
+    if (!capacityEl) return;
+    const used = cartSlotsUsed();
+    capacityEl.textContent = `Espaços na mochila: ${used}/${GEAR_SLOTS_TOTAL}`;
+    capacityEl.classList.toggle("shop-capacity-full", used >= GEAR_SLOTS_TOTAL);
   }
 
   function renderTabs(){
@@ -113,15 +125,23 @@
     }
 
     const rem = remainingCopper();
+    const usedSlots = cartSlotsUsed();
     const items = catalog
       .filter(i => activeType === "all" || i.type === activeType)
       .slice()
       .sort((a,b) => a.name.localeCompare(b.name, "pt-BR"));
 
+    if (!items.length){
+      listEl.append(el("div", { class: "gm-empty" }, "Nenhum item encontrado com esse filtro."));
+      return;
+    }
+
     items.forEach(item => {
       const qty = cart[item.id] || 0;
       const unitCopper = itemUnitCopper(item);
-      const canAdd = !shopLocked && (rem - unitCopper >= 0);
+      const hasMoney = rem - unitCopper >= 0;
+      const hasSlots = item.slots === 0 || usedSlots + item.slots <= GEAR_SLOTS_TOTAL;
+      const canAdd = !shopLocked && hasMoney && hasSlots;
       const canRemove = !shopLocked && qty > 0;
 
       const row = el("div", { class: "shop-item" });
@@ -145,6 +165,8 @@
         onclick: () => { changeQty(item, 1); }
       }, "+");
       btnPlus.disabled = !canAdd;
+      if (!hasSlots) btnPlus.title = `Limite de ${GEAR_SLOTS_TOTAL} espaços atingido`;
+      else if (!hasMoney) btnPlus.title = "Saldo insuficiente";
       controls.append(btnMinus, qtyOut, btnPlus);
       row.append(controls);
 
@@ -177,6 +199,7 @@
 
   function renderAll(){
     renderWallet();
+    renderCapacity();
     renderList();
     renderCart();
     const btnConfirm = $("#btnConfirmShop");
@@ -289,7 +312,6 @@
   document.addEventListener("DOMContentLoaded", () => {
     const btnConfirm = $("#btnConfirmShop");
     const btnSkip = $("#btnSkipShop");
-
     if (btnConfirm){
       btnConfirm.addEventListener("click", () => {
         if (shopLocked) return;
