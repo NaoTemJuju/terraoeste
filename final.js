@@ -269,7 +269,7 @@
       armorClass: 10,
       gearSlotsTotal: GEAR_SLOTS_TOTAL,
       gearSlotsUsed,
-      bonuses: [],
+      bonuses: window.app.getRaceBonuses?.(ancestry, state.raceTalent) || [],
       goldRolled: state.goldRolled ?? state.gold ?? 0,
       gold: goldFinal,
       silver: silverFinal,
@@ -304,6 +304,7 @@
     const renderObj = {
       nome: state.name || "Aventureiro",
       raca: state.race || "",
+      talentoRacial: state.raceTalent || null,
       classe: state.cls || "",
       maestria: state.maestria ? state.maestria.nome : null,
       origem: state.origem ? state.origem.titulo : null,
@@ -486,7 +487,7 @@
       armorClass: 10,
       gearSlotsTotal: GEAR_SLOTS_TOTAL,
       gearSlotsUsed,
-      bonuses: [],
+      bonuses: window.app.getRaceBonuses?.(src?.raca, src?.talentoRacial) || [],
       goldRolled: src?.ouroRolado ?? src?.ouro ?? 0,
       gold: src?.ouro || 0,
       silver: src?.prata || 0,
@@ -527,6 +528,7 @@
       if (!resp.ok) return;
 
       const obj = await resp.json();
+      window.app.__loadedRawObj = obj;
 
       // Constrói exportObj e guarda para o botão "Copiar .json"
       try {
