@@ -13,11 +13,25 @@
   const btnConfirmClass = $("#btnConfirmClass");
   const classInfo = $("#classInfo");
   const classInfoTitle = $("#classInfoTitle");
+  const classInfoDescription = $("#classInfoDescription");
+
+  // Descrições da tradução PT-BR do compêndio de classes do Foundry.
+  // Só associa classes do site com equivalentes claros no compêndio.
+  const CLASS_DESCRIPTIONS = {
+    "Bardo": "Bardos são viajantes bem-vindos e conselheiros sábios; sua tarefa é proteger e compartilhar o conhecimento que é repassado através das eras.",
+    "Guerreiro": "Gladiadores ensanguentados usando armaduras amassadas, duelistas acrobáticos com suas espadas de arremesso, ou arqueiros élficos de visão aguçada que forjam suas lendas com aço e coragem.",
+    "Mago": "Adeptos tatuados com runas, sábios usando óculos, e bruxas conjuradoras de chamas que ousam manipular as terríveis forças da magia.",
+    "Patrulheiro": "Rastreadores habilidosos, andarilhos furtivos e guerreiros incomparáveis que têm as terras selvagens como lar.",
+    "Sacerdote": "Templários cruzados, xamãs proféticos, ou fanáticos com olhos enlouquecidos que empunham o poder de seus deuses para expurgar os impuros."
+  };
 
   function updateClassInfo(cls){
     if (!classInfo) return;
     classInfo.hidden = !cls;
     if (classInfoTitle && cls) classInfoTitle.textContent = `Informações: ${cls}`;
+    if (classInfoDescription) {
+      classInfoDescription.textContent = cls ? (CLASS_DESCRIPTIONS[cls] || "Ainda não há uma descrição correspondente no compêndio consultado.") : "A descrição da classe aparecerá aqui.";
+    }
   }
 
   // Sorteia uma classe aleatória
