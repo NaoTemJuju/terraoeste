@@ -67,6 +67,23 @@
         <button id="btnRandRace" class="ghost">Aleatório</button>
         <button id="btnConfirmRace" disabled>Continuar</button>
       </div>
+      <div id="raceInfo" class="selection-info" aria-live="polite" hidden>
+        <h3 id="raceInfoTitle">Informações da ancestralidade</h3>
+        <div class="selection-info-grid">
+          <div class="selection-info-item">
+            <strong>Descrição</strong>
+            <p>A descrição da ancestralidade aparecerá aqui.</p>
+          </div>
+          <div class="selection-info-item">
+            <strong>Idiomas nativos</strong>
+            <p>Os idiomas nativos da ancestralidade aparecerão aqui.</p>
+          </div>
+          <div class="selection-info-item">
+            <strong>Habilidade racial</strong>
+            <p>A habilidade especial da ancestralidade aparecerá aqui.</p>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Etapa 4: Classe -->
@@ -76,6 +93,19 @@
         <select id="classSelect" aria-label="Escolher classe"></select>
         <button id="btnRandClass" class="ghost">Aleatório</button>
         <button id="btnConfirmClass" disabled>Continuar</button>
+      </div>
+      <div id="classInfo" class="selection-info" aria-live="polite" hidden>
+        <h3 id="classInfoTitle">Informações da classe</h3>
+        <div class="selection-info-grid selection-info-grid--class">
+          <div class="selection-info-item">
+            <strong>Descrição</strong>
+            <p>A descrição da classe aparecerá aqui.</p>
+          </div>
+          <div class="selection-info-item">
+            <strong>Habilidade especial</strong>
+            <p>A habilidade especial da classe aparecerá aqui.</p>
+          </div>
+        </div>
       </div>
     </section>
 

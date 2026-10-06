@@ -11,6 +11,15 @@
   const classSel = $("#classSelect");
   const btnRandClass = $("#btnRandClass");
   const btnConfirmClass = $("#btnConfirmClass");
+  const classInfo = $("#classInfo");
+  const classInfoTitle = $("#classInfoTitle");
+
+  function updateClassInfo(cls){
+    if (!classInfo) return;
+    classInfo.hidden = !cls;
+    if (classInfoTitle && cls) classInfoTitle.textContent = `Informações: ${cls}`;
+  }
+
   // Sorteia uma classe aleatória
   if (btnRandClass) {
     btnRandClass.addEventListener("click", () => {
@@ -20,6 +29,7 @@
         if (classSel.options.length > 0) classSel.options[0].disabled = true;
       }
       pending.cls = c;
+      updateClassInfo(c);
       if (btnConfirmClass) btnConfirmClass.disabled = false;
     });
   }
@@ -28,6 +38,7 @@
     classSel.addEventListener("change", e => {
       const val = e.target.value;
       pending.cls = val || null;
+      updateClassInfo(pending.cls);
       if (btnConfirmClass) btnConfirmClass.disabled = !pending.cls;
     });
   }

@@ -11,6 +11,15 @@
   const raceSel = $("#raceSelect");
   const btnRandRace = $("#btnRandRace");
   const btnConfirmRace = $("#btnConfirmRace");
+  const raceInfo = $("#raceInfo");
+  const raceInfoTitle = $("#raceInfoTitle");
+
+  function updateRaceInfo(race){
+    if (!raceInfo) return;
+    raceInfo.hidden = !race;
+    if (raceInfoTitle && race) raceInfoTitle.textContent = `Informações: ${race}`;
+  }
+
   // Sorteia uma raça aleatória
   if (btnRandRace) {
     btnRandRace.addEventListener("click", () => {
@@ -21,6 +30,7 @@
         if (raceSel.options.length > 0) raceSel.options[0].disabled = true;
       }
       pending.race = r;
+      updateRaceInfo(r);
       if (btnConfirmRace) btnConfirmRace.disabled = false;
     });
   }
@@ -29,6 +39,7 @@
     raceSel.addEventListener("change", e => {
       const val = e.target.value;
       pending.race = val || null;
+      updateRaceInfo(pending.race);
       if (btnConfirmRace) btnConfirmRace.disabled = !pending.race;
     });
   }

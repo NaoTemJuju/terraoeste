@@ -60,6 +60,23 @@ section{
 .grid{display:grid; gap:12px}
 .cols-2{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
 
+/* Espaços reservados para descrições e regras da raça/classe selecionada */
+.selection-info{
+  margin-top:14px; padding:14px 16px;
+  border:1px dashed rgba(59,44,26,.65); border-radius:12px;
+  background:rgba(255,255,255,.38);
+}
+.selection-info[hidden]{display:none}
+.selection-info h3{margin:0 0 10px; font-size:18px}
+.selection-info-grid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px}
+.selection-info-grid--class{grid-template-columns:repeat(2,minmax(0,1fr))}
+.selection-info-item{padding:10px 12px; border-radius:9px; background:rgba(246,238,220,.72)}
+.selection-info-item strong{display:block; margin-bottom:4px}
+.selection-info-item p{margin:0; color:var(--muted); font-size:15px; font-style:italic}
+@media (max-width:640px){
+  .selection-info-grid,.selection-info-grid--class{grid-template-columns:1fr}
+}
+
 /* Inputs & selects */
 input[type="text"], select{
   background:#f9f3e3; color:var(--ink);
