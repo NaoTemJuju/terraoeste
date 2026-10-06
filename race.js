@@ -41,12 +41,12 @@
       { id: "stout", name: "Robusto", description: "Começa com +2 PV. Role os pontos de vida a cada nível com Vantagem." }
     ],
     "Elfo": [
-      { id: "farsight-ranged", name: "Visão Aguçada (Armas à Distância)", description: "+1 em jogadas de ataque com armas à distância.", sourceName: "Elf", bonus: { name: "FarSight", bonusName: "AttackBonus", bonusTo: "RangedWeapons", bonusAmount: 1 } },
-      { id: "farsight-spell", name: "Visão Aguçada (Conjuração)", description: "+1 em testes de conjuração.", sourceName: "Elf", bonus: { name: "FarSight", bonusName: "Plus1ToCastingSpells", bonusAmount: 1 } }
+      { id: "farsight-ranged", name: "Visão Aguçada (Armas à Distância)", originalName: "Farsight (Ranged)", description: "+1 em jogadas de ataque com armas à distância.", sourceName: "Elf", bonus: { name: "FarSight", bonusName: "AttackBonus", bonusTo: "RangedWeapons", bonusAmount: 1 } },
+      { id: "farsight-spell", name: "Visão Aguçada (Conjuração)", originalName: "Farsight (Spell)", description: "+1 em testes de conjuração.", sourceName: "Elf", bonus: { name: "FarSight", bonusName: "Plus1ToCastingSpells", bonusAmount: 1 } }
     ],
     "Gnomo": [
-      { id: "knack-spellcasting", name: "Aptidão (Conjuração)", description: "+1 em testes de conjuração.", sourceName: "Gnome", bonus: { name: "Knack", bonusName: "Plus1ToCastingSpells", bonusAmount: 1 } },
-      { id: "knack-luck", name: "Aptidão (Sorte)", description: "Começa cada sessão com uma ficha de sorte.", sourceName: "Gnome", bonus: { name: "Knack", bonusName: "LuckTokenAtStartOfSession" } }
+      { id: "knack-spellcasting", name: "Aptidão (Conjuração)", originalName: "Knack (Spellcasting)", description: "+1 em testes de conjuração.", sourceName: "Gnome", bonus: { name: "Knack", bonusName: "Plus1ToCastingSpells", bonusAmount: 1 } },
+      { id: "knack-luck", name: "Aptidão (Sorte)", originalName: "Knack (Luck)", description: "Começa cada sessão com uma ficha de sorte.", sourceName: "Gnome", bonus: { name: "Knack", bonusName: "LuckTokenAtStartOfSession" } }
     ],
     "Goblin": [
       { id: "keen-senses", name: "Sentidos Apurados", description: "Você não pode ser surpreendido." }
@@ -87,12 +87,24 @@
       gainedAtLevel: 1
     }];
   }
+  function getRaceChoiceMetadata(race, talentId){
+    const options = talentOptions(race);
+    const selected = options.find(item => item.id === talentId);
+    if (options.length < 2 || !selected?.originalName || options.some(item => !item.originalName)) return [];
+    return [{
+      sourceType: "Ancestry",
+      sourceName: selected.sourceName,
+      selected: selected.originalName,
+      options: options.map(item => item.originalName)
+    }];
+  }
 
   window.app.hasRaceTalentChoice = hasRaceTalentChoice;
   window.app.isRaceTalentValid = isRaceTalentValid;
   window.app.randomRaceTalent = randomRaceTalent;
   window.app.getRaceTalentDisplay = getRaceTalentDisplay;
   window.app.getRaceBonuses = getRaceBonuses;
+  window.app.getRaceChoiceMetadata = getRaceChoiceMetadata;
 
   function updateConfirmButton(){
     if (btnConfirmRace) btnConfirmRace.disabled = !pending.race ||
