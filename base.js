@@ -182,6 +182,7 @@
     if (result.prata) moneyBits.push(`${result.prata} PP`);
     if (result.cobre || moneyBits.length === 0) moneyBits.push(`${result.cobre ?? 0} PC`);
     const moneyStr = moneyBits.join(", ");
+    const raceTalentName = window.app?.getRaceTalentDisplay?.(result.raca, result.talentoRacial) || "";
 
     const itens = Array.isArray(result.itens) ? result.itens : [];
     const itensHTML = itens.length
@@ -195,6 +196,7 @@
         <div class="grid cols-2">
           <div><strong>Nome</strong><br>${escapeHTML(result.nome || "—")}</div>
           <div><strong>Raça</strong><br>${result.raca || "—"}</div>
+          ${raceTalentName ? `<div><strong>Talento racial</strong><br>${escapeHTML(raceTalentName)}</div>` : ""}
           <div><strong>Classe</strong><br>${result.classe || "—"}</div>
           ${result.maestria ? `<div><strong>Maestria em Arma</strong><br>${escapeHTML(result.maestria)}</div>` : ""}
           <div><strong>Origem</strong><br>${result.origem || "—"}</div>
@@ -435,6 +437,7 @@
       // Escolhe raça e classe aleatórias
       const race = RACES[randInt(0, RACES.length - 1)];
       state.race = race;
+      state.raceTalent = window.app.randomRaceTalent?.(race) || null;
       const classKeys = CLASSES;
       const cls = classKeys[randInt(0, classKeys.length - 1)];
       state.cls = cls;
@@ -566,6 +569,7 @@
     attrs:null,
     mods:null,
     race:null,
+    raceTalent:null,
     cls:null,
     origem:null,
     maestria:null,
@@ -578,7 +582,7 @@
     hpBaseRoll:null
   };
 
-  const pending = { race:null, cls:null };
+  const pending = { race:null, raceTalent:null, cls:null };
   let attrsLocked = false;
   let __loadedRawObj = null;
 
@@ -672,7 +676,7 @@
         armorClass: 10,
         gearSlotsTotal: GEAR_SLOTS_TOTAL,
         gearSlotsUsed,
-        bonuses: [],
+        bonuses: window.app.getRaceBonuses?.(obj?.raca, obj?.talentoRacial) || [],
         goldRolled: obj?.ouroRolado ?? obj?.ouro ?? 0,
         gold: obj?.ouro || 0,
         silver: obj?.prata || 0,
@@ -740,6 +744,12 @@
 
     const btnCopyLoadedJSON = $("#btnCopyLoadedJSON");
     if (btnCopyLoadedJSON) btnCopyLoadedJSON.addEventListener("click", () => {
+      const raw = window.app?.__loadedRawObj;
+      if (raw && window.app.hasRaceTalentChoice?.(raw.raca) &&
+          !window.app.isRaceTalentValid?.(raw.raca, raw.talentoRacial)) {
+        alert("Esta ficha antiga não registra qual talento racial foi escolhido. Crie um novo personagem para exportar o JSON corretamente.");
+        return;
+      }
       const exportObj = window.app?.__exportObj;
       if (!exportObj){ alert("Nenhum JSON carregado."); return; }
       const pretty = JSON.stringify(exportObj, null, 2);
