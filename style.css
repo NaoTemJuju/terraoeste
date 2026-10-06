@@ -519,6 +519,8 @@ button.primary:active:not(:disabled){background:linear-gradient(#7c2624,#5c1c1a)
    Reaproveita paleta e componentes existentes (.pill, .ghost, .gm-table),
    com uma lista compacta de itens + carrinho lateral.
 ============================================================================ */
+.shop-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:8px}
+.shop-head h2{margin:0}
 .shop-status{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
 .shop-capacity-full{border-color:var(--danger);color:var(--danger)}
 .shop-list{
@@ -555,6 +557,7 @@ button.primary:active:not(:disabled){background:linear-gradient(#7c2624,#5c1c1a)
   .shop-item{flex-wrap:wrap}
 }
 @media (max-width:640px){
+  .shop-head{align-items:flex-start;flex-direction:column;gap:8px}
   .shop-status{justify-content:flex-start}
 }
 
