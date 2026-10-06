@@ -73,6 +73,12 @@ section{
 .selection-info-item{padding:10px 12px; border-radius:9px; background:rgba(246,238,220,.72)}
 .selection-info-item strong{display:block; margin-bottom:4px}
 .selection-info-item p{margin:0; color:var(--muted); font-size:15px; font-style:italic}
+.race-talent-choices{display:grid; gap:8px; margin-top:10px}
+.race-talent-choices[hidden]{display:none}
+.race-talent-choice{display:flex; gap:8px; align-items:flex-start; padding:8px; border:1px solid var(--border); border-radius:8px; cursor:pointer}
+.race-talent-choice input{margin-top:3px}
+.race-talent-choice b,.race-talent-choice small{display:block}
+.race-talent-choice small{color:var(--muted)}
 @media (max-width:640px){
   .selection-info-grid,.selection-info-grid--class{grid-template-columns:1fr}
 }
