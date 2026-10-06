@@ -15,17 +15,19 @@
   const raceInfoTitle = $("#raceInfoTitle");
   const raceInfoDescription = $("#raceInfoDescription");
 
-  // Descrições transcritas do export Babele enviado pelo usuário.
-  // Pequenino usa a entrada "Halfling" do export.
+  // Descrições obtidas do Babele pt-BR instalado no Foundry.
+  // Gnomo e Meio-Elfo não existem no compêndio Babele ativo e mantêm
+  // as descrições do export fornecido pelo usuário.
+  // Pequenino usa o nome adotado no site para a ancestralidade Halfling.
   const RACE_DESCRIPTIONS = {
-    "Anão": "Brave, stalwart folk as sturdy as the stone kingdoms they carve inside mountains.",
-    "Elfo": "Ethereal, graceful people who revere knowledge and beauty. Elves see far and live long.",
+    "Anão": "Povo corajoso e robusto, tão resiliente quanto os reinos de pedra que eles esculpem dentro das montanhas. Você conhece os idiomas Comum e Anão.",
+    "Elfo": "Povo etéreo e gracioso, que venera o conhecimento e a beleza. Os elfos enxergam longe e vivem bastante. Você conhece os idiomas Comum, Élfico e Silvestre.",
     "Gnomo": "Pequenos e inteligentes seres das florestas e montanhas, os Gnomos têm uma afinidade natural com a magia.",
     "Goblin": "Criaturas verdes e espertas que prosperam em locais escuros e apertados. Os goblins são tão ferozes quanto pequenos. Você conhece os idiomas Comum e Goblin.",
     "Pequenino": "Pequenos e alegres habitantes do campo, com personalidades travessas. Eles apreciam os prazeres simples da vida. Você conhece o idioma Comum.",
-    "Humano": "Bold, adaptable, and diverse people who learn quickly and accomplish mighty deeds.",
+    "Humano": "Povo corajoso, adaptável e diverso que aprende de forma rápida e realiza feitos poderosos. Você conhece o idioma Comum e um idioma comum adicional.",
     "Meio-Elfo": "Seres etéreos e graciosos que reverenciam o conhecimento e a beleza. Os elfos veem longe e vivem muito.",
-    "Meio-Orc": "Towering, tusked warriors who are as daring as humans and as relentless as orcs."
+    "Meio-Orc": "Guerreiros imponentes e com presas, que são tão implacáveis quanto os orcs e tão ousados quanto os humanos. Você conhece os idiomas Comum e Orc."
   };
 
   function updateRaceInfo(race){
@@ -78,3 +80,4 @@
     });
   }
 })();
+
