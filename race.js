@@ -14,6 +14,7 @@
   const raceInfo = $("#raceInfo");
   const raceInfoTitle = $("#raceInfoTitle");
   const raceInfoDescription = $("#raceInfoDescription");
+  const raceInfoLanguages = $("#raceInfoLanguages");
 
   // Descrições obtidas do Babele pt-BR instalado no Foundry.
   // Gnomo e Meio-Elfo não existem no compêndio Babele ativo e mantêm
@@ -36,6 +37,16 @@
     if (raceInfoTitle && race) raceInfoTitle.textContent = `Informações: ${race}`;
     if (raceInfoDescription) {
       raceInfoDescription.textContent = race ? (RACE_DESCRIPTIONS[race] || "Descrição não disponível no export de ancestralidades.") : "A descrição da ancestralidade aparecerá aqui.";
+    }
+    if (raceInfoLanguages) {
+      const languageInfo = race && window.langs && window.langs.getRaceBaseLanguages(race);
+      const nativeLanguages = languageInfo && languageInfo.granted.length
+        ? languageInfo.granted.join(", ")
+        : "Nenhum idioma nativo definido.";
+      const extraCommon = languageInfo && languageInfo.bonus && languageInfo.bonus.common;
+      raceInfoLanguages.textContent = extraCommon
+        ? `${nativeLanguages} (+${extraCommon} idioma${extraCommon === 1 ? "" : "s"} comum à escolha)`
+        : nativeLanguages;
     }
   }
 
