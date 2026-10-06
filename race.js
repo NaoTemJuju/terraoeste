@@ -15,6 +15,7 @@
   const raceInfoTitle = $("#raceInfoTitle");
   const raceInfoDescription = $("#raceInfoDescription");
   const raceInfoLanguages = $("#raceInfoLanguages");
+  const raceInfoAbility = $("#raceInfoAbility");
 
   // Descrições obtidas do Babele pt-BR instalado no Foundry.
   // Gnomo e Meio-Elfo não existem no compêndio Babele ativo e mantêm
@@ -29,6 +30,19 @@
     "Humano": "Povo corajoso, adaptável e diverso que aprende de forma rápida e realiza feitos poderosos.",
     "Meio-Elfo": "Seres etéreos e graciosos que reverenciam o conhecimento e a beleza. Os elfos veem longe e vivem muito.",
     "Meio-Orc": "Guerreiros imponentes e com presas, que são tão implacáveis quanto os orcs e tão ousados quanto os humanos."
+  };
+
+  // Talentos e efeitos copiados das opções de ancestralidade do Foundry,
+  // com os nomes e textos localizados pelo Babele pt-BR.
+  const RACE_ABILITIES = {
+    "Anão": "Robusto: começa com +2 PV. Role os pontos de vida a cada nível com Vantagem.",
+    "Elfo": "Escolha 1: Visão Aguçada (Armas à Distância), +1 em jogadas de ataque com armas à distância; ou Visão Aguçada (Conjuração), +1 em testes de conjuração.",
+    "Gnomo": "Escolha 1: Aptidão (Conjuração), +1 em testes de conjuração; ou Aptidão (Sorte), começa cada sessão com uma ficha de sorte.",
+    "Goblin": "Sentidos Apurados: você não pode ser surpreendido.",
+    "Pequenino": "Furtivo: uma vez por dia, você pode ficar invisível por 3 rodadas.",
+    "Humano": "Ambicioso: ganha uma rolagem de talento adicional no nível 1.",
+    "Meio-Elfo": "O registro do Foundry informa 2 escolhas de talento, mas não lista as opções disponíveis.",
+    "Meio-Orc": "Poderoso: recebe +1 em jogadas de ataque e dano com armas corpo a corpo."
   };
 
   function updateRaceInfo(race){
@@ -47,6 +61,11 @@
       raceInfoLanguages.textContent = extraCommon
         ? `${nativeLanguages} (+${extraCommon} idioma${extraCommon === 1 ? "" : "s"} comum à escolha)`
         : nativeLanguages;
+    }
+    if (raceInfoAbility) {
+      raceInfoAbility.textContent = race
+        ? (RACE_ABILITIES[race] || "Talento racial não encontrado no compêndio.")
+        : "A habilidade especial da ancestralidade aparecerá aqui.";
     }
   }
 
