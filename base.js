@@ -677,6 +677,7 @@
         gearSlotsTotal: GEAR_SLOTS_TOTAL,
         gearSlotsUsed,
         bonuses: window.app.getRaceBonuses?.(obj?.raca, obj?.talentoRacial) || [],
+        terraOesteChoices: window.app.getRaceChoiceMetadata?.(obj?.raca, obj?.talentoRacial) || [],
         goldRolled: obj?.ouroRolado ?? obj?.ouro ?? 0,
         gold: obj?.ouro || 0,
         silver: obj?.prata || 0,
