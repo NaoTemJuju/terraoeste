@@ -32,6 +32,7 @@
     "Meio-Elfo": "Seres etéreos e graciosos que reverenciam o conhecimento e a beleza. Os elfos veem longe e vivem muito.",
     "Meio-Orc": "Guerreiros imponentes e com presas, que são tão implacáveis quanto os orcs e tão ousados quanto os humanos."
   };
+  const CORE_RACE_DESCRIPTIONS = { ...RACE_DESCRIPTIONS };
 
   // As opções correspondem ao compêndio de ancestralidades do Foundry.
   // Os bônus FarSight e Knack identificam a opção escolhida para o importador.
@@ -62,19 +63,24 @@
     ]
   };
 
-  function talentOptions(race){ return RACE_TALENTS[race] || []; }
-  function hasRaceTalentChoice(race){ return talentOptions(race).length > 1; }
+  function talentOptions(race){ return (window.CUSTOM_RACE_DATA?.[race]?.talents || RACE_TALENTS[race] || []); }
+  function hasRaceTalentChoice(race){
+    const mode = window.CUSTOM_RACE_DATA?.[race]?.talentMode;
+    return talentOptions(race).length > 1 && (mode ? mode === "choice" : true);
+  }
   function isRaceTalentValid(race, talentId){
     return talentOptions(race).some(talent => talent.id === talentId);
   }
   function randomRaceTalent(race){
+    if (!hasRaceTalentChoice(race)) return talentOptions(race).length === 1 ? talentOptions(race)[0].id : null;
     const options = talentOptions(race);
     return options.length ? options[randInt(0, options.length - 1)].id : null;
   }
   function getRaceTalentDisplay(race, talentId){
     const options = talentOptions(race);
     const talent = options.find(item => item.id === talentId) || (options.length === 1 ? options[0] : null);
-    return talent ? talent.name : "";
+    if (talent) return talent.name;
+    return !hasRaceTalentChoice(race) ? options.map(item => item.name).join(", ") : "";
   }
   function getRaceBonuses(race, talentId){
     const talent = talentOptions(race).find(item => item.id === talentId);
@@ -90,7 +96,7 @@
   function getRaceChoiceMetadata(race, talentId){
     const options = talentOptions(race);
     const selected = options.find(item => item.id === talentId);
-    if (options.length < 2 || !selected?.originalName || options.some(item => !item.originalName)) return [];
+    if (!hasRaceTalentChoice(race) || options.length < 2 || !selected?.originalName || options.some(item => !item.originalName)) return [];
     return [{
       sourceType: "Ancestry",
       sourceName: selected.sourceName,
@@ -105,6 +111,18 @@
   window.app.getRaceTalentDisplay = getRaceTalentDisplay;
   window.app.getRaceBonuses = getRaceBonuses;
   window.app.getRaceChoiceMetadata = getRaceChoiceMetadata;
+  window.app.getRaceContent = race => ({
+    name: race,
+    description: window.CUSTOM_RACE_DATA?.[race]?.description ?? RACE_DESCRIPTIONS[race] ?? "",
+    talents: talentOptions(race).map(item => ({ ...item })),
+    languages: window.langs?.getRaceBaseLanguages(race) || { granted: [], bonus: {} }
+  });
+  window.app.applyContentCatalog = function(content){
+    Object.keys(RACE_DESCRIPTIONS).forEach(name => { if (!Object.prototype.hasOwnProperty.call(CORE_RACE_DESCRIPTIONS, name)) delete RACE_DESCRIPTIONS[name]; });
+    Object.assign(RACE_DESCRIPTIONS, CORE_RACE_DESCRIPTIONS);
+    window.CUSTOM_RACE_DATA = Object.fromEntries((content?.races || []).map(item => [item.name, item]));
+    (content?.races || []).forEach(item => { if (item?.name && item.description) RACE_DESCRIPTIONS[item.name] = item.description; });
+  };
 
   function updateConfirmButton(){
     if (btnConfirmRace) btnConfirmRace.disabled = !pending.race ||
@@ -124,22 +142,25 @@
         ? languageInfo.granted.join(", ")
         : "Nenhum idioma nativo definido.";
       const extraCommon = languageInfo && languageInfo.bonus && languageInfo.bonus.common;
-      raceInfoLanguages.textContent = extraCommon
-        ? `${nativeLanguages} (+${extraCommon} idioma${extraCommon === 1 ? "" : "s"} comum à escolha)`
-        : nativeLanguages;
+      const extraRare = languageInfo && languageInfo.bonus && languageInfo.bonus.rare;
+      const extras = [];
+      if (extraCommon) extras.push(`+${extraCommon} idioma(s) comum(ns) à escolha`);
+      if (extraRare) extras.push(`+${extraRare} idioma(s) raro(s) à escolha`);
+      raceInfoLanguages.textContent = extras.length ? `${nativeLanguages} (${extras.join("; ")})` : nativeLanguages;
     }
     const options = talentOptions(race);
     if (raceInfoAbility) {
-      raceInfoAbility.textContent = options.length > 1
+      raceInfoAbility.textContent = hasRaceTalentChoice(race) && options.length > 1
         ? "Escolha um dos talentos raciais:"
-        : options.length === 1
-          ? `${options[0].name}: ${options[0].description}`
-          : "O registro do Foundry informa 2 escolhas de talento para Meio-Elfo, mas não lista as opções disponíveis.";
+        : options.length > 0
+          ? options.map(item => `${item.name}: ${item.description}`).join("; ")
+          : "Nenhum talento cadastrado para esta ancestralidade.";
     }
     if (raceTalentChoices) {
       raceTalentChoices.replaceChildren();
-      raceTalentChoices.hidden = options.length <= 1;
-      if (options.length > 1) options.forEach(talent => {
+      const isChoice = hasRaceTalentChoice(race) && options.length > 1;
+      raceTalentChoices.hidden = !isChoice;
+      if (isChoice) options.forEach(talent => {
         const label = document.createElement("label");
         label.className = "race-talent-choice";
         const input = document.createElement("input");
@@ -210,3 +231,4 @@
     });
   }
 })();
+

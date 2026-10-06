@@ -270,7 +270,10 @@
       gearSlotsTotal: GEAR_SLOTS_TOTAL,
       gearSlotsUsed,
       bonuses: window.app.getRaceBonuses?.(ancestry, state.raceTalent) || [],
-      terraOesteChoices: window.app.getRaceChoiceMetadata?.(ancestry, state.raceTalent) || [],
+      terraOesteChoices: [
+        ...(window.app.getRaceChoiceMetadata?.(ancestry, state.raceTalent) || []),
+        ...(window.app.getClassChoiceMetadata?.(cls, state.classTalent) || [])
+      ],
       goldRolled: state.goldRolled ?? state.gold ?? 0,
       gold: goldFinal,
       silver: silverFinal,
@@ -306,6 +309,7 @@
       nome: state.name || "Aventureiro",
       raca: state.race || "",
       talentoRacial: state.raceTalent || null,
+      talentoClasse: state.classTalent || null,
       classe: state.cls || "",
       maestria: state.maestria ? state.maestria.nome : null,
       origem: state.origem ? state.origem.titulo : null,
@@ -489,7 +493,10 @@
       gearSlotsTotal: GEAR_SLOTS_TOTAL,
       gearSlotsUsed,
       bonuses: window.app.getRaceBonuses?.(src?.raca, src?.talentoRacial) || [],
-      terraOesteChoices: window.app.getRaceChoiceMetadata?.(src?.raca, src?.talentoRacial) || [],
+      terraOesteChoices: [
+        ...(window.app.getRaceChoiceMetadata?.(src?.raca, src?.talentoRacial) || []),
+        ...(window.app.getClassChoiceMetadata?.(src?.classe, src?.talentoClasse) || [])
+      ],
       goldRolled: src?.ouroRolado ?? src?.ouro ?? 0,
       gold: src?.ouro || 0,
       silver: src?.prata || 0,
@@ -581,3 +588,4 @@
   window.app.renderLanguages = renderLanguages;
   window.app.finalizeCharacter = finalize;
 })();
+

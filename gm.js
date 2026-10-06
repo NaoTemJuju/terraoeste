@@ -55,6 +55,7 @@
   const btnDisableAll = $("#btnDisableAll");
   const btnTabAvail = $("#btnTabAvail");
   const btnTabClasses = $("#btnTabClasses");
+  const btnTabContent = $("#btnTabContent");
   const btnTabShop = $("#btnTabShop");
 
   function makeCheck(name, kind, checked){
@@ -127,6 +128,7 @@
   }
   btnTabAvail?.addEventListener('click', () => showTab('panelAvail'));
   btnTabClasses?.addEventListener('click', () => showTab('panelClasses'));
+  btnTabContent?.addEventListener('click', () => showTab('panelContent'));
   btnTabShop?.addEventListener('click', () => showTab('panelShop'));
 
   // ------- Adicionar/Editar classes personalizadas -------
@@ -461,3 +463,4 @@
     listShopItems();
   })();
 })();
+

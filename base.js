@@ -65,6 +65,9 @@
   const CLASSES = Object.keys(CLASS_DICE);
   const ALL_CLASSES = [...CLASSES];
   const ALL_RACES = [...RACES];
+  const CORE_CLASS_DICE = { ...CLASS_DICE };
+  const CORE_CLASS_NAMES = [...ALL_CLASSES];
+  const CORE_RACE_NAMES = [...ALL_RACES];
 
   // ====================== Utilitários ======================
   /** Seleciona um elemento do DOM utilizando querySelector. */
@@ -441,8 +444,9 @@
       const classKeys = CLASSES;
       const cls = classKeys[randInt(0, classKeys.length - 1)];
       state.cls = cls;
+      state.classTalent = window.app.randomClassTalent?.(cls) || null;
       // Seleciona uma origem aleatória da classe
-      const origens = (window.ORIGENS_POR_CLASSE?.[cls] || []);
+      const origens = window.getOriginsForClass?.(cls) || (window.ORIGENS_POR_CLASSE?.[cls] || []);
       if (origens.length > 0){
         const idx = randInt(0, origens.length - 1);
         const pick = origens[idx];
@@ -570,6 +574,7 @@
     mods:null,
     race:null,
     raceTalent:null,
+    classTalent:null,
     cls:null,
     origem:null,
     maestria:null,
@@ -582,7 +587,7 @@
     hpBaseRoll:null
   };
 
-  const pending = { race:null, raceTalent:null, cls:null };
+  const pending = { race:null, raceTalent:null, cls:null, classTalent:null };
   let attrsLocked = false;
   let __loadedRawObj = null;
 
@@ -677,7 +682,10 @@
         gearSlotsTotal: GEAR_SLOTS_TOTAL,
         gearSlotsUsed,
         bonuses: window.app.getRaceBonuses?.(obj?.raca, obj?.talentoRacial) || [],
-        terraOesteChoices: window.app.getRaceChoiceMetadata?.(obj?.raca, obj?.talentoRacial) || [],
+        terraOesteChoices: [
+          ...(window.app.getRaceChoiceMetadata?.(obj?.raca, obj?.talentoRacial) || []),
+          ...(window.app.getClassChoiceMetadata?.(obj?.classe, obj?.talentoClasse) || [])
+        ],
         goldRolled: obj?.ouroRolado ?? obj?.ouro ?? 0,
         gold: obj?.ouro || 0,
         silver: obj?.prata || 0,
@@ -771,6 +779,7 @@
       const data = await resp.json();
       if (!data || !Array.isArray(data.classes)) return;
       const extras = data.classes;
+      window.LEGACY_CUSTOM_CLASSES = extras;
       const customSpec = {};
       const customOrigens = {};
       extras.forEach(cls => {
@@ -810,6 +819,41 @@
     } catch {}
   }
 
+  async function loadContentCatalog(){
+    try {
+      const resp = await fetch("/api/content", { headers: { "cache-control": "no-store" } });
+      if (!resp.ok) return;
+      const data = await resp.json();
+      const content = { races: Array.isArray(data.races) ? data.races : [], classes: Array.isArray(data.classes) ? data.classes : [] };
+      Object.keys(CLASS_DICE).forEach(name => { if (!Object.prototype.hasOwnProperty.call(CORE_CLASS_DICE, name)) delete CLASS_DICE[name]; });
+      Object.assign(CLASS_DICE, CORE_CLASS_DICE);
+      ALL_RACES.splice(0, ALL_RACES.length, ...CORE_RACE_NAMES);
+      ALL_CLASSES.splice(0, ALL_CLASSES.length, ...CORE_CLASS_NAMES);
+      (window.LEGACY_CUSTOM_CLASSES || []).forEach(item => {
+        const hp = parseInt(item?.hp, 10);
+        if (item?.name && hp > 0) CLASS_DICE[item.name] = hp;
+        if (item?.name && !ALL_CLASSES.includes(item.name)) ALL_CLASSES.push(item.name);
+      });
+      window.CUSTOM_ORIGENS = {};
+      (window.LEGACY_CUSTOM_CLASSES || []).forEach(item => { if (item?.name && Array.isArray(item.origins)) window.CUSTOM_ORIGENS[item.name] = item.origins; });
+      content.races.forEach(item => { if (item?.name && !ALL_RACES.includes(item.name)) ALL_RACES.push(item.name); });
+      content.classes.forEach(item => {
+        if (!item?.name) return;
+        const hp = parseInt(item.hp, 10);
+        if (hp > 0) CLASS_DICE[item.name] = hp;
+        if (!ALL_CLASSES.includes(item.name)) ALL_CLASSES.push(item.name);
+        if (Array.isArray(item.origins) && item.origins.length) {
+          window.CUSTOM_ORIGENS = window.CUSTOM_ORIGENS || {};
+          window.CUSTOM_ORIGENS[item.name] = item.origins;
+        }
+      });
+      window.langs?.applyContentLanguages?.(content);
+      window.app?.applyContentCatalog?.(content);
+      window.CUSTOM_CLASS_DATA = Object.fromEntries(content.classes.map(item => [item.name, item]));
+      window.CONTENT_CATALOG = content;
+    } catch {}
+  }
+
   // ====================== Disponibilidade (GM) via Cloudflare KV ======================
   let __availability = { classes:{}, races:{} };
 
@@ -843,6 +887,7 @@
 // ====================== Bootstrap ======================
 	document.addEventListener('DOMContentLoaded', async () => {
   await loadCustomClasses();
+  await loadContentCatalog();
   await loadAvailability();
   try {
     const headerActions = document.querySelector('.header-actions');
@@ -935,6 +980,7 @@
     ALL_CLASSES,
     ALL_RACES,
     loadCustomClasses,
+    loadContentCatalog,
     // estado e utilitários
     state,
     pending,
@@ -944,3 +990,4 @@
     set __loadedRawObj(val){ __loadedRawObj = val; }
   };
 })();
+

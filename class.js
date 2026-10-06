@@ -14,6 +14,8 @@
   const classInfo = $("#classInfo");
   const classInfoTitle = $("#classInfoTitle");
   const classInfoDescription = $("#classInfoDescription");
+  const classInfoAbility = $("#classInfoAbility");
+  const classTalentChoices = $("#classTalentChoices");
 
   // Descrições da tradução PT-BR do compêndio de classes do Foundry.
   // Só associa classes do site com equivalentes claros no compêndio.
@@ -25,14 +27,57 @@
     "Sacerdote": "Templários cruzados, xamãs proféticos, ou fanáticos com olhos enlouquecidos que empunham o poder de seus deuses para expurgar os impuros."
   };
 
+  function talentOptions(cls){ return window.CUSTOM_CLASS_DATA?.[cls]?.talents || []; }
+  function hasClassTalentChoice(cls){ return talentOptions(cls).length > 1 && window.CUSTOM_CLASS_DATA?.[cls]?.talentMode === "choice"; }
+  window.app.randomClassTalent = cls => {
+    const options = talentOptions(cls);
+    return hasClassTalentChoice(cls) ? options[randInt(0, options.length - 1)].id : (options.length === 1 ? options[0].id : null);
+  };
   function updateClassInfo(cls){
     if (!classInfo) return;
     classInfo.hidden = !cls;
     if (classInfoTitle && cls) classInfoTitle.textContent = `Informações: ${cls}`;
     if (classInfoDescription) {
-      classInfoDescription.textContent = cls ? (CLASS_DESCRIPTIONS[cls] || "Ainda não há uma descrição correspondente no compêndio consultado.") : "A descrição da classe aparecerá aqui.";
+      classInfoDescription.textContent = cls ? (window.CUSTOM_CLASS_DATA?.[cls]?.description || CLASS_DESCRIPTIONS[cls] || "Ainda não há uma descrição correspondente no compêndio consultado.") : "A descrição da classe aparecerá aqui.";
     }
+    const talents = talentOptions(cls);
+    if (classInfoAbility) classInfoAbility.textContent = talents.length
+      ? (hasClassTalentChoice(cls) ? "Escolha um dos talentos da classe:" : talents.map(t => `${t.name}: ${t.description || ""}`).join("; "))
+      : "Nenhuma habilidade da classe cadastrada.";
+    if (classTalentChoices) {
+      classTalentChoices.replaceChildren();
+      classTalentChoices.hidden = !hasClassTalentChoice(cls);
+      if (hasClassTalentChoice(cls)) talents.forEach(talent => {
+        const label = document.createElement("label"); label.className = "race-talent-choice";
+        const input = document.createElement("input"); input.type = "radio"; input.name = "classTalent"; input.value = talent.id;
+        input.checked = pending.classTalent === talent.id;
+        const detail = document.createElement("span");
+        const name = document.createElement("b"); name.textContent = talent.name;
+        const description = document.createElement("small"); description.textContent = talent.description || "";
+        detail.append(name, description); label.append(input, detail);
+        input.addEventListener("change", () => { pending.classTalent = talent.id; updateConfirmButton(); });
+        classTalentChoices.append(label);
+      });
+    }
+    updateConfirmButton();
   }
+
+  function updateConfirmButton(){ if (btnConfirmClass) btnConfirmClass.disabled = !pending.cls || (hasClassTalentChoice(pending.cls) && !talentOptions(pending.cls).some(t => t.id === pending.classTalent)); }
+
+  window.app.getClassContent = cls => ({
+    name: cls,
+    description: window.CUSTOM_CLASS_DATA?.[cls]?.description ?? CLASS_DESCRIPTIONS[cls] ?? "",
+    hp: CLASS_DICE[cls] || 6,
+    talents: talentOptions(cls).map(item => ({ ...item })),
+    languages: window.langs?.getClassBonusSpec(cls) || {},
+    origins: window.getOriginsForClass?.(cls) || (window.CUSTOM_ORIGENS?.[cls] || []).map(item => ({ ...item }))
+  });
+  window.app.getClassChoiceMetadata = (cls, talentId) => {
+    const options = talentOptions(cls);
+    const selected = options.find(item => item.id === talentId);
+    if (!hasClassTalentChoice(cls) || options.length < 2 || !selected?.originalName || options.some(item => !item.originalName)) return [];
+    return [{ sourceType: "Class", sourceName: window.CUSTOM_CLASS_DATA?.[cls]?.foundryName || cls, selected: selected.originalName, options: options.map(item => item.originalName) }];
+  };
 
   // Sorteia uma classe aleatória
   if (btnRandClass) {
@@ -43,8 +88,9 @@
         if (classSel.options.length > 0) classSel.options[0].disabled = true;
       }
       pending.cls = c;
+      pending.classTalent = hasClassTalentChoice(c) ? null : (talentOptions(c).length === 1 ? talentOptions(c)[0].id : null);
       updateClassInfo(c);
-      if (btnConfirmClass) btnConfirmClass.disabled = false;
+      updateConfirmButton();
     });
   }
   // Seleção manual da classe
@@ -52,15 +98,18 @@
     classSel.addEventListener("change", e => {
       const val = e.target.value;
       pending.cls = val || null;
+      const talents = talentOptions(pending.cls);
+      pending.classTalent = hasClassTalentChoice(pending.cls) ? null : (talents.length === 1 ? talents[0].id : null);
       updateClassInfo(pending.cls);
-      if (btnConfirmClass) btnConfirmClass.disabled = !pending.cls;
+      updateConfirmButton();
     });
   }
   // Confirma a classe e prepara as etapas seguintes
   if (btnConfirmClass) {
     btnConfirmClass.addEventListener("click", () => {
-      if (!pending.cls) return;
+      if (!pending.cls || (hasClassTalentChoice(pending.cls) && !talentOptions(pending.cls).some(t => t.id === pending.classTalent))) return;
       state.cls = pending.cls;
+      state.classTalent = pending.classTalent;
       state.origem = null;
       if (classSel) classSel.disabled = true;
       if (btnRandClass) btnRandClass.disabled = true;
@@ -129,3 +178,4 @@
     });
   }
 })();
+

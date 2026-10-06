@@ -103,7 +103,7 @@
    * @param {string} race
    */
   function getRaceBaseLanguages(race){
-    const r = RACE_BASE[race] || { granted: [] };
+    const r = (window.CUSTOM_RACE_LANGUAGES || {})[race] || RACE_BASE[race] || { granted: [] };
     return { granted: dedupe(r.granted || []), bonus: r.bonus || {} };
   }
 
@@ -112,6 +112,13 @@
    * @param {string} cls
    */
   function getClassBonusSpec(cls){ const extra=(window.CUSTOM_CLASS_SPEC||{}); const base=(CLASS_SPEC||{})[cls]||{}; const ex=extra[cls]||{}; return Object.assign({}, base, ex); }
+
+  function applyContentLanguages(content){
+    window.CUSTOM_RACE_LANGUAGES = {};
+    window.CUSTOM_CLASS_SPEC = Object.assign({}, window.CUSTOM_CLASS_SPEC || {});
+    (content?.races || []).forEach(item => { if (item?.name && item.languages) window.CUSTOM_RACE_LANGUAGES[item.name] = item.languages; });
+    (content?.classes || []).forEach(item => { if (item?.name && item.languages) window.CUSTOM_CLASS_SPEC[item.name] = item.languages; });
+  }
 
   /**
    * Calcula as línguas concedidas, os bônus e as escolhas opcionais
@@ -261,9 +268,11 @@
     RARE_LANGS: RARE_LANGS.slice(),
     getRaceBaseLanguages,
     getClassBonusSpec,
+    applyContentLanguages,
     computeLanguagePools,
     applyChoices,
 	pickRandomChoices,
 	applyRandom
   };
 })();
+

@@ -249,5 +249,7 @@
 
 
   window.ORIGENS_POR_CLASSE = ORIGENS_POR_CLASSE;
+  window.getOriginsForClass = name => (window.CUSTOM_ORIGENS?.[name] || ORIGENS_POR_CLASSE[name] || []).map(item => ({ ...item }));
   window.attachOriginStep = attachOriginStep;
 })();
+

@@ -455,6 +455,12 @@ button.primary:active:not(:disabled){background:linear-gradient(#7c2624,#5c1c1a)
 }
 
 .gm-empty{color:var(--muted); font-style:italic; padding:10px 0; margin:0}
+.gm-panel [hidden]{display:none !important}
+.gm-content-selectors .field{display:block; min-width:0}
+#panelContent .field input[type="text"], #panelContent .field textarea{width:100%; min-width:0; box-sizing:border-box}
+#panelContent .field textarea{min-height:82px; resize:vertical; font:inherit; background:#f9f3e3; color:var(--ink); border:1px solid var(--border); border-radius:8px; padding:9px 11px}
+#panelContent .field label{display:block; margin-bottom:6px}
+#panelContent code{font-size:.9em; overflow-wrap:anywhere}
 
 @media (max-width:640px){
   .gm-tab{padding:10px 14px; font-size:15px}
@@ -692,3 +698,4 @@ header > div:last-child > button:active:not(:disabled){
     flex:1 1 auto;
   }
 }
+

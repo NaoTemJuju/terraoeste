@@ -15,7 +15,7 @@
     <header class="gm-topbar">
       <div>
         <h1><span class="gm-seal" aria-hidden="true"></span>Painel do Mestre</h1>
-        <div class="sub">Disponibilidade de classes/raças e classes personalizadas</div>
+        <div class="sub">Disponibilidade, conteúdo de raças/classes e loja</div>
       </div>
       <div class="header-actions">
         <a class="ghost" href="index.html">⬅ Voltar ao criador</a>
@@ -24,7 +24,8 @@
 
     <nav class="gm-tabs" role="tablist" aria-label="Seções do painel">
       <button id="btnTabAvail" class="gm-tab" role="tab" aria-selected="true" aria-controls="panelAvail">Disponibilidade</button>
-      <button id="btnTabClasses" class="gm-tab" role="tab" aria-selected="false" aria-controls="panelClasses">Classes Personalizadas</button>
+      <button id="btnTabClasses" class="gm-tab" role="tab" aria-selected="false" aria-controls="panelClasses">Classes Personalizadas (legado)</button>
+      <button id="btnTabContent" class="gm-tab" role="tab" aria-selected="false" aria-controls="panelContent">Raças e Classes</button>
       <button id="btnTabShop" class="gm-tab" role="tab" aria-selected="false" aria-controls="panelShop">Loja</button>
     </nav>
 
@@ -60,14 +61,75 @@
       </div>
     </section>
 
+    <!-- ================ Aba: Conteúdo de raças e classes ================ -->
+    <section id="panelContent" class="gm-panel" role="tabpanel" aria-labelledby="btnTabContent">
+      <div class="gm-card">
+        <div class="gm-card-head">
+          <h2>Raças e classes</h2>
+          <span class="count">Edite os dados do criador mantendo os nomes iguais aos do Foundry</span>
+        </div>
+        <p>Talentos com mais de uma opção pedem uma escolha do jogador. O nome original é enviado no JSON para o Foundry localizar o talento correspondente.</p>
+        <div class="gm-columns gm-content-selectors">
+          <div class="field"><label for="contentKind">Tipo</label><select id="contentKind"><option value="race">Raça</option><option value="class">Classe</option></select></div>
+          <div class="field"><label for="contentEntity">Editar existente</label><select id="contentEntity"></select></div>
+          <div class="field gm-content-new"><label for="contentNewName">Ou criar novo</label><input id="contentNewName" type="text" placeholder="Nome igual ao do Foundry"></div>
+          <div class="field gm-content-new-action"><label>&nbsp;</label><button id="btnStartNewContent" class="ghost" type="button">Nova entrada</button></div>
+        </div>
+        <div class="gm-edit-banner" id="contentEditBanner" style="display:none"><strong>Editando:</strong> <span id="contentEditingLabel" class="muted"></span></div>
+        <fieldset class="gm-fieldset">
+          <legend>Identidade e descrição</legend>
+          <div class="gm-columns">
+            <div class="field"><label for="contentName">Nome usado no site</label><input id="contentName" type="text"></div>
+            <div class="field"><label for="contentFoundryName">Nome da raça/classe no Foundry</label><input id="contentFoundryName" type="text"></div>
+          </div>
+          <div class="field"><label for="contentDescription">Descrição</label><textarea id="contentDescription" rows="3"></textarea></div>
+        </fieldset>
+        <fieldset class="gm-fieldset" id="contentClassFields">
+          <legend>Dados da classe</legend>
+          <div class="gm-columns">
+            <div class="field"><label for="contentHP">Dado de vida</label><select id="contentHP"><option value="4">d4</option><option value="6">d6</option><option value="8">d8</option><option value="10">d10</option><option value="12">d12</option></select></div>
+            <div class="field"><label for="contentClassLanguages">Idiomas concedidos (separados por vírgula)</label><input id="contentClassLanguages" type="text" placeholder="Druídico, Silvestre"></div>
+          </div>
+          <div class="gm-columns">
+            <div class="field"><label for="contentCommonBonus">Idiomas comuns extras</label><input id="contentCommonBonus" type="number" min="0" value="0"></div>
+            <div class="field"><label for="contentRareBonus">Idiomas raros extras</label><input id="contentRareBonus" type="number" min="0" value="0"></div>
+          </div>
+          <div class="gm-columns">
+            <div class="field"><label for="contentPickOne">Escolher exatamente um (separados por vírgula)</label><input id="contentPickOne" type="text"></div>
+            <div class="field"><label for="contentPickOneOrNone">Escolher um ou nenhum (separados por vírgula)</label><input id="contentPickOneOrNone" type="text"></div>
+          </div>
+          <div class="field"><label for="contentAlignmentLanguages">Idioma por alinhamento (JSON opcional)</label><input id="contentAlignmentLanguages" type="text" placeholder='{"Ordeiro":"Celestial","Neutro":"Primordial","Caótico":"Diabólico"}'></div>
+          <div class="field"><label for="contentOrigins">Origens, uma por linha: <code>Nome | descrição</code></label><textarea id="contentOrigins" rows="6" placeholder="Ex.: Batedor | Você guiava caravanas"></textarea></div>
+        </fieldset>
+        <fieldset class="gm-fieldset" id="contentRaceFields">
+          <legend>Idiomas nativos da raça</legend>
+          <div class="field"><label for="contentRaceLanguages">Idiomas (separados por vírgula)</label><input id="contentRaceLanguages" type="text" placeholder="Comum, Anânico"></div>
+          <div class="field"><label for="contentRaceCommonBonus">Idiomas comuns extras à escolha</label><input id="contentRaceCommonBonus" type="number" min="0" value="0"></div>
+          <div class="field"><label for="contentRaceRareBonus">Idiomas raros extras à escolha</label><input id="contentRaceRareBonus" type="number" min="0" value="0"></div>
+        </fieldset>
+        <fieldset class="gm-fieldset">
+          <legend>Talentos reconhecidos pelo Foundry</legend>
+          <div class="field"><label for="contentTalentMode">Como os talentos são concedidos</label><select id="contentTalentMode"><option value="all">Todos os talentos listados</option><option value="choice">O jogador escolhe um</option></select></div>
+          <div class="field"><label for="contentTalents">Um talento por linha: <code>Nome no site | nome exato no Foundry | descrição</code></label><textarea id="contentTalents" rows="7" placeholder="Robusto | Robusto | +2 PV e vantagem nas rolagens de PV ao subir de nível"></textarea></div>
+          <p class="hint">Use “Todos” quando a raça/classe concede todas as habilidades e “Escolhe um” para opções excludentes, como os dois talentos do Elfo. Use o nome exato do item no compêndio do Foundry; para conteúdos novos, crie a mesma raça/classe e os mesmos talentos no Foundry.</p>
+        </fieldset>
+        <div class="gm-toolbar">
+          <div class="left"><button id="btnDeleteContent" class="ghost" type="button">Remover cadastro / restaurar padrão</button></div>
+          <div class="right"><button id="btnSaveContent" class="primary" type="button">Salvar conteúdo globalmente</button></div>
+        </div>
+        <p id="contentStatus" class="gm-empty" aria-live="polite"></p>
+      </div>
+    </section>
+
     <!-- ================= Aba: Classes Personalizadas ================= -->
     <section id="panelClasses" class="gm-panel" role="tabpanel" aria-labelledby="btnTabClasses">
 
       <div class="gm-card">
         <div class="gm-card-head">
-          <h2>Classes extras cadastradas</h2>
+          <h2>Classes extras cadastradas no formulário antigo</h2>
           <button id="btnListClasses" class="ghost">Atualizar lista</button>
         </div>
+        <p class="hint">Use a aba “Raças e Classes” para editar qualquer registro e adicionar talentos reconhecidos pelo Foundry.</p>
         <div id="customClassList"><p class="gm-empty">Carregando...</p></div>
       </div>
 
@@ -180,7 +242,13 @@
     </section>
   </div>
 
+  <script src="languages.js"></script>
   <script src="base.js"></script>
+  <script src="origens.js"></script>
+  <script src="race.js"></script>
+  <script src="class.js"></script>
   <script src="gm.js"></script>
+  <script src="gm-content.js"></script>
 </body>
 </html>
+
