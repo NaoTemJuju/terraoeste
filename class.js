@@ -367,19 +367,26 @@
         });
         details.append(select);
       } else if (entry.choice === "rangerAttackBonus") {
-        const select = document.createElement("select");
-        select.append(new Option("Escolha o tipo de ataque", ""), new Option("+1 em ataques corpo a corpo e dano", "melee"), new Option("+1 em ataques à distância e dano", "ranged"));
-        select.addEventListener("change", () => {
-          if (!select.value) { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); return; }
-          const melee = select.value === "melee";
+        const applyAttackBonus = attackType => {
+          const melee = attackType === "melee";
           chosen.id = melee ? "RangerMeleeAttackDamage" : "RangerRangedAttackDamage";
           chosen.talentRolledName = melee ? "+1 to Melee Attacks and Damage" : "+1 to Ranged Attacks and Damage";
           chosen.bonusName = chosen.talentRolledName;
           chosen.bonusTo = chosen.talentRolledName;
           chosen.displayDesc = melee ? "+1 para ataques corpo a corpo e dano" : "+1 para ataques à distância e dano";
           complete(chosen);
-        });
-        details.append(select);
+        };
+        if (entry.rangerAttackType) {
+          applyAttackBonus(entry.rangerAttackType);
+        } else {
+          const select = document.createElement("select");
+          select.append(new Option("Escolha o tipo de ataque", ""), new Option("+1 em ataques corpo a corpo e dano", "melee"), new Option("+1 em ataques à distância e dano", "ranged"));
+          select.addEventListener("change", () => {
+            if (!select.value) { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); return; }
+            applyAttackBonus(select.value);
+          });
+          details.append(select);
+        }
       } else if (entry.choice === "rangerHerbalism") {
         const label = document.createElement("label");
         label.textContent = "Erva escolhida";
@@ -476,7 +483,10 @@
     } else if (result.needsChoice === "rangerTwelve") {
       const select = document.createElement("select");
       select.append(new Option("Escolha um benefício", ""));
-      const choices = config.entries.filter(entry => ["rangerWeaponDamage", "rangerAttackBonus", "rangerHerbalism"].includes(entry.choice));
+      const choices = config.entries.filter(entry => ["rangerWeaponDamage", "rangerAttackBonus", "rangerHerbalism"].includes(entry.choice)).flatMap(entry => entry.choice === "rangerAttackBonus" ? [
+        { ...entry, id: "RangerMeleeAttackDamage", desc: "+1 para ataques corpo a corpo e dano", rangerAttackType: "melee" },
+        { ...entry, id: "RangerRangedAttackDamage", desc: "+1 para ataques à distância e dano", rangerAttackType: "ranged" }
+      ] : [entry]);
       choices.forEach(entry => select.append(new Option(entry.desc, entry.id)));
       select.append(new Option("Distribuir +2 pontos entre atributos", "stats"));
       const details = document.createElement("div");
@@ -499,6 +509,7 @@
         const entry = choices.find(item => item.id === select.value);
         if (!entry) { updateTalentContinueButton(); return; }
         const chosen = resultForEntry(entry, result.roll);
+        if (entry.rangerAttackType) chosen.rangerAttackType = entry.rangerAttackType;
         chosen.rolled12Mode = "talent";
         chosen.rolled12TalentOrTwoStatPoints = "Talent";
         chosen.rolled12ChosenTalentName = chosen.talentRolledName;
@@ -919,7 +930,7 @@
         chosen.bonusTo = weapon.value;
         chosen.displayDesc = `Dado de dano aumentado: ${weapon.label}`;
       } else if (entry.choice === "rangerAttackBonus") {
-        const melee = randInt(0, 1) === 0;
+        const melee = entry.rangerAttackType ? entry.rangerAttackType === "melee" : randInt(0, 1) === 0;
         chosen.id = melee ? "RangerMeleeAttackDamage" : "RangerRangedAttackDamage";
         chosen.talentRolledName = melee ? "+1 to Melee Attacks and Damage" : "+1 to Ranged Attacks and Damage";
         chosen.bonusName = chosen.talentRolledName;
@@ -994,7 +1005,10 @@
     };
     let result = resultForEntry(entry, roll);
     if (entry.choice === "rangerTwelve") {
-      const options = [...config.entries.filter(item => ["rangerWeaponDamage", "rangerAttackBonus", "rangerHerbalism"].includes(item.choice)), { choice: "rangerDistributeStats" }];
+      const options = config.entries.filter(item => ["rangerWeaponDamage", "rangerAttackBonus", "rangerHerbalism"].includes(item.choice)).flatMap(item => item.choice === "rangerAttackBonus" ? [
+        { ...item, id: "RangerMeleeAttackDamage", rangerAttackType: "melee" },
+        { ...item, id: "RangerRangedAttackDamage", rangerAttackType: "ranged" }
+      ] : [item]).concat({ choice: "rangerDistributeStats" });
       const selected = options[randInt(0, options.length - 1)];
       if (selected.choice === "rangerDistributeStats") {
         const first = ["STR", "DEX", "CON", "INT", "WIS", "CHA"][randInt(0, 5)];
