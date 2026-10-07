@@ -530,10 +530,14 @@
     mageSpellTables.replaceChildren();
     mageSpellTables.hidden = cls !== "Mago";
     if (cls !== "Mago") return;
-    const makeTable = (titleText, headers, rows) => {
+    const makeTable = (titleText, headers, rows, captionText = "") => {
       const title = document.createElement("h4");
       title.textContent = titleText;
       const table = document.createElement("table");
+      if (captionText) {
+        const caption = table.createCaption();
+        caption.textContent = captionText;
+      }
       const thead = document.createElement("thead");
       const headerRow = document.createElement("tr");
       headers.forEach(text => { const th=document.createElement("th"); th.scope="col"; th.textContent=text; headerRow.append(th); });
@@ -550,10 +554,33 @@
         tbody.append(row);
       });
       table.append(thead,tbody);
-      mageSpellTables.append(title,table);
+      return { title, table };
     };
-    makeTable("Magias de Mago Conhecidas", ["Nível","1","2","3","4","5"], [["1","3","–","–","–","–"]]);
-    makeTable("Magias de 1º círculo", ["Magia","Duração","Alcance"], MAGE_SPELLS.map(spell => [spell.label,spell.duration,spell.range]));
+    const knownSpellTable = makeTable("Magias de Mago Conhecidas", ["Nível","1","2","3","4","5"], [
+      ["1","3","–","–","–","–"],
+      ["2","4","–","–","–","–"],
+      ["3","4","1","–","–","–"],
+      ["4","4","2","–","–","–"],
+      ["5","4","2","1","–","–"],
+      ["6","4","3","2","–","–"],
+      ["7","4","3","2","1","–"],
+      ["8","4","4","2","2","–"],
+      ["9","4","4","3","2","1"],
+      ["10","4","4","4","2","2"]
+    ], "Magias Conhecidas por Grau de Magia");
+    const info = document.createElement("details");
+    info.className = "mage-known-spells-info";
+    info.style.margin = "8px 0";
+    const trigger = document.createElement("summary");
+    trigger.className = "mage-known-spells-info__trigger";
+    trigger.textContent = "i";
+    trigger.title = "Ver tabela completa de magias de mago conhecidas";
+    trigger.setAttribute("aria-label", trigger.title);
+    trigger.style.cssText = "display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border:1px solid currentColor;border-radius:50%;font-size:14px;font-weight:700;line-height:1;cursor:pointer;list-style:none;";
+    info.append(trigger, knownSpellTable.title, knownSpellTable.table);
+    mageSpellTables.append(info);
+    const spellListTable = makeTable("Magias de 1º círculo", ["Magia","Duração","Alcance"], MAGE_SPELLS.map(spell => [spell.label,spell.duration,spell.range]));
+    mageSpellTables.append(spellListTable.title, spellListTable.table);
   }
 
   function talentOptions(cls){ return window.CUSTOM_CLASS_DATA?.[cls]?.talents || []; }
