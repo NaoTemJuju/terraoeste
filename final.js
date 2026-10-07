@@ -218,9 +218,9 @@
     const spellsKnown = mageSpellsKnown.join(", ") || "None";
     const mageSpellBonuses = cls === "Mago" ? mageSpellsKnown.map((spell, index) => ({
       sourceType: "Class",
-      sourceName: window.app.getFoundryClassName?.(cls) || cls,
+      sourceName: "Wizard",
       sourceCategory: "Ability",
-      name: `Spell: ${window.app.getFoundryClassName?.(cls) || cls}, Tier 1, Spell ${index + 1}`,
+      name: `Spell: Wizard, Tier 1, Spell ${index + 1}`,
       bonusName: spell,
       bonusTo: `Tier:1, Spell:${index + 1}`,
       gainedAtLevel: 1
@@ -475,9 +475,9 @@
     const spellsKnown = mageSpellsKnown.join(", ") || "None";
     const mageSpellBonuses = src?.classe === "Mago" ? mageSpellsKnown.map((spell, index) => ({
       sourceType: "Class",
-      sourceName: window.app.getFoundryClassName?.(src?.classe) || src?.classe,
+      sourceName: "Wizard",
       sourceCategory: "Ability",
-      name: `Spell: ${window.app.getFoundryClassName?.(src?.classe) || src?.classe}, Tier 1, Spell ${index + 1}`,
+      name: `Spell: Wizard, Tier 1, Spell ${index + 1}`,
       bonusName: spell,
       bonusTo: `Tier:1, Spell:${index + 1}`,
       gainedAtLevel: 1
