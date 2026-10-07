@@ -44,7 +44,21 @@
       choiceDescription: "Maestria em Armas: escolha um tipo de arma para receber +1 em ataques e dano, além de metade do seu nível (arredondada para baixo). Bravura: escolha Força ou Destreza para ter vantagem em testes dessa categoria usados para superar uma força oposta."
     }
   };
-  const FIGHTER_WEAPON_LABELS = Object.fromEntries(FIGHTER_WEAPON_TYPES.map(item => [item.value, item.label]));
+  const MAGE_SPELLS = [
+    { label: "Alarme", value: "Alarm", duration: "1 dia", range: "Adjacente" },
+    { label: "Armadura Arcana", value: "Arcane Armor", duration: "10 rodadas", range: "Você" },
+    { label: "Detectar Magia", value: "Detect Magic", duration: "Concentração", range: "Perto" },
+    { label: "Disco Flutuante", value: "Floating Disk", duration: "10 rodadas", range: "Perto" },
+    { label: "Encantar Pessoa", value: "Charm Person", duration: "1d8 dias", range: "Perto" },
+    { label: "Luz", value: "Light", duration: "1h (tempo real)", range: "Adjacente" },
+    { label: "Mãos Flamejantes", value: "Burning Hands", duration: "Instantâneo", range: "Adjacente" },
+    { label: "Míssil Mágico", value: "Magic Missile", duration: "Instantâneo", range: "Longe" },
+    { label: "Obstruir Porta", value: "Hold Portal", duration: "10 rodadas", range: "Perto" },
+    { label: "Proteção contra o Mal", value: "Protection from Evil", duration: "Concentração", range: "Adjacente" },
+    { label: "Queda Suave", value: "Feather Fall", duration: "Instantâneo", range: "Você" },
+    { label: "Sono", value: "Sleep", duration: "Instantâneo", range: "Perto" }
+  ];
+    const FIGHTER_WEAPON_LABELS = Object.fromEntries(FIGHTER_WEAPON_TYPES.map(item => [item.value, item.label]));
   const FIGHTER_ARMOR_TYPES = [
     { label: "Armadura de Couro", value: "Leather armor" },
     { label: "Cota de Malha", value: "Chainmail" },
@@ -103,6 +117,16 @@
   };
 
   const CLASS_TALENT_TABLES = {
+    "Mago": {
+      title: "Talentos de Mago",
+      entries: [
+        { roll: "2", effect: "Crie 1 item mágico aleatório de qualquer tipo, à sua escolha (pág. 288)" },
+        { roll: "3–7", effect: "+2 em Inteligência ou +1 em testes de conjuração de magias de mago" },
+        { roll: "8–9", effect: "Ganhe Vantagem na conjuração de uma magia que você conhece" },
+        { roll: "10–11", effect: "Aprenda outra magia de mago de qualquer grau que você conheça" },
+        { roll: "12", effect: "Escolha um talento ou distribua +2 pontos entre os seus atributos" }
+      ]
+    },
     "Guerreiro": {
       title: "Talentos de Guerreiro",
       entries: [
@@ -138,12 +162,29 @@
   // Dados estruturados para o primeiro talento de classe. Novas tabelas
   // podem usar o mesmo fluxo sem misturar essa rolagem com a escolha de
   // habilidade especial configurada pelo GM.
+  const MAGE_SPECIAL_ABILITY = [
+    "Aprendendo Magias. Você pode aprender permanentemente uma magia de mago a partir de um pergaminho mágico, ao estudá-lo por um dia e ser bem-sucedido em um teste de Inteligência CD 15. Independentemente de sucesso ou falha, você gasta o pergaminho mágico. Magias que você aprende dessa forma não são contabilizadas no seu número de magias conhecidas.",
+    "",
+    "Conjuração. Você pode conjurar as magias de mago que você conhece. Você conhece três magias de grau 1, à sua escolha, da lista de magias de mago. A cada nível que você ganhar, escolha novas magias de mago para aprender, de acordo com a tabela de Magias de Mago Conhecidas. Para conjurar magias de mago, veja Conjuração, na pág. 44."
+  ].join("\n");
   const CLASS_SPECIAL_ABILITIES = {
+    "Mago": MAGE_SPECIAL_ABILITY,
     "Malandro": THIEF_SPECIAL_ABILITY,
     "Ladrão": THIEF_SPECIAL_ABILITY
   };
 
   const CLASS_LEVEL_TALENTS = {
+    "Mago": {
+      foundryName: "Mago",
+      title: "Talentos de Mago",
+      entries: [
+        { min: 2, max: 2, id: "MakeRandomMagicItem", name: "MakeRandomMagicItem", choice: "magicItem", desc: "Crie 1 item mágico aleatório de qualquer tipo, à sua escolha", foundryDesc: "Create one random magic item of any type, your choice", bonusName: "MakeRandomMagicItem" },
+        { min: 3, max: 7, id: "Plus2INTOrPlus1Casting", choice: "mageStatOrCasting", desc: "+2 em Inteligência ou +1 em testes de conjuração de magias de mago", foundryDesc: "+2 Intelligence or +1 to casting checks for mage spells" },
+        { min: 8, max: 9, id: "AdvOnCastOneSpell", name: "AdvOnCastOneSpell", choice: "mageKnownSpell", desc: "Ganhe Vantagem na conjuração de uma magia que você conhece", foundryDesc: "Gain Advantage casting one spell you know", bonusName: "AdvOnCastOneSpell" },
+        { min: 10, max: 11, id: "PickExtraSpell", name: "PickExtraSpell", choice: "mageExtraSpell", desc: "Aprenda outra magia de mago de qualquer grau que você conheça", foundryDesc: "Learn one additional mage spell of any tier you know", bonusName: "PickExtraSpell" },
+        { min: 12, max: 12, id: "ChooseTalentOrStats", choice: "twelve", desc: "Escolha um talento ou distribua +2 pontos entre os seus atributos" }
+      ]
+    },
     "Guerreiro": {
       foundryName: "Guerreiro",
       title: "Talentos de Guerreiro",
@@ -444,7 +485,7 @@
         classInfoAbility.replaceChildren();
         specialAbility.split(String.fromCharCode(10)).forEach((line, index) => {
           if (index) classInfoAbility.append(document.createElement("br"));
-          const heading = line.match(/^(Apunhalada Pelas Costas|Ladroagem)[.](.*)$/);
+          const heading = line.match(/^(Apunhalada Pelas Costas|Ladroagem|Aprendendo Magias|Conjuração)[.](.*)$/);
           if (heading) {
             const strong = document.createElement("strong");
             strong.style.display = "inline";
