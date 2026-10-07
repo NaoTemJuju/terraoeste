@@ -393,7 +393,7 @@
         const input = document.createElement("input");
         input.type = "text";
         input.placeholder = "Digite o nome da erva";
-        input.addEventListener("input", () => {
+        input.addEventListener("change", () => {
           if (!input.value.trim()) { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); return; }
           chosen.talentRolledName = "Herbalism Check Advantage";
           chosen.bonusName = "Herbalism Check Advantage";
