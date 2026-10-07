@@ -160,6 +160,26 @@
         { roll: "12", effect: "Escolha um talento ou distribua +2 pontos entre os seus atributos" }
       ]
     },
+    "Patrulheiro": {
+      title: "Talentos de Patrulheiro",
+      entries: [
+        { roll: "2", effect: "Dado de Dano de Arma Aumentado" },
+        { roll: "3–6", effect: "Escolha 1" },
+        { roll: "3–6", effect: "+1 para Ataques Corpo a Corpo e Dano" },
+        { roll: "3–6", effect: "+1 para Ataques à Distância e Dano" },
+        { roll: "7–9", effect: "Escolha 1" },
+        { roll: "7–9", effect: "+2 de Força" },
+        { roll: "7–9", effect: "+2 de Destreza" },
+        { roll: "7–9", effect: "+2 de Inteligência" },
+        { roll: "10–11", effect: "Vantagem em Teste de Herbalismo" },
+        { roll: "12", effect: "Escolha 1" },
+        { roll: "12", effect: "Dado de Dano de Arma Aumentado" },
+        { roll: "12", effect: "+1 para Ataques Corpo a Corpo e Dano" },
+        { roll: "12", effect: "+1 para Ataques à Distância e Dano" },
+        { roll: "12", effect: "Vantagem em Teste de Herbalismo" },
+        { roll: "12", effect: "Distribuir entre Atributos" }
+      ]
+    },
     "Malandro": {
       title: "Talentos de Ladrão",
       entries: [
@@ -206,6 +226,17 @@
         { min: 8, max: 9, id: "AdvOnCastOneSpell", name: "AdvOnCastOneSpell", choice: "mageKnownSpell", desc: "Ganhe Vantagem na conjuração de uma magia que você conhece", foundryDesc: "Gain Advantage casting one spell you know", bonusName: "AdvOnCastOneSpell" },
         { min: 10, max: 11, id: "PickExtraSpell", name: "PickExtraSpell", choice: "mageExtraSpell", desc: "Aprenda outra magia de mago de qualquer grau que você conheça", foundryDesc: "Learn one additional mage spell of any tier you know", bonusName: "PickExtraSpell" },
         { min: 12, max: 12, id: "ChooseTalentOrStats", choice: "twelve", desc: "Escolha um talento ou distribua +2 pontos entre os seus atributos" }
+      ]
+    },
+    "Patrulheiro": {
+      foundryName: "Patrulheiro",
+      title: "Talentos de Patrulheiro",
+      entries: [
+        { min: 2, max: 2, id: "IncreasedWeaponDamageDie", name: "Increased Weapon Damage Die", choice: "rangerWeaponDamage", desc: "Dado de Dano de Arma Aumentado", foundryDesc: "Increased Weapon Damage Die", bonusName: "Increased Weapon Damage Die" },
+        { min: 3, max: 6, id: "RangerAttackBonus", choice: "rangerAttackBonus", desc: "Escolha +1 para ataques corpo a corpo e dano ou ataques à distância e dano", foundryDesc: "Choose +1 to melee attacks and damage or ranged attacks and damage" },
+        { min: 7, max: 9, id: "StatBonus", choice: "stat", statOptions: ["STR", "DEX", "INT"], desc: "+2 em Força, Destreza ou Inteligência", foundryDesc: "+2 Strength, Dexterity, or Intelligence", bonusName: "StatBonus" },
+        { min: 10, max: 11, id: "HerbalismCheckAdvantage", name: "Herbalism Check Advantage", choice: "rangerHerbalism", desc: "Vantagem em Teste de Herbalismo", foundryDesc: "Herbalism Check Advantage", bonusName: "Herbalism Check Advantage" },
+        { min: 12, max: 12, id: "RangerChooseTalentOrStats", choice: "rangerTwelve", desc: "Escolha um talento da tabela ou distribua +2 pontos entre os atributos", foundryDesc: "Choose a talent from the table or distribute +2 points among ability scores" }
       ]
     },
     "Guerreiro": {
@@ -321,6 +352,50 @@
           complete(chosen);
         });
         details.append(select);
+      } else if (entry.choice === "rangerWeaponDamage") {
+        const select = document.createElement("select");
+        select.append(new Option("Escolha a arma", ""));
+        FIGHTER_WEAPON_TYPES.forEach(option => select.append(new Option(option.label, option.value)));
+        select.addEventListener("change", () => {
+          if (!select.value) { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); return; }
+          const weapon = FIGHTER_WEAPON_TYPES.find(item => item.value === select.value);
+          chosen.talentRolledName = "Increased Weapon Damage Die";
+          chosen.bonusName = "Increased Weapon Damage Die";
+          chosen.bonusTo = weapon.value;
+          chosen.displayDesc = `Dado de dano aumentado: ${weapon.label}`;
+          complete(chosen);
+        });
+        details.append(select);
+      } else if (entry.choice === "rangerAttackBonus") {
+        const select = document.createElement("select");
+        select.append(new Option("Escolha o tipo de ataque", ""), new Option("+1 em ataques corpo a corpo e dano", "melee"), new Option("+1 em ataques à distância e dano", "ranged"));
+        select.addEventListener("change", () => {
+          if (!select.value) { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); return; }
+          const melee = select.value === "melee";
+          chosen.id = melee ? "RangerMeleeAttackDamage" : "RangerRangedAttackDamage";
+          chosen.talentRolledName = melee ? "+1 to Melee Attacks and Damage" : "+1 to Ranged Attacks and Damage";
+          chosen.bonusName = chosen.talentRolledName;
+          chosen.bonusTo = chosen.talentRolledName;
+          chosen.displayDesc = melee ? "+1 para ataques corpo a corpo e dano" : "+1 para ataques à distância e dano";
+          complete(chosen);
+        });
+        details.append(select);
+      } else if (entry.choice === "rangerHerbalism") {
+        const label = document.createElement("label");
+        label.textContent = "Erva escolhida";
+        const input = document.createElement("input");
+        input.type = "text";
+        input.placeholder = "Digite o nome da erva";
+        input.addEventListener("input", () => {
+          if (!input.value.trim()) { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); return; }
+          chosen.talentRolledName = "Herbalism Check Advantage";
+          chosen.bonusName = "Herbalism Check Advantage";
+          chosen.bonusTo = input.value.trim();
+          chosen.displayDesc = `Vantagem em Herbalismo: ${input.value.trim()}`;
+          complete(chosen);
+        });
+        label.append(input);
+        details.append(label);
       } else if (entry.choice === "magicItem") {
         const select = document.createElement("select");
         select.append(new Option("Selecione uma categoria de item mágico", ""));
@@ -396,8 +471,41 @@
         result.displayDesc = `+2 em ${stat}`;
         finish(result);
       }, result.statOptions || ["STR","DEX","CHA"]));
-    } else if (["weaponMastery", "armorMastery", "magicItem", "mageStatOrCasting", "mageKnownSpell", "mageExtraSpell"].includes(result.needsChoice)) {
+    } else if (["weaponMastery", "armorMastery", "magicItem", "mageStatOrCasting", "mageKnownSpell", "mageExtraSpell", "rangerWeaponDamage", "rangerAttackBonus", "rangerHerbalism"].includes(result.needsChoice)) {
       showEntryChoice(config.entries.find(entry => entry.id === result.id), result, choiceArea);
+    } else if (result.needsChoice === "rangerTwelve") {
+      const select = document.createElement("select");
+      select.append(new Option("Escolha um benefício", ""));
+      const choices = config.entries.filter(entry => ["rangerWeaponDamage", "rangerAttackBonus", "rangerHerbalism"].includes(entry.choice));
+      choices.forEach(entry => select.append(new Option(entry.desc, entry.id)));
+      select.append(new Option("Distribuir +2 pontos entre atributos", "stats"));
+      const details = document.createElement("div");
+      details.className = "class-level-talent-choice-details";
+      select.addEventListener("change", () => {
+        details.replaceChildren();
+        pending.classLevelTalents[rollIndex] = null;
+        if (select.value === "stats") {
+          const selected = [];
+          const updateStats = () => {
+            if (selected.length !== 2 || !selected.every(Boolean)) { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); return; }
+            const counts = selected.reduce((acc, code) => ({...acc,[code]:(acc[code]||0)+1}), {});
+            const labels = selected.map(code => STAT_LABELS.find(stat => STAT_CODES[stat] === code));
+            finish({ roll: result.roll, id: "TwoStatPoints", talentRolledName: "", talentRolledDesc: "+2 to ability scores", bonusName: "StatBonus", bonusTo: Object.entries(counts).map(([code,n]) => `${code}:+${n}`).join(", "), rolled12Mode: "twoStatPoints", displayDesc: `+2 pontos nos atributos: ${labels.join(" e ")}`, rolled12TalentOrTwoStatPoints: "TwoStatPoints" });
+          };
+          details.append(makeStatSelect("Primeiro ponto", code => { selected[0]=code; updateStats(); }, null, 1));
+          details.append(makeStatSelect("Segundo ponto", code => { selected[1]=code; updateStats(); }, null, 1));
+          return;
+        }
+        const entry = choices.find(item => item.id === select.value);
+        if (!entry) { updateTalentContinueButton(); return; }
+        const chosen = resultForEntry(entry, result.roll);
+        chosen.rolled12Mode = "talent";
+        chosen.rolled12TalentOrTwoStatPoints = "Talent";
+        chosen.rolled12ChosenTalentName = chosen.talentRolledName;
+        chosen.rolled12ChosenTalentDesc = chosen.talentRolledDesc;
+        showEntryChoice(entry, chosen, details, true);
+      });
+      choiceArea.append(select, details);
     } else if (result.needsChoice === "twelve") {
       const mode = document.createElement("select");
       mode.append(new Option("Escolha: talento ou +2 nos atributos", ""), new Option("Escolher um talento da tabela", "talent"), new Option("Distribuir +2 pontos entre atributos", "stats"));
@@ -804,7 +912,25 @@
     const roll = randInt(1, 6) + randInt(1, 6);
     const entry = config.entries.find(item => roll >= item.min && roll <= item.max);
     const randomChoice = (entry, chosen, rolled12 = false) => {
-      if (entry.choice === "stat") {
+      if (entry.choice === "rangerWeaponDamage") {
+        const weapon = FIGHTER_WEAPON_TYPES[randInt(0, FIGHTER_WEAPON_TYPES.length - 1)];
+        chosen.talentRolledName = "Increased Weapon Damage Die";
+        chosen.bonusName = "Increased Weapon Damage Die";
+        chosen.bonusTo = weapon.value;
+        chosen.displayDesc = `Dado de dano aumentado: ${weapon.label}`;
+      } else if (entry.choice === "rangerAttackBonus") {
+        const melee = randInt(0, 1) === 0;
+        chosen.id = melee ? "RangerMeleeAttackDamage" : "RangerRangedAttackDamage";
+        chosen.talentRolledName = melee ? "+1 to Melee Attacks and Damage" : "+1 to Ranged Attacks and Damage";
+        chosen.bonusName = chosen.talentRolledName;
+        chosen.bonusTo = chosen.talentRolledName;
+        chosen.displayDesc = melee ? "+1 para ataques corpo a corpo e dano" : "+1 para ataques à distância e dano";
+      } else if (entry.choice === "rangerHerbalism") {
+        chosen.talentRolledName = "Herbalism Check Advantage";
+        chosen.bonusName = "Herbalism Check Advantage";
+        chosen.bonusTo = "herb";
+        chosen.displayDesc = "Vantagem em Teste de Herbalismo";
+      } else if (entry.choice === "stat") {
         const options = entry.statOptions || ["STR", "DEX", "CHA"];
         const code = options[randInt(0, options.length - 1)];
         const stat = STAT_LABELS.find(name => STAT_CODES[name] === code);
@@ -867,6 +993,24 @@
       return chosen;
     };
     let result = resultForEntry(entry, roll);
+    if (entry.choice === "rangerTwelve") {
+      const options = [...config.entries.filter(item => ["rangerWeaponDamage", "rangerAttackBonus", "rangerHerbalism"].includes(item.choice)), { choice: "rangerDistributeStats" }];
+      const selected = options[randInt(0, options.length - 1)];
+      if (selected.choice === "rangerDistributeStats") {
+        const first = ["STR", "DEX", "CON", "INT", "WIS", "CHA"][randInt(0, 5)];
+        const second = ["STR", "DEX", "CON", "INT", "WIS", "CHA"][randInt(0, 5)];
+        const counts = [first, second].reduce((acc, code) => ({ ...acc, [code]: (acc[code] || 0) + 1 }), {});
+        const labels = [first, second].map(code => STAT_LABELS.find(stat => STAT_CODES[stat] === code));
+        return { roll, id: "TwoStatPoints", talentRolledName: "", talentRolledDesc: "+2 to ability scores", bonusName: "StatBonus", bonusTo: Object.entries(counts).map(([code, amount]) => `${code}:+${amount}`).join(", "), rolled12Mode: "twoStatPoints", rolled12TalentOrTwoStatPoints: "TwoStatPoints", displayDesc: `+2 pontos nos atributos: ${labels.join(" e ")}` };
+      }
+      result = randomChoice(selected, resultForEntry(selected, roll), true);
+      result.rolled12Mode = "talent";
+      result.rolled12TalentOrTwoStatPoints = "Talent";
+      result.rolled12ChosenTalentName = result.talentRolledName;
+      result.rolled12ChosenTalentDesc = result.talentRolledDesc;
+      result.displayDesc = `Escolheu talento: ${result.displayDesc || selected.desc}`;
+      return result;
+    }
     if (entry.choice === "twelve") {
       if (randInt(0, 1) === 0) {
         const stats = ["STR", "DEX", "CON", "INT", "WIS", "CHA"];
