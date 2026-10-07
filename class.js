@@ -45,6 +45,11 @@
     }
   };
   const FIGHTER_WEAPON_LABELS = Object.fromEntries(FIGHTER_WEAPON_TYPES.map(item => [item.value, item.label]));
+  const FIGHTER_ARMOR_TYPES = [
+    { label: "Armadura de Couro", value: "Leather armor" },
+    { label: "Cota de Malha", value: "Chainmail" },
+    { label: "Armadura de Placas", value: "Plate mail" }
+  ];
 
   function makeClassFeatureBonuses(cls, choices){
     if (!["Guerreiro", "Fighter"].includes(cls) || !choices) return [];
@@ -85,6 +90,16 @@
   };
 
   const CLASS_TALENT_TABLES = {
+    "Guerreiro": {
+      title: "Talentos de Guerreiro",
+      entries: [
+        { roll: "2", effect: "Ganhe Maestria em Armas em um tipo de arma adicional" },
+        { roll: "3–6", effect: "+1 em ataques corpo a corpo e à distância" },
+        { roll: "7–9", effect: "+2 no atributo Força, Destreza ou Constituição" },
+        { roll: "10–11", effect: "Escolha um tipo de armadura e receba +1 na CA ao usá-la" },
+        { roll: "12", effect: "Escolha um talento ou distribua +2 pontos entre os seus atributos" }
+      ]
+    },
     "Malandro": {
       title: "Talentos de Ladrão",
       entries: [
@@ -111,6 +126,17 @@
   // podem usar o mesmo fluxo sem misturar essa rolagem com a escolha de
   // habilidade especial configurada pelo GM.
   const CLASS_LEVEL_TALENTS = {
+    "Guerreiro": {
+      foundryName: "Fighter",
+      title: "Talentos de Guerreiro",
+      entries: [
+        { min: 2, max: 2, id: "WeaponMastery", name: "WeaponMastery", choice: "weaponMastery", desc: "Ganhe Maestria em Armas em um tipo de arma adicional", foundryDesc: "Gain Weapon Mastery with one additional weapon", bonusName: "Plus1AttackAndDamagePlusHalfLevel" },
+        { min: 3, max: 6, id: "Plus1ToHit", name: "+1 para Ataques Corpo a Corpo ou à Distância", desc: "+1 em ataques corpo a corpo e à distância", foundryDesc: "+1 to melee and ranged attacks", bonusTo: "Melee and ranged attacks", bonusName: "Plus1ToHit" },
+        { min: 7, max: 9, id: "StatBonus", choice: "stat", statOptions: ["STR", "DEX", "CON"], desc: "+2 em Força, Destreza ou Constituição", foundryDesc: "+2 Strength, Dexterity, or Constitution", bonusName: "StatBonus" },
+        { min: 10, max: 11, id: "ArmorMastery", name: "ArmorMastery", choice: "armorMastery", desc: "Escolha um tipo de armadura e receba +1 na CA ao usá-la", foundryDesc: "Choose one kind of armor. You get +1 AC from that armor", bonusName: "ArmorMastery" },
+        { min: 12, max: 12, id: "ChooseTalentOrStats", choice: "twelve", desc: "Escolha um talento ou distribua +2 pontos entre os seus atributos" }
+      ]
+    },
     "Malandro": {
       foundryName: "Ladrão",
       title: "Talentos de Ladrão",
@@ -145,52 +171,92 @@
 
   function classLevelTalentConfig(cls){ return CLASS_LEVEL_TALENTS[cls] || null; }
   window.app.getFoundryClassName = cls => classLevelTalentConfig(cls)?.foundryName || window.CUSTOM_CLASS_DATA?.[cls]?.foundryName || cls || "";
-  function resultForEntry(entry, roll){ return { roll, id: entry.id, talentRolledName: entry.name || "", talentRolledDesc: entry.foundryDesc || entry.desc, displayDesc: entry.desc, bonusName: entry.bonusName || entry.id, bonusTo: entry.bonusTo || "", needsChoice: entry.choice || "" }; }
+  function resultForEntry(entry, roll){ return { roll, id: entry.id, talentRolledName: entry.name || "", talentRolledDesc: entry.foundryDesc || entry.desc, displayDesc: entry.desc, bonusName: entry.bonusName || entry.id, bonusTo: entry.bonusTo || "", needsChoice: entry.choice || "", statOptions: entry.statOptions || null }; }
   function makeTalentBonus(result, cls){
     if (!result || !(result.bonusName || result.id)) return [];
     const config = classLevelTalentConfig(cls);
     const effectName = result.bonusName || result.id;
     const bonusTo = result.bonusTo || result.talentRolledName || effectName;
-    return [{ sourceType: "Class", sourceName: window.app.getFoundryClassName(cls) || config?.foundryName || cls, sourceCategory: "Talent", name: result.talentRolledName || effectName, bonusName: effectName, bonusTo, gainedAtLevel: 1 }];
+    return String(bonusTo).split(/,\s*/).filter(Boolean).map(target => ({ sourceType: "Class", sourceName: window.app.getFoundryClassName(cls) || config?.foundryName || cls, sourceCategory: "Talent", name: result.talentRolledName || effectName, bonusName: effectName, bonusTo: target, gainedAtLevel: 1 }));
   }
   function renderLevelTalentChoices(result, rollIndex){
     if (!classLevelTalent) return;
     const choiceArea = document.createElement("div");
     choiceArea.className = "class-level-talent-choice";
+    const config = classLevelTalentConfig(pending.cls);
     const finish = chosen => {
       pending.classLevelTalents[rollIndex] = chosen || result;
       pending.classLevelTalentDraft = null;
       renderClassLevelTalent(pending.cls);
       updateTalentContinueButton();
     };
-    const makeStatSelect = (labelText, onChange, selected = "") => {
+    const makeStatSelect = (labelText, onChange, codes = null, amount = 2) => {
       const label = document.createElement("label");
       label.textContent = labelText;
       const select = document.createElement("select");
       select.append(new Option("Escolha um atributo", ""));
-      const availableStats = labelText.includes("+2") ? ["Força", "Destreza", "Carisma"] : STAT_LABELS;
-      availableStats.forEach(stat => {
+      const allowed = codes || ["STR", "DEX", "CON", "INT", "WIS", "CHA"];
+      allowed.forEach(code => {
+        const stat = STAT_LABELS.find(name => STAT_CODES[name] === code);
         const current = state.attrs?.[STAT_LABELS.indexOf(stat)];
-        const increase = labelText.includes("+2") ? 2 : 1;
-        const optionLabel = Number.isFinite(current) ? `${stat} (${current} → ${current + increase})` : stat;
-        select.append(new Option(optionLabel, STAT_CODES[stat]));
+        const optionLabel = Number.isFinite(current) ? `${stat} (${current} → ${current + amount})` : stat;
+        select.append(new Option(optionLabel, code));
       });
-      select.value = selected;
       select.addEventListener("change", () => onChange(select.value));
       label.append(select);
       return label;
     };
+    const finishRolled12Talent = chosen => {
+      chosen.rolled12TalentOrTwoStatPoints = "Talent";
+      chosen.rolled12ChosenTalentName = chosen.talentRolledName;
+      chosen.rolled12ChosenTalentDesc = chosen.talentRolledDesc;
+      finish(chosen);
+    };
+    const showEntryChoice = (entry, chosen, details, isRolled12 = false) => {
+      const complete = value => isRolled12 ? finishRolled12Talent(value) : finish(value);
+      if (entry.choice === "stat") {
+        details.append(makeStatSelect("Atributo para o bônus +2", code => {
+          if (!code) { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); return; }
+          const stat = STAT_LABELS.find(name => STAT_CODES[name] === code);
+          const english = {STR:"Strength",DEX:"Dexterity",CON:"Constitution",INT:"Intelligence",WIS:"Wisdom",CHA:"Charisma"}[code];
+          chosen.talentRolledName = `+2 de ${stat}`;
+          chosen.bonusName = "StatBonus";
+          chosen.bonusTo = `${code}:+2`;
+          chosen.talentRolledDesc = `+2 ${english}`;
+          chosen.displayDesc = `+2 em ${stat}`;
+          complete(chosen);
+        }, entry.statOptions || ["STR","DEX","CHA"]));
+      } else if (entry.choice === "weaponMastery" || entry.choice === "armorMastery") {
+        const weapon = entry.choice === "weaponMastery";
+        const select = document.createElement("select");
+        select.append(new Option(weapon ? "Escolha uma arma" : "Escolha uma armadura", ""));
+        (weapon ? FIGHTER_WEAPON_TYPES : FIGHTER_ARMOR_TYPES).forEach(option => select.append(new Option(option.label, option.value)));
+        select.addEventListener("change", () => {
+          if (!select.value) { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); return; }
+          chosen.bonusTo = select.value;
+          chosen.talentRolledName = entry.name || (weapon ? "WeaponMastery" : "ArmorMastery");
+          chosen.displayDesc = weapon ? `Maestria em Armas adicional: ${(FIGHTER_WEAPON_TYPES.find(item => item.value === select.value) || {}).label}` : `+1 na CA usando ${(FIGHTER_ARMOR_TYPES.find(item => item.value === select.value) || {}).label}`;
+          complete(chosen);
+        });
+        details.append(select);
+      } else {
+        complete(chosen);
+      }
+    };
     if (result.needsChoice === "stat") {
-      const statLabel = makeStatSelect("Atributo para o bônus +2", code => {
+      choiceArea.append(makeStatSelect("Atributo para o bônus +2", code => {
         if (!code) { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); return; }
-        result.talentRolledName = `+2 de ${STAT_LABELS.find(stat => STAT_CODES[stat] === code)}`;
+        const stat = STAT_LABELS.find(name => STAT_CODES[name] === code);
+        const english = {STR:"Strength",DEX:"Dexterity",CON:"Constitution",INT:"Intelligence",WIS:"Wisdom",CHA:"Charisma"}[code];
+        result.talentRolledName = `+2 de ${stat}`;
         result.bonusName = "StatBonus";
         result.bonusTo = `${code}:+2`;
-        result.talentRolledDesc = `+2 ${({STR:"Strength",DEX:"Dexterity",CON:"Constitution",INT:"Intelligence",WIS:"Wisdom",CHA:"Charisma"})[code]}`;
-        result.displayDesc = `+2 em ${STAT_LABELS.find(stat => STAT_CODES[stat] === code)}`;
+        result.talentRolledDesc = `+2 ${english}`;
+        result.displayDesc = `+2 em ${stat}`;
         finish(result);
-      });
-      choiceArea.append(statLabel);
+      }, result.statOptions || ["STR","DEX","CHA"]));
+    } else if (result.needsChoice === "weaponMastery" || result.needsChoice === "armorMastery") {
+      showEntryChoice(config.entries.find(entry => entry.id === result.id), result, choiceArea);
     } else if (result.needsChoice === "twelve") {
       const mode = document.createElement("select");
       mode.append(new Option("Escolha: talento ou +2 nos atributos", ""), new Option("Escolher um talento da tabela", "talent"), new Option("Distribuir +2 pontos entre atributos", "stats"));
@@ -200,55 +266,41 @@
         details.replaceChildren();
         pending.classLevelTalents[rollIndex] = null;
         if (mode.value === "talent") {
+          const choices = (config?.entries || []).filter(entry => entry.choice !== "twelve");
           const select = document.createElement("select");
           select.append(new Option("Escolha um talento", ""));
-          STAT_TALENT_OPTIONS.forEach(id => {
-            const entry = CLASS_LEVEL_TALENTS.Malandro.entries.find(item => item.id === id);
-            select.append(new Option(entry.desc, id));
-          });
+          choices.forEach(entry => select.append(new Option(entry.desc, entry.id)));
+          const choiceDetails = document.createElement("div");
+          choiceDetails.className = "class-level-talent-choice-details";
           select.addEventListener("change", () => {
-            const entry = CLASS_LEVEL_TALENTS.Malandro.entries.find(item => item.id === select.value);
-            if (!entry) { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); return; }
+            choiceDetails.replaceChildren();
+            pending.classLevelTalents[rollIndex] = null;
+            const entry = choices.find(item => item.id === select.value);
+            if (!entry) { updateTalentContinueButton(); return; }
             const chosen = resultForEntry(entry, result.roll);
             chosen.rolled12Mode = "talent";
-            if (entry.choice === "stat") {
-              const statLabel = makeStatSelect("Atributo para o bônus +2", code => {
-                if (!code) { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); return; }
-                chosen.bonusTo = `${code}:+2`;
-                chosen.talentRolledDesc = `+2 ${{STR:"Strength",DEX:"Dexterity",CON:"Constitution",INT:"Intelligence",WIS:"Wisdom",CHA:"Charisma"}[code]}`;
-                chosen.displayDesc = `+2 em ${STAT_LABELS.find(stat => STAT_CODES[stat] === code)}`;
-                chosen.rolled12TalentOrTwoStatPoints = "Talent";
-                chosen.talentRolledName = `+2 de ${STAT_LABELS.find(stat => STAT_CODES[stat] === code)}`;
-                chosen.rolled12ChosenTalentName = chosen.talentRolledName;
-                chosen.rolled12ChosenTalentDesc = chosen.talentRolledDesc;
-                finishWith(chosen);
-              });
-              details.append(statLabel);
-            } else {
-              chosen.rolled12TalentOrTwoStatPoints = "Talent";
-              chosen.rolled12ChosenTalentName = chosen.talentRolledName;
-              chosen.rolled12ChosenTalentDesc = chosen.talentRolledDesc;
-              finishWith(chosen);
-            }
+            showEntryChoice(entry, chosen, choiceDetails, true);
           });
-          details.append(select);
+          details.append(select, choiceDetails);
         } else if (mode.value === "stats") {
           const selected = [];
           const updateStats = () => {
-            if (selected.length === 2 && selected.every(Boolean)) {
-              const names = selected.map(code => STAT_LABELS.find(stat => STAT_CODES[stat] === code));
-              const counts = selected.reduce((acc, code) => ({ ...acc, [code]: (acc[code] || 0) + 1 }), {});
-              const bonusTo = Object.entries(counts).map(([code, amount]) => `${code}:+${amount}`).join(", ");
-          finishWith({ roll: result.roll, id: "TwoStatPoints", talentRolledName: "", talentRolledDesc: "+2 to ability scores", bonusName: "StatBonus", bonusTo, rolled12Mode: "twoStatPoints", displayDesc: `+2 pontos nos atributos: ${names.join(" e ")}`, rolled12TalentOrTwoStatPoints: "TwoStatPoints" });
-              } else { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); }
+            if (selected.length !== 2 || !selected.every(Boolean)) { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); return; }
+            const counts = selected.reduce((acc, code) => ({...acc,[code]:(acc[code]||0)+1}), {});
+            const labels = selected.map(code => STAT_LABELS.find(stat => STAT_CODES[stat] === code));
+            finish({
+              roll: result.roll, id: "TwoStatPoints", talentRolledName: "", talentRolledDesc: "+2 to ability scores",
+              bonusName: "StatBonus", bonusTo: Object.entries(counts).map(([code,n]) => `${code}:+${n}`).join(", "),
+              rolled12Mode: "twoStatPoints", displayDesc: `+2 pontos nos atributos: ${labels.join(" e ")}`,
+              rolled12TalentOrTwoStatPoints: "TwoStatPoints"
+            });
           };
-          details.append(makeStatSelect("Primeiro ponto", code => { selected[0] = code; updateStats(); }));
-          details.append(makeStatSelect("Segundo ponto", code => { selected[1] = code; updateStats(); }));
+          details.append(makeStatSelect("Primeiro ponto", code => { selected[0]=code; updateStats(); }, null, 1));
+          details.append(makeStatSelect("Segundo ponto", code => { selected[1]=code; updateStats(); }, null, 1));
         }
       });
       choiceArea.append(mode, details);
     }
-    function finishWith(chosen){ finish(chosen); }
     classLevelTalent.append(choiceArea);
   }
 
