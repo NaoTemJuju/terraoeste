@@ -27,3 +27,5 @@ A versão 0.4.0 padroniza o nome exibido da arma escolhida. Para Longsword, a fi
 A versão 0.5.0 também cria as chaves dos efeitos de Maestria usando o nome da arma em português. Exemplo: Espada Longa gera `system.roll.melee.bonus.espada-longa` e `system.roll.melee.damage.espada-longa`, como no efeito original do Shadowdark localizado.
 
 A versão 0.8.0 corrige a importação das magias conhecidas de Mago e a escolha de magia na Vantagem em Conjuração.
+
+A versão 0.8.1 reconhece o identificador canônico `Mage Armor` e mantém o slug localizado `armadura-arcana` na escolha de Vantagem em Conjuração.
