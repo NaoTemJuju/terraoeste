@@ -427,9 +427,9 @@
       const specialAbility = CLASS_SPECIAL_ABILITIES[cls];
       if (specialAbility) {
         classInfoAbility.replaceChildren();
-        specialAbility.split("\\n").forEach((line, index) => {
+        specialAbility.split(String.fromCharCode(10)).forEach((line, index) => {
           if (index) classInfoAbility.append(document.createElement("br"));
-          const heading = line.match(/^(Apunhalada Pelas Costas|Ladroagem)\\.(.*)$/);
+          const heading = line.match(/^(Apunhalada Pelas Costas|Ladroagem)[.](.*)$/);
           if (heading) {
             const strong = document.createElement("strong");
             strong.textContent = `${heading[1]}.`;
