@@ -321,6 +321,65 @@
           complete(chosen);
         });
         details.append(select);
+      } else if (entry.choice === "magicItem") {
+        const select = document.createElement("select");
+        select.append(new Option("Selecione uma categoria de item mágico", ""));
+        MAGE_ITEM_TYPES.forEach(option => select.append(new Option(option.label, option.value)));
+        select.addEventListener("change", () => {
+          if (!select.value) { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); return; }
+          const category = MAGE_ITEM_TYPES.find(item => item.value === select.value);
+          chosen.talentRolledName = "MakeRandomMagicItem";
+          chosen.bonusName = "MakeRandomMagicItem";
+          chosen.bonusTo = select.value;
+          chosen.displayDesc = `Crie 1 item mágico aleatório: ${category.label}`;
+          complete(chosen);
+        });
+        details.append(select);
+      } else if (entry.choice === "mageStatOrCasting") {
+        const select = document.createElement("select");
+        select.append(new Option("Escolha o benefício", ""), new Option("+2 em Inteligência", "int"), new Option("+1 em testes de conjuração de magias de mago", "casting"));
+        select.addEventListener("change", () => {
+          if (select.value === "int") {
+            chosen.id = "StatBonus";
+            chosen.talentRolledName = "+2 de Inteligência";
+            chosen.bonusName = "StatBonus";
+            chosen.bonusTo = "INT:+2";
+            chosen.talentRolledDesc = "+2 Intelligence";
+            chosen.displayDesc = "+2 em Inteligência";
+            complete(chosen);
+          } else if (select.value === "casting") {
+            chosen.id = "Plus1ToCastingSpells";
+            chosen.talentRolledName = "Plus1ToCastingSpells";
+            chosen.bonusName = "Plus1ToCastingSpells";
+            chosen.bonusTo = "Casting spells";
+            chosen.talentRolledDesc = "+1 to casting checks for mage spells";
+            chosen.displayDesc = "+1 em testes de conjuração de magias de mago";
+            complete(chosen);
+          } else {
+            pending.classLevelTalents[rollIndex] = null;
+            updateTalentContinueButton();
+          }
+        });
+        details.append(select);
+      } else if (entry.choice === "mageKnownSpell" || entry.choice === "mageExtraSpell") {
+        const known = state.classFeatures?.mageSpells || [];
+        const options = entry.choice === "mageKnownSpell"
+          ? MAGE_SPELLS.filter(spell => known.includes(spell.value))
+          : MAGE_SPELLS.filter(spell => !known.includes(spell.value));
+        const select = document.createElement("select");
+        select.append(new Option(entry.choice === "mageKnownSpell" ? "Escolha uma magia conhecida" : "Escolha a magia adicional", ""));
+        options.forEach(spell => select.append(new Option(spell.label, spell.value)));
+        select.addEventListener("change", () => {
+          if (!select.value) { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); return; }
+          const spell = MAGE_SPELLS.find(item => item.value === select.value);
+          chosen.bonusTo = spell.value;
+          chosen.talentRolledName = entry.name;
+          chosen.displayDesc = entry.choice === "mageKnownSpell"
+            ? `Vantagem ao conjurar: ${spell.label}`
+            : `Magia adicional aprendida: ${spell.label}`;
+          complete(chosen);
+        });
+        details.append(select);
       } else {
         complete(chosen);
       }
@@ -337,7 +396,7 @@
         result.displayDesc = `+2 em ${stat}`;
         finish(result);
       }, result.statOptions || ["STR","DEX","CHA"]));
-    } else if (result.needsChoice === "weaponMastery" || result.needsChoice === "armorMastery") {
+    } else if (["weaponMastery", "armorMastery", "magicItem", "mageStatOrCasting", "mageKnownSpell", "mageExtraSpell"].includes(result.needsChoice)) {
       showEntryChoice(config.entries.find(entry => entry.id === result.id), result, choiceArea);
     } else if (result.needsChoice === "twelve") {
       const mode = document.createElement("select");
@@ -737,6 +796,41 @@
         chosen.bonusTo = armor.value;
         chosen.talentRolledName = entry.name || "ArmorMastery";
         chosen.displayDesc = `+1 na CA usando ${armor.label}`;
+      } else if (entry.choice === "magicItem") {
+        const item = MAGE_ITEM_TYPES[randInt(0, MAGE_ITEM_TYPES.length - 1)];
+        chosen.talentRolledName = "MakeRandomMagicItem";
+        chosen.bonusName = "MakeRandomMagicItem";
+        chosen.bonusTo = item.value;
+        chosen.displayDesc = `Crie 1 item mágico aleatório: ${item.label}`;
+      } else if (entry.choice === "mageStatOrCasting") {
+        if (randInt(0, 1) === 0) {
+          chosen.id = "StatBonus";
+          chosen.talentRolledName = "+2 de Inteligência";
+          chosen.bonusName = "StatBonus";
+          chosen.bonusTo = "INT:+2";
+          chosen.talentRolledDesc = "+2 Intelligence";
+          chosen.displayDesc = "+2 em Inteligência";
+        } else {
+          chosen.id = "Plus1ToCastingSpells";
+          chosen.talentRolledName = "Plus1ToCastingSpells";
+          chosen.bonusName = "Plus1ToCastingSpells";
+          chosen.bonusTo = "Casting spells";
+          chosen.talentRolledDesc = "+1 to casting checks for mage spells";
+          chosen.displayDesc = "+1 em testes de conjuração de magias de mago";
+        }
+      } else if (entry.choice === "mageKnownSpell" || entry.choice === "mageExtraSpell") {
+        const known = state.classFeatures?.mageSpells || [];
+        const options = entry.choice === "mageKnownSpell"
+          ? MAGE_SPELLS.filter(spell => known.includes(spell.value))
+          : MAGE_SPELLS.filter(spell => !known.includes(spell.value));
+        const spell = options[randInt(0, options.length - 1)];
+        if (spell) {
+          chosen.bonusTo = spell.value;
+          chosen.talentRolledName = entry.name;
+          chosen.displayDesc = entry.choice === "mageKnownSpell"
+            ? `Vantagem ao conjurar: ${spell.label}`
+            : `Magia adicional aprendida: ${spell.label}`;
+        }
       }
       if (rolled12) {
         chosen.rolled12TalentOrTwoStatPoints = "Talent";
