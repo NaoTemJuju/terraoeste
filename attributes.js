@@ -19,6 +19,7 @@
   const btnRollAttrs    = $("#btnRollAttrs");
   const btnConfirmAttrs = $("#btnConfirmAttrs");
   const btnRerollAttrs  = $("#btnRerollAttrs");
+  const btnRandomizeAttrs = $("#btnRandomizeAttrs");
   const REROLL_LIMIT = 1;
 
   // pool: os 6 valores rolados (3d6 cada)
@@ -39,6 +40,7 @@
   function updateConfirmState(){
     if (!btnConfirmAttrs) return;
     btnConfirmAttrs.disabled = window.app.attrsLocked || !isFullyAssigned();
+    if (btnRandomizeAttrs) btnRandomizeAttrs.disabled = window.app.attrsLocked || pool.length !== ATTRS.length;
   }
 
   function updateRerollButtonLabel(){
@@ -206,6 +208,18 @@
     updateConfirmState();
   }
 
+  function assignRandomly(){
+    if (window.app.attrsLocked || pool.length !== ATTRS.length) return;
+    const shuffled = pool.map((_, index) => index);
+    for (let i = shuffled.length - 1; i > 0; i--){
+      const j = window.app.randInt(0, i);
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    assignment = shuffled;
+    heldPoolIdx = null;
+    renderAll();
+  }
+
   /**
    * Executa a animação de rolagem e, ao final, sorteia os 6 valores
    * (3d6 cada) e reinicia a alocação.
@@ -281,6 +295,10 @@
 
       doRoll(); // doRoll() chama updateRerollButtonLabel() ao final, já refletindo o novo rerollsUsed
     });
+  }
+
+  if (btnRandomizeAttrs) {
+    btnRandomizeAttrs.addEventListener("click", assignRandomly);
   }
 
   if (btnConfirmAttrs) {
@@ -361,4 +379,3 @@
 
   window.app.goToAttrs = goToAttrs;
 })();
-
