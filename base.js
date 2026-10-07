@@ -572,6 +572,7 @@
         raca: obj.ancestry || "—",
         classe: obj.class || "—",
         opcoesClasse: fighterOptions,
+        terraOesteClassOptions: fighterOptions,
         habilidadesClasse: window.app?.getClassFeatureDisplay?.(obj.class, fighterOptions) || "",
         talentoClasseNivel1: Array.isArray(obj.terraOesteClassTalents) && obj.terraOesteClassTalents.length ? obj.terraOesteClassTalents : Array.isArray(obj.levels) && obj.levels[0]?.talentRolledName ? [{
           talentRolledName: obj.levels[0].talentRolledName,
@@ -695,6 +696,7 @@
           stoutHitPointRoll: 0
         }],
         terraOesteClassTalents: classLevelTalent.talents || [],
+        terraOesteClassOptions: obj?.opcoesClasse || obj?.terraOesteClassOptions || null,
         XP: 0,
         ambitionTalentLevel: {
           level,

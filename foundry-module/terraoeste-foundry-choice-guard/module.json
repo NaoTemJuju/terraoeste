@@ -1,0 +1,20 @@
+{
+  "id": "terraoeste-foundry-choice-guard",
+  "title": "TerraOeste: escolhas de talentos",
+  "description": "Aplica escolhas de talentos e Maestria em Armas ao importar fichas do TerraOeste no Shadowdark.",
+  "version": "0.2.0",
+  "compatibility": {
+    "minimum": "13",
+    "verified": "14"
+  },
+  "authors": [
+    { "name": "TerraOeste" }
+  ],
+  "esmodules": ["main.mjs"],
+  "relationships": {
+    "systems": [
+      { "id": "shadowdark", "type": "system" }
+    ]
+  }
+}
+

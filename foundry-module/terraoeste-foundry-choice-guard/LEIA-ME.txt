@@ -1,0 +1,21 @@
+TerraOeste: escolhas de talentos no Foundry
+
+Instalação/atualização:
+1. Feche o Foundry.
+2. Copie a pasta terraoeste-foundry-choice-guard para Data/modules do Foundry,
+   substituindo os arquivos da versão anterior.
+3. Abra o Foundry e confirme que o módulo está ativo no mundo Shadowdark.
+4. Exporte um JSON novo do TerraOeste e reimporte o personagem.
+
+O módulo mantém as escolhas de talentos declaradas em terraOesteChoices e agora
+também trata Weapon Mastery: remove as cópias genéricas recebidas da classe e do
+bônus, cria uma cópia do talento original do compêndio, atualiza as chaves dos
+efeitos para a arma selecionada e mostra o nome da arma na ficha.
+
+O JSON TerraOeste pode trazer a seleção em terraOesteClassOptions e também no
+bonus Plus1AttackAndDamagePlusHalfLevel (bonusTo com o nome original da arma).
+O módulo usa o item original do compêndio, preservando os efeitos e a origem do
+talento do Shadowdark.
+
+O módulo não altera os arquivos do sistema Shadowdark.
+
