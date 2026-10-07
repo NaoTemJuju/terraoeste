@@ -216,6 +216,15 @@
     const mageExtraSpells = cls === "Mago" ? (classLevelTalent.talents || []).filter(talent => talent.bonusName === "PickExtraSpell").map(talent => talent.bonusTo).filter(Boolean) : [];
     const mageSpellsKnown = cls === "Mago" ? [...new Set([...(state.classFeatures?.mageSpells || []), ...mageExtraSpells])] : [];
     const spellsKnown = mageSpellsKnown.join(", ") || "None";
+    const mageSpellBonuses = cls === "Mago" ? mageSpellsKnown.map((spell, index) => ({
+      sourceType: "Class",
+      sourceName: window.app.getFoundryClassName?.(cls) || cls,
+      sourceCategory: "Ability",
+      name: `Spell: ${window.app.getFoundryClassName?.(cls) || cls}, Tier 1, Spell ${index + 1}`,
+      bonusName: spell,
+      bonusTo: `Tier:1, Spell:${index + 1}`,
+      gainedAtLevel: 1
+    })) : [];
     const classFeatureBonuses = window.app.getClassFeatureBonuses?.(cls, state.classFeatures) || [];
     const level = classLevelTalent.level;
     const hpRoll  = Number.isFinite(state.hpBaseRoll) ? state.hpBaseRoll : 0;
@@ -276,6 +285,7 @@
       bonuses: [
         ...(window.app.getRaceBonuses?.(ancestry, state.raceTalent) || []),
         ...classFeatureBonuses,
+        ...mageSpellBonuses,
         ...(classLevelTalent.bonuses || [])
       ],
       terraOesteChoices: [
@@ -463,6 +473,15 @@
     const mageExtraSpells = src?.classe === "Mago" ? (classLevelTalent.talents || []).filter(talent => talent.bonusName === "PickExtraSpell").map(talent => talent.bonusTo).filter(Boolean) : [];
     const mageSpellsKnown = src?.classe === "Mago" ? [...new Set([...(src?.opcoesClasse?.mageSpells || src?.terraOesteClassOptions?.mageSpells || []), ...mageExtraSpells])] : [];
     const spellsKnown = mageSpellsKnown.join(", ") || "None";
+    const mageSpellBonuses = src?.classe === "Mago" ? mageSpellsKnown.map((spell, index) => ({
+      sourceType: "Class",
+      sourceName: window.app.getFoundryClassName?.(src?.classe) || src?.classe,
+      sourceCategory: "Ability",
+      name: `Spell: ${window.app.getFoundryClassName?.(src?.classe) || src?.classe}, Tier 1, Spell ${index + 1}`,
+      bonusName: spell,
+      bonusTo: `Tier:1, Spell:${index + 1}`,
+      gainedAtLevel: 1
+    })) : [];
     const classFeatureBonuses = window.app.getClassFeatureBonuses?.(src?.classe, src?.opcoesClasse || src?.terraOesteClassOptions) || [];
     const level = classLevelTalent.level;
     const gear = Array.isArray(src?.itens) ? src.itens : [];
@@ -513,6 +532,7 @@
       bonuses: [
         ...(window.app.getRaceBonuses?.(src?.raca, src?.talentoRacial) || []),
         ...classFeatureBonuses,
+        ...mageSpellBonuses,
         ...(classLevelTalent.bonuses || [])
       ],
       terraOesteChoices: [
