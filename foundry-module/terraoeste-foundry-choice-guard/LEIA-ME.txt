@@ -19,3 +19,5 @@ talento do Shadowdark.
 
 O módulo não altera os arquivos do sistema Shadowdark.
 
+Compatibilidade com Babele em português:
+O módulo também inclui tabelas RollTable cujo nome foi traduzido para “Talentos de Classe: …”. Isso corrige o seletor “Tabela de Talentos da Classe” nas fichas de classe quando o Foundry está em português. Não é necessário renomear tabelas nem alterar arquivos do sistema Shadowdark.
