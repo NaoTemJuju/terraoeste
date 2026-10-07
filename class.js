@@ -81,7 +81,19 @@
 
   // Descrições da tradução PT-BR do compêndio de classes do Foundry.
   // Só associa classes do site com equivalentes claros no compêndio.
+  const THIEF_DESCRIPTION = "Assassinos que se esgueiram por telhados, vigaristas sorridentes ou escaladores encapuzados que podem arrancar uma pedra preciosa das garras de um demônio adormecido e vendê-la pelo dobro de seu preço.";
+  const THIEF_SPECIAL_ABILITY = [
+    "Apunhalada Pelas Costas. Se acertar uma criatura que não esteja ciente do seu ataque, você causa dano extra com o dado da arma. Adicione dados de arma adicionais equivalentes à metade do seu nível (arredondando para baixo).",
+    "Ladroagem. Você tem proficiência em habilidades de roubo e possui as ferramentas necessárias para isso escondidas com você (elas não ocupam espaços de equipamento). Você é treinado nas habilidades a seguir e tem Vantagem em qualquer teste associado a elas:",
+    "• Escalar.",
+    "• Esgueirar-se e esconder-se.",
+    "• Usar disfarces.",
+    "• Encontrar e desarmar armadilhas.",
+    "• Tarefas delicadas como roubar bolsos e abrir fechaduras."
+  ].join("\n\n");
   const CLASS_DESCRIPTIONS = {
+    "Malandro": THIEF_DESCRIPTION,
+    "Ladrão": THIEF_DESCRIPTION,
     "Bardo": "Bardos são viajantes bem-vindos e conselheiros sábios; sua tarefa é proteger e compartilhar o conhecimento que é repassado através das eras.",
     "Guerreiro": "Gladiadores ensanguentados usando armaduras amassadas, duelistas acrobáticos com suas espadas de arremesso, ou arqueiros élficos de visão aguçada que forjam suas lendas com aço e coragem.",
     "Mago": "Adeptos tatuados com runas, sábios usando óculos, e bruxas conjuradoras de chamas que ousam manipular as terríveis forças da magia.",
@@ -125,6 +137,11 @@
   // Dados estruturados para o primeiro talento de classe. Novas tabelas
   // podem usar o mesmo fluxo sem misturar essa rolagem com a escolha de
   // habilidade especial configurada pelo GM.
+  const CLASS_SPECIAL_ABILITIES = {
+    "Malandro": THIEF_SPECIAL_ABILITY,
+    "Ladrão": THIEF_SPECIAL_ABILITY
+  };
+
   const CLASS_LEVEL_TALENTS = {
     "Guerreiro": {
       foundryName: "Guerreiro",
@@ -405,6 +422,11 @@
       : "Nenhuma habilidade da classe cadastrada.";
     const featureConfig = FIGHTER_CLASS_FEATURES[cls] || (cls === "Fighter" ? FIGHTER_CLASS_FEATURES.Guerreiro : null);
     if (classInfoAbility && featureConfig) classInfoAbility.textContent = `${featureConfig.fixedDescription} ${featureConfig.choiceDescription}`;
+    if (classInfoAbility) {
+      const specialAbility = CLASS_SPECIAL_ABILITIES[cls];
+      if (specialAbility) classInfoAbility.textContent = specialAbility;
+      classInfoAbility.style.whiteSpace = specialAbility ? "pre-line" : "";
+    }
     if (classFeatureChoices) {
       classFeatureChoices.replaceChildren();
       classFeatureChoices.hidden = !featureConfig;
