@@ -81,6 +81,14 @@ section{
 .race-talent-choice b{font-size:15px; font-weight:400; line-height:1.4}
 .race-talent-choice small{font-size:15px; font-style:normal; line-height:1.4}
 .race-talent-choice small{color:var(--muted)}
+.class-talent-table{margin-top:14px;padding-top:12px;border-top:1px solid rgba(59,44,26,.25)}
+.class-talent-table[hidden]{display:none}
+.class-talent-table h4{margin:0 0 6px;font-size:17px}
+.class-talent-table table{width:100%;border-collapse:collapse;font-size:15px;line-height:1.4}
+.class-talent-table th,.class-talent-table td{padding:6px 8px;text-align:left;vertical-align:top;border-bottom:1px solid rgba(59,44,26,.22)}
+.class-talent-table thead th{font-weight:700}
+.class-talent-table tbody th{width:72px;white-space:nowrap;font-weight:700}
+@media (max-width:640px){.class-talent-table table{font-size:14px}.class-talent-table th,.class-talent-table td{padding:6px 5px}}
 @media (max-width:640px){
   .selection-info-grid,.selection-info-grid--class{grid-template-columns:1fr}
 }
