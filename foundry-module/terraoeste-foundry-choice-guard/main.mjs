@@ -258,6 +258,85 @@ async function applyWeaponMasteryChoice(importer, json) {
   return true;
 }
 
+function spellDisplayName(value) {
+  const names = {
+    "alarm": "Alarme",
+    "arcane armor": "Armadura Arcana",
+    "detect magic": "Detectar Magia",
+    "floating disk": "Disco Flutuante",
+    "charm person": "Encantar Pessoa",
+    "light": "Luz",
+    "burning hands": "Mãos Flamejantes",
+    "magic missile": "Míssil Mágico",
+    "hold portal": "Obstruir Porta",
+    "protection from evil": "Proteção contra o Mal",
+    "feather fall": "Queda Suave",
+    "sleep": "Sono"
+  };
+  return names[key(value)] || String(value ?? "").trim();
+}
+
+function setSpellcastingAdvantageEffect(item, spellName) {
+  const spellSlug = slug(spellDisplayName(spellName));
+  let replaced = 0;
+  for (const effect of item.effects ?? []) {
+    const changes = Array.isArray(effect.changes)
+      ? effect.changes
+      : Array.isArray(effect.system?.changes) ? effect.system.changes : [];
+    for (const change of changes) {
+      if (!/^system\.roll\.spellcasting\.advantage\.REPLACEME$/i.test(String(change.key ?? ""))) continue;
+      change.key = `system.roll.spellcasting.advantage.${spellSlug}`;
+      replaced += 1;
+    }
+  }
+  return replaced > 0;
+}
+
+async function applySpellcastingAdvantageChoice(importer, json) {
+  const bonuses = (Array.isArray(json?.bonuses) ? json.bonuses : []).filter(item =>
+    item?.bonusName === "AdvOnCastOneSpell" && typeof item.bonusTo === "string" && item.bonusTo.trim()
+  );
+  const uniqueSelections = bonuses.filter((selection, index, all) =>
+    all.findIndex(item => key(item.bonusTo) === key(selection.bonusTo)) === index
+  );
+  if (!uniqueSelections.length) return false;
+
+  const talentUuid = importer.itemMapping?.bonus?.AdvOnCastOneSpell;
+  if (!talentUuid) return false;
+  const sourceTalent = await fromUuid(talentUuid);
+  if (!sourceTalent) return false;
+
+  const mappedId = String(talentUuid).split(".").pop();
+  const currentCopies = (importer.talents ?? []).filter(item =>
+    item._id === mappedId || ["spellcasting advantage on spell", "vantagem em conjuração"].includes(
+      key(item.flags?.babele?.originalName ?? item.name)
+    )
+  );
+  const displayedBaseName = currentCopies[0]?.name || sourceTalent.name;
+  const talents = [];
+
+  for (const bonus of uniqueSelections) {
+    const spellName = spellDisplayName(bonus.bonusTo);
+    const talent = sourceTalent.toObject();
+    talent._id = globalThis.foundry?.utils?.randomID?.() || `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
+    if (!setSpellcastingAdvantageEffect(talent, spellName)) {
+      console.warn(`${MODULE_ID}: não foi possível aplicar Vantagem em Conjuração para ${spellName}.`);
+      continue;
+    }
+
+    talent.name = `${displayedBaseName} (${spellName})`;
+    if (bonus.gainedAtLevel && talent.system?.talentClass === "level") {
+      talent.system.level = bonus.gainedAtLevel;
+    }
+    talents.push(talent);
+  }
+
+  if (!talents.length) return false;
+  importer.talents = (importer.talents ?? []).filter(item => !currentCopies.includes(item));
+  importer.talents.push(...talents);
+  return true;
+}
+
 function isClassTalentTable(document) {
   const names = [
     document?.name,
@@ -318,6 +397,11 @@ Hooks.once("ready", () => {
       changed = (await applyArmorMasteryChoice(this, json)) || changed;
     } catch (error) {
       console.error(`${MODULE_ID}: não foi possível aplicar a armadura escolhida na Maestria em Armaduras.`, error);
+    }
+    try {
+      changed = (await applySpellcastingAdvantageChoice(this, json)) || changed;
+    } catch (error) {
+      console.error(`${MODULE_ID}: não foi possível aplicar a magia escolhida na Vantagem em Conjuração.`, error);
     }
     for (const choice of readChoices(json)) {
       try {
