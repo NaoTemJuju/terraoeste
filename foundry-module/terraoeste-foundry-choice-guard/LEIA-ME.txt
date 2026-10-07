@@ -29,3 +29,5 @@ A versão 0.5.0 também cria as chaves dos efeitos de Maestria usando o nome da 
 A versão 0.8.0 corrige a importação das magias conhecidas de Mago e a escolha de magia na Vantagem em Conjuração.
 
 A versão 0.8.1 reconhece o identificador canônico `Mage Armor` e mantém o slug localizado `armadura-arcana` na escolha de Vantagem em Conjuração.
+
+A versão 0.8.2 adapta a chave `REPLACEME` da Vantagem em Conjuração na cópia do talento importado, aceitando os caminhos de efeito usados pelo Foundry.
