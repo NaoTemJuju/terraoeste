@@ -127,7 +127,7 @@
   // habilidade especial configurada pelo GM.
   const CLASS_LEVEL_TALENTS = {
     "Guerreiro": {
-      foundryName: "Fighter",
+      foundryName: "Guerreiro",
       title: "Talentos de Guerreiro",
       entries: [
         { min: 2, max: 2, id: "WeaponMastery", name: "WeaponMastery", choice: "weaponMastery", desc: "Ganhe Maestria em Armas em um tipo de arma adicional", foundryDesc: "Gain Weapon Mastery with one additional weapon", bonusName: "Plus1AttackAndDamagePlusHalfLevel" },
