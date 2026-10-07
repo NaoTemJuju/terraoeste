@@ -212,7 +212,7 @@
 
     // Classes com tabela cadastrada exportam a ficha no nível 1 e incluem
     // o resultado escolhido da rolagem inicial.
-    const classLevelTalent = window.app.getClassLevelTalent?.(cls, state.classLevelTalent) || { level: 0, bonuses: [], fields: {} };
+    const classLevelTalent = window.app.getClassLevelTalent?.(cls, state.classLevelTalent) || { level: 1, bonuses: [], fields: {} };
     const classFeatureBonuses = window.app.getClassFeatureBonuses?.(cls, state.classFeatures) || [];
     const level = classLevelTalent.level;
     const hpRoll  = Number.isFinite(state.hpBaseRoll) ? state.hpBaseRoll : 0;
