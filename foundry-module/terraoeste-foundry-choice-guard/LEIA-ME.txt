@@ -22,3 +22,4 @@ O módulo não altera os arquivos do sistema Shadowdark.
 Compatibilidade com Babele em português:
 O módulo também inclui tabelas RollTable cujo nome foi traduzido para “Talentos de Classe: …”. Isso corrige o seletor “Tabela de Talentos da Classe” nas fichas de classe quando o Foundry está em português. Não é necessário renomear tabelas nem alterar arquivos do sistema Shadowdark.
 A versão 0.4.0 padroniza o nome exibido da arma escolhida. Para Longsword, a ficha usa “Espada Longa”, com a mesma capitalização do item do compêndio traduzido, para o Foundry reconhecer a arma corretamente.
+A versão 0.5.0 também cria as chaves dos efeitos de Maestria usando o nome da arma em português. Exemplo: Espada Longa gera `system.roll.melee.bonus.espada-longa` e `system.roll.melee.damage.espada-longa`, como no efeito original do Shadowdark localizado.
