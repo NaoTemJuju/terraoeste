@@ -425,8 +425,21 @@
     if (classInfoAbility && featureConfig) classInfoAbility.textContent = `${featureConfig.fixedDescription} ${featureConfig.choiceDescription}`;
     if (classInfoAbility) {
       const specialAbility = CLASS_SPECIAL_ABILITIES[cls];
-      if (specialAbility) classInfoAbility.textContent = specialAbility;
-      classInfoAbility.style.whiteSpace = specialAbility ? "pre-line" : "";
+      if (specialAbility) {
+        classInfoAbility.replaceChildren();
+        specialAbility.split("\\n").forEach((line, index) => {
+          if (index) classInfoAbility.append(document.createElement("br"));
+          const heading = line.match(/^(Apunhalada Pelas Costas|Ladroagem)\\.(.*)$/);
+          if (heading) {
+            const strong = document.createElement("strong");
+            strong.textContent = `${heading[1]}.`;
+            classInfoAbility.append(strong, document.createTextNode(heading[2]));
+          } else {
+            classInfoAbility.append(document.createTextNode(line));
+          }
+        });
+      }
+      classInfoAbility.style.whiteSpace = specialAbility ? "normal" : "";
     }
     if (classFeatureChoices) {
       classFeatureChoices.replaceChildren();
