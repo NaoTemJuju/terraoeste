@@ -61,10 +61,10 @@
       foundryName: "Thief",
       title: "Talentos de Ladrão",
       entries: [
-        { min: 2, max: 2, id: "InitiativeAdvantage", name: "InitiativeAdvantage", desc: "Vantagem nas rolagens de iniciativa (role novamente se repetir)", foundryDesc: "Advantage on initiative rolls (reroll if tied)", bonusTo: "Initiative", bonusName: "InitiativeAdvantage" },
-        { min: 3, max: 5, id: "BackstabPlus1DamageDice", name: "BackstabPlus1DamageDice", desc: "Sua Apunhalada Pelas Costas causa +1 dado de dano", foundryDesc: "+1 backstab damage die", bonusTo: "Backstab", bonusName: "BackstabPlus1DamageDice" },
+        { min: 2, max: 2, id: "InitiativeAdvantage", name: "Vantagem na Iniciativa", desc: "Vantagem nas rolagens de iniciativa (role novamente se repetir)", foundryDesc: "Advantage on initiative rolls (reroll if tied)", bonusTo: "Initiative", bonusName: "InitiativeAdvantage" },
+        { min: 3, max: 5, id: "BackstabPlus1DamageDice", name: "Apunhalada pelas Costas: +1 Dado de Dano", desc: "Sua Apunhalada pelas Costas causa +1 dado de dano", foundryDesc: "+1 backstab damage die", bonusTo: "Backstab", bonusName: "BackstabPlus1DamageDice" },
         { min: 6, max: 9, id: "StatBonus", choice: "stat", desc: "+2 em Força, Destreza ou Carisma", foundryDesc: "+2 Strength, Dexterity, or Charisma", bonusName: "StatBonus" },
-        { min: 10, max: 11, id: "Plus1ToHit", name: "Plus1ToHit", desc: "+1 em ataques corpo a corpo e à distância", foundryDesc: "+1 to melee and ranged attacks", bonusTo: "Melee and ranged attacks", bonusName: "Plus1ToHit" },
+        { min: 10, max: 11, id: "Plus1ToHit", name: "+1 para Ataques Corpo a Corpo ou à Distância", desc: "+1 em ataques corpo a corpo e à distância", foundryDesc: "+1 to melee and ranged attacks", bonusTo: "Melee and ranged attacks", bonusName: "Plus1ToHit" },
         { min: 12, max: 12, id: "ChooseTalentOrStats", choice: "twelve", desc: "Escolha um talento ou distribua +2 pontos entre os seus atributos" }
       ]
     },
@@ -82,10 +82,11 @@
   window.app.getFoundryClassName = cls => classLevelTalentConfig(cls)?.foundryName || window.CUSTOM_CLASS_DATA?.[cls]?.foundryName || cls || "";
   function resultForEntry(entry, roll){ return { roll, id: entry.id, talentRolledName: entry.name || "", talentRolledDesc: entry.foundryDesc || entry.desc, bonusName: entry.bonusName || entry.id, bonusTo: entry.bonusTo || "", needsChoice: entry.choice || "" }; }
   function makeTalentBonus(result, cls){
-    if (!result || !result.talentRolledName) return [];
+    if (!result || !(result.bonusName || result.id)) return [];
     const config = classLevelTalentConfig(cls);
-    const bonusTo = result.bonusTo || result.talentRolledName;
-    return [{ sourceType: "Class", sourceName: window.app.getFoundryClassName(cls) || config?.foundryName || cls, sourceCategory: "Talent", name: result.talentRolledName, bonusName: result.bonusName || result.talentRolledName, bonusTo, gainedAtLevel: 1 }];
+    const effectName = result.bonusName || result.id;
+    const bonusTo = result.bonusTo || result.talentRolledName || effectName;
+    return [{ sourceType: "Class", sourceName: window.app.getFoundryClassName(cls) || config?.foundryName || cls, sourceCategory: "Talent", name: effectName, bonusName: effectName, bonusTo, gainedAtLevel: 1 }];
   }
   function renderLevelTalentChoices(result){
     if (!classLevelTalent) return;
@@ -107,7 +108,7 @@
     if (result.needsChoice === "stat") {
       const statLabel = makeStatSelect("Atributo para o bônus +2", code => {
         if (!code) { pending.classLevelTalent = null; updateConfirmButton(); return; }
-        result.talentRolledName = "StatBonus";
+        result.talentRolledName = `+2 de ${STAT_LABELS.find(stat => STAT_CODES[stat] === code)}`;
         result.bonusName = "StatBonus";
         result.bonusTo = `${code}:+2`;
         result.talentRolledDesc = `+2 ${({STR:"Strength",DEX:"Dexterity",CON:"Constitution",INT:"Intelligence",WIS:"Wisdom",CHA:"Charisma"})[code]}`;
@@ -142,6 +143,7 @@
                 chosen.talentRolledDesc = `+2 ${{STR:"Strength",DEX:"Dexterity",CON:"Constitution",INT:"Intelligence",WIS:"Wisdom",CHA:"Charisma"}[code]}`;
                 chosen.displayDesc = `+2 em ${STAT_LABELS.find(stat => STAT_CODES[stat] === code)}`;
                 chosen.rolled12TalentOrTwoStatPoints = "Talent";
+                chosen.talentRolledName = `+2 de ${STAT_LABELS.find(stat => STAT_CODES[stat] === code)}`;
                 chosen.rolled12ChosenTalentName = chosen.talentRolledName;
                 chosen.rolled12ChosenTalentDesc = chosen.talentRolledDesc;
                 finishWith(chosen);
@@ -162,7 +164,7 @@
               const names = selected.map(code => STAT_LABELS.find(stat => STAT_CODES[stat] === code));
               const counts = selected.reduce((acc, code) => ({ ...acc, [code]: (acc[code] || 0) + 1 }), {});
               const bonusTo = Object.entries(counts).map(([code, amount]) => `${code}:+${amount}`).join(", ");
-              finishWith({ roll: result.roll, id: "TwoStatPoints", talentRolledName: "StatBonus", talentRolledDesc: "+2 to ability scores", bonusName: "StatBonus", bonusTo, rolled12Mode: "twoStatPoints", displayDesc: `+2 pontos nos atributos: ${names.join(" e ")}`, rolled12TalentOrTwoStatPoints: "TwoStatPoints" });
+          finishWith({ roll: result.roll, id: "TwoStatPoints", talentRolledName: "", talentRolledDesc: "+2 to ability scores", bonusName: "StatBonus", bonusTo, rolled12Mode: "twoStatPoints", displayDesc: `+2 pontos nos atributos: ${names.join(" e ")}`, rolled12TalentOrTwoStatPoints: "TwoStatPoints" });
             } else { pending.classLevelTalent = null; updateConfirmButton(); }
           };
           details.append(makeStatSelect("Primeiro ponto", code => { selected[0] = code; updateStats(); }));
@@ -301,6 +303,7 @@
     if (entry.choice === "stat") {
       const code = ["STR", "DEX", "CHA"][randInt(0, 2)];
       result.bonusTo = `${code}:+2`;
+      result.talentRolledName = `+2 de ${STAT_LABELS.find(stat => STAT_CODES[stat] === code)}`;
       result.talentRolledDesc = `+2 ${{STR:"Strength",DEX:"Dexterity",CHA:"Charisma"}[code]}`;
       result.displayDesc = `+2 em ${STAT_LABELS.find(stat => STAT_CODES[stat] === code)}`;
     } else if (entry.choice === "twelve") {
@@ -310,7 +313,7 @@
         const second = stats[randInt(0, stats.length - 1)];
         const counts = [first, second].reduce((acc, code) => ({ ...acc, [code]: (acc[code] || 0) + 1 }), {});
         const labels = [first, second].map(code => STAT_LABELS.find(stat => STAT_CODES[stat] === code));
-        return { roll, id: "TwoStatPoints", talentRolledName: "StatBonus", talentRolledDesc: "+2 to ability scores", bonusName: "StatBonus", bonusTo: Object.entries(counts).map(([code, amount]) => `${code}:+${amount}`).join(", "), rolled12Mode: "twoStatPoints", rolled12TalentOrTwoStatPoints: "TwoStatPoints", displayDesc: `+2 pontos nos atributos: ${labels.join(" e ")}` };
+        return { roll, id: "TwoStatPoints", talentRolledName: "", talentRolledDesc: "+2 to ability scores", bonusName: "StatBonus", bonusTo: Object.entries(counts).map(([code, amount]) => `${code}:+${amount}`).join(", "), rolled12Mode: "twoStatPoints", rolled12TalentOrTwoStatPoints: "TwoStatPoints", displayDesc: `+2 pontos nos atributos: ${labels.join(" e ")}` };
       }
       const chosenId = STAT_TALENT_OPTIONS[randInt(0, STAT_TALENT_OPTIONS.length - 1)];
       const chosen = resultForEntry(config.entries.find(item => item.id === chosenId), roll);
@@ -321,6 +324,8 @@
       if (chosen.needsChoice === "stat") {
         const code = ["STR", "DEX", "CHA"][randInt(0, 2)];
         chosen.bonusTo = `${code}:+2`;
+        chosen.talentRolledName = `+2 de ${STAT_LABELS.find(stat => STAT_CODES[stat] === code)}`;
+        chosen.rolled12ChosenTalentName = chosen.talentRolledName;
         chosen.talentRolledDesc = `+2 ${{STR:"Strength",DEX:"Dexterity",CHA:"Charisma"}[code]}`;
         chosen.rolled12ChosenTalentDesc = chosen.talentRolledDesc;
       }
