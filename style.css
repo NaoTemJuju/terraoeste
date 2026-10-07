@@ -79,6 +79,8 @@ section{
 .race-talent-choice{display:flex; gap:8px; align-items:flex-start; padding:8px; border:1px solid var(--border); border-radius:8px; cursor:pointer; min-width:0}
 .race-talent-choice input{margin-top:3px}
 .race-talent-choice b,.race-talent-choice small{display:block}
+.race-talent-choice b{font-size:1.12em; line-height:1.3}
+.race-talent-choice small{font-size:15px; font-style:normal; line-height:1.4}
 .race-talent-choice small{color:var(--muted)}
 @media (max-width:640px){
   .selection-info-grid,.selection-info-grid--class{grid-template-columns:1fr}
