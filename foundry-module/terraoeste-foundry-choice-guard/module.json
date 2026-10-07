@@ -2,7 +2,7 @@
   "id": "terraoeste-foundry-choice-guard",
   "title": "TerraOeste: escolhas de talentos",
   "description": "Aplica escolhas de talentos, magias de Mago e efeitos localizados de Maestria em Armas e Armaduras.",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "compatibility": {
     "minimum": "13",
     "verified": "14"
