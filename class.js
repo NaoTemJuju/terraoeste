@@ -16,6 +16,7 @@
   const classInfoDescription = $("#classInfoDescription");
   const classInfoAbility = $("#classInfoAbility");
   const classTalentChoices = $("#classTalentChoices");
+  const classTalentTable = $("#classTalentTable");
 
   // Descrições da tradução PT-BR do compêndio de classes do Foundry.
   // Só associa classes do site com equivalentes claros no compêndio.
@@ -27,6 +28,63 @@
     "Sacerdote": "Templários cruzados, xamãs proféticos, ou fanáticos com olhos enlouquecidos que empunham o poder de seus deuses para expurgar os impuros."
   };
 
+  const CLASS_TALENT_TABLES = {
+    "Malandro": {
+      title: "Talentos de Ladrão",
+      entries: [
+        { roll: "2", effect: "Ganhe Vantagem nas rolagens de iniciativa (role novamente se repetir)" },
+        { roll: "3–5", effect: "Sua Apunhalada Pelas Costas causa +1 dado de dano" },
+        { roll: "6–9", effect: "+2 no atributo Força, Destreza ou Carisma" },
+        { roll: "10–11", effect: "+1 em ataques corpo a corpo e à distância" },
+        { roll: "12", effect: "Escolha um talento ou distribua +2 pontos entre os seus atributos" }
+      ]
+    },
+    "Ladrão": {
+      title: "Talentos de Ladrão",
+      entries: [
+        { roll: "2", effect: "Ganhe Vantagem nas rolagens de iniciativa (role novamente se repetir)" },
+        { roll: "3–5", effect: "Sua Apunhalada Pelas Costas causa +1 dado de dano" },
+        { roll: "6–9", effect: "+2 no atributo Força, Destreza ou Carisma" },
+        { roll: "10–11", effect: "+1 em ataques corpo a corpo e à distância" },
+        { roll: "12", effect: "Escolha um talento ou distribua +2 pontos entre os seus atributos" }
+      ]
+    }
+  };
+
+  function renderClassTalentTable(cls){
+    if (!classTalentTable) return;
+    const data = CLASS_TALENT_TABLES[cls];
+    classTalentTable.replaceChildren();
+    classTalentTable.hidden = !data;
+    if (!data) return;
+
+    const title = document.createElement("h4");
+    title.textContent = data.title;
+    const table = document.createElement("table");
+    const thead = document.createElement("thead");
+    const headingRow = document.createElement("tr");
+    ["2d6", "Efeito"].forEach(label => {
+      const th = document.createElement("th");
+      th.scope = "col";
+      th.textContent = label;
+      headingRow.append(th);
+    });
+    thead.append(headingRow);
+    const tbody = document.createElement("tbody");
+    data.entries.forEach(entry => {
+      const row = document.createElement("tr");
+      const roll = document.createElement("th");
+      roll.scope = "row";
+      roll.textContent = entry.roll;
+      const effect = document.createElement("td");
+      effect.textContent = entry.effect;
+      row.append(roll, effect);
+      tbody.append(row);
+    });
+    table.append(thead, tbody);
+    classTalentTable.append(title, table);
+  }
+
   function talentOptions(cls){ return window.CUSTOM_CLASS_DATA?.[cls]?.talents || []; }
   function hasClassTalentChoice(cls){ return talentOptions(cls).length > 1 && window.CUSTOM_CLASS_DATA?.[cls]?.talentMode === "choice"; }
   window.app.randomClassTalent = cls => {
@@ -36,6 +94,7 @@
   function updateClassInfo(cls){
     if (!classInfo) return;
     classInfo.hidden = !cls;
+    renderClassTalentTable(cls);
     if (classInfoTitle && cls) classInfoTitle.textContent = `Informações: ${cls}`;
     if (classInfoDescription) {
       classInfoDescription.textContent = cls ? (window.CUSTOM_CLASS_DATA?.[cls]?.description || CLASS_DESCRIPTIONS[cls] || "Ainda não há uma descrição correspondente no compêndio consultado.") : "A descrição da classe aparecerá aqui.";
