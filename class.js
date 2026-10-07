@@ -422,7 +422,20 @@
       ? (hasClassTalentChoice(cls) ? "Escolha um dos talentos da classe:" : talents.map(t => `${t.name}: ${t.description || ""}`).join("; "))
       : "Nenhuma habilidade da classe cadastrada.";
     const featureConfig = FIGHTER_CLASS_FEATURES[cls] || (cls === "Fighter" ? FIGHTER_CLASS_FEATURES.Guerreiro : null);
-    if (classInfoAbility && featureConfig) classInfoAbility.textContent = `${featureConfig.fixedDescription} ${featureConfig.choiceDescription}`;
+    if (classInfoAbility && featureConfig) {
+      const featureSections = [
+        ["Carregador", "some seu modificador de Constituição, se positivo, aos espaços de equipamento."],
+        ["Maestria em Armas", "escolha um tipo de arma para receber +1 em ataques e dano, além de metade do seu nível (arredondada para baixo)."],
+        ["Bravura", "escolha Força ou Destreza para ter vantagem em testes dessa categoria usados para superar uma força oposta."]
+      ];
+      classInfoAbility.replaceChildren();
+      featureSections.forEach(([name, description], index) => {
+        if (index) classInfoAbility.append(document.createElement("br"));
+        const strong = document.createElement("strong");
+        strong.textContent = `${name}.`;
+        classInfoAbility.append(strong, document.createTextNode(` ${description}`));
+      });
+    }
     if (classInfoAbility) {
       const specialAbility = CLASS_SPECIAL_ABILITIES[cls];
       if (specialAbility) {
