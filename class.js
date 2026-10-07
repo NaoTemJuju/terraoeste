@@ -432,6 +432,8 @@
       featureSections.forEach(([name, description], index) => {
         if (index) classInfoAbility.append(document.createElement("br"));
         const strong = document.createElement("strong");
+        strong.style.display = "inline";
+        strong.style.fontStyle = "normal";
         strong.textContent = `${name}.`;
         classInfoAbility.append(strong, document.createTextNode(` ${description}`));
       });
@@ -445,6 +447,8 @@
           const heading = line.match(/^(Apunhalada Pelas Costas|Ladroagem)[.](.*)$/);
           if (heading) {
             const strong = document.createElement("strong");
+            strong.style.display = "inline";
+            strong.style.fontStyle = "normal";
             strong.textContent = `${heading[1]}.`;
             classInfoAbility.append(strong, document.createTextNode(heading[2]));
           } else {
