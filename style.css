@@ -66,6 +66,12 @@ section{
   border:1px dashed rgba(59,44,26,.65); border-radius:12px;
   background:rgba(255,255,255,.38);
 }
+.selection-description{
+  border-width:1px; border-style:dashed; border-color:rgba(59,44,26,.45);
+  border-radius:12px; background:rgba(246,238,220,.72);
+}
+.selection-description strong{display:block}
+.selection-description p{margin:4px 0 0; color:var(--muted); font-size:15px; font-style:italic}
 .selection-info[hidden]{display:none}
 .selection-info h3{margin:0 0 10px; font-size:18px}
 .selection-info-grid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px}

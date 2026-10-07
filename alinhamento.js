@@ -135,7 +135,7 @@
       );
       area.append(row);
       area.append(
-        el("div",{ class:"final", html:`<div><strong>${state.deity}</strong></div><div class="muted">${info?.hint || "—"}</div>` })
+        el("div",{ class:"selection-info selection-description", html:`<strong>${state.deity}</strong><p>${info?.hint || "—"}</p>` })
       );
       step.scrollIntoView({ behavior:"smooth", block:"start" });
       return;
@@ -160,7 +160,7 @@
       row.append(pill, btnConfirm);
       area.append(row);
       area.append(
-        el("div",{ class:"final", html:`<div><strong>${auto}</strong></div><div class="muted">${info?.hint || "—"}</div>` })
+        el("div",{ class:"selection-info selection-description", html:`<strong>${auto}</strong><p>${info?.hint || "—"}</p>` })
       );
       step.scrollIntoView({ behavior:"smooth", block:"start" });
       return;
@@ -197,7 +197,7 @@
     const btnConfirm = el("button",{ id:"btnConfirmDeity", html:"Continuar", disabled:true });
     row.append(fieldWrap, btnRand, btnConfirm);
     area.append(row);
-    const descBox = el("div",{ class:"final", id:"deityDesc", html:"<em class='muted'>Selecione uma divindade para ver a descrição.</em>" });
+    const descBox = el("div",{ class:"selection-info selection-description", id:"deityDesc", html:"<em class='muted'>Selecione uma divindade para ver a descrição.</em>" });
     area.append(descBox);
     // Helpers
     const byName = name => options.find(o => o.name === name);
@@ -205,7 +205,7 @@
     const updateDesc = () => {
       const pick = isValid() ? byName(sel.value) : null;
       descBox.innerHTML = pick
-        ? `<div><strong>${pick.name}</strong></div><div class="muted">${pick.hint || "—"}</div>`
+        ? `<strong>${pick.name}</strong><p>${pick.hint || "—"}</p>`
         : `<em class='muted'>Selecione uma divindade para ver a descrição.</em>`;
       btnConfirm.disabled = !isValid();
     };
@@ -236,3 +236,4 @@
   // Expõe a função de alinhamento no namespace app para ser invocada por ouro.js
   window.app.showAlignmentStep = showAlignmentStep;
 })();
+
