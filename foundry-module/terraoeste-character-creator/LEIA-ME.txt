@@ -1,0 +1,26 @@
+Terra Oeste: criador de personagens (teste)
+=============================================
+
+Este é um protótipo isolado do criador interno. Ele adiciona um botão à
+lista de personagens e abre uma janela dentro do Foundry para informar
+nome, ancestralidade, classe, origem, divindade, alinhamento e atributos.
+Ao confirmar, cria um Actor Player de nível 1 no mundo Shadowdark e abre
+a ficha recém-criada.
+
+Limites desta prova de conceito
+-------------------------------
+
+- Os valores dos atributos são digitados manualmente, por enquanto.
+- Os PV são rolados usando o dado da classe e o modificador de Constituição.
+- Talentos, escolhas de classe/ancestralidade, magias, idiomas e equipamento
+  ainda não são aplicados por este protótipo.
+- O importador JSON e o módulo de correções atual não são alterados.
+
+Instalação para teste
+---------------------
+
+Instale este diretório como um módulo Foundry em Data/modules e ative
+"Terra Oeste: criador de personagens (teste)" em Configurações > Módulos.
+Abra a aba de personagens para encontrar o botão de teste.
+
+O protótipo requer Foundry 13+ e o sistema Shadowdark.
