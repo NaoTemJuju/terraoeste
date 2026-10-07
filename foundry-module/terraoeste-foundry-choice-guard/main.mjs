@@ -154,7 +154,7 @@ function setArmorMasteryEffect(item, armorName) {
       ? effect.changes
       : Array.isArray(effect.system?.changes) ? effect.system.changes : [];
     for (const change of changes) {
-      const match = String(change.key ?? "").match(/^system\\.attributes\\.ac\\.REPLACEME$/i);
+      const match = String(change.key ?? "").match(/^system\.attributes\.ac\.REPLACEME$/i);
       if (!match) continue;
       change.key = `system.attributes.ac.${armorSlug}`;
       replaced += 1;
