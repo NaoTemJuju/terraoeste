@@ -18,6 +18,7 @@
   const classTalentChoices = $("#classTalentChoices");
   const classFeatureChoices = $("#classFeatureChoices");
   const classTalentTable = $("#classTalentTable");
+  const mageSpellTables = $("#mageSpellTables");
   const classLevelTalent = $("#classLevelTalent");
   const classLevelTalentTable = $("#classLevelTalentTable");
   const btnContinueClassTalent = $("#btnContinueClassTalent");
@@ -58,7 +59,15 @@
     { label: "Queda Suave", value: "Feather Fall", duration: "Instantâneo", range: "Você" },
     { label: "Sono", value: "Sleep", duration: "Instantâneo", range: "Perto" }
   ];
-    const FIGHTER_WEAPON_LABELS = Object.fromEntries(FIGHTER_WEAPON_TYPES.map(item => [item.value, item.label]));
+    const MAGE_ITEM_TYPES = [
+    { label: "Armadura mágica", value: "Armor" },
+    { label: "Arma mágica", value: "Weapon" },
+    { label: "Poção", value: "Potion" },
+    { label: "Pergaminho", value: "Scroll" },
+    { label: "Varinha", value: "Wand" },
+    { label: "Item mágico diverso", value: "Miscellaneous" }
+  ];
+  const FIGHTER_WEAPON_LABELS = Object.fromEntries(FIGHTER_WEAPON_TYPES.map(item => [item.value, item.label]));
   const FIGHTER_ARMOR_TYPES = [
     { label: "Armadura de Couro", value: "Leather armor" },
     { label: "Cota de Malha", value: "Chainmail" },
@@ -83,15 +92,29 @@
   }
   window.app.getClassFeatureBonuses = makeClassFeatureBonuses;
   window.app.getClassFeatureDisplay = (cls, choices) => {
-    if (!["Guerreiro", "Fighter"].includes(cls) || !choices) return "";
+    if (!choices) return "";
+    if (cls === "Mago") {
+      const spells = (choices.mageSpells || []).map(value => MAGE_SPELLS.find(spell => spell.value === value)?.label).filter(Boolean);
+      return spells.length ? `Magias de 1º círculo: ${spells.join(", ")}` : "";
+    }
+    if (!["Guerreiro", "Fighter"].includes(cls)) return "";
     const weapon = FIGHTER_WEAPON_LABELS[choices.weaponMastery];
     const grit = choices.grit === "Strength" ? "Força" : choices.grit === "Dexterity" ? "Destreza" : "";
     return [weapon ? `Maestria em Armas: ${weapon}` : "", grit ? `Bravura: ${grit}` : ""].filter(Boolean).join("; ");
   };
-  window.app.randomClassFeatureChoices = cls => cls === "Guerreiro" ? {
-    weaponMastery: FIGHTER_WEAPON_TYPES[randInt(0, FIGHTER_WEAPON_TYPES.length - 1)].value,
-    grit: randInt(0, 1) ? "Strength" : "Dexterity"
-  } : null;
+  window.app.randomClassFeatureChoices = cls => {
+    if (cls === "Guerreiro") return {
+      weaponMastery: FIGHTER_WEAPON_TYPES[randInt(0, FIGHTER_WEAPON_TYPES.length - 1)].value,
+      grit: randInt(0, 1) ? "Strength" : "Dexterity"
+    };
+    if (cls === "Mago") {
+      const pool = [...MAGE_SPELLS];
+      const mageSpells = [];
+      while (mageSpells.length < 3) mageSpells.push(pool.splice(randInt(0, pool.length - 1), 1)[0].value);
+      return { mageSpells };
+    }
+    return null;
+  };
 
   // Descrições da tradução PT-BR do compêndio de classes do Foundry.
   // Só associa classes do site com equivalentes claros no compêndio.
@@ -443,6 +466,37 @@
     target.append(title, table);
   }
 
+  function renderMageSpellTables(cls){
+    if (!mageSpellTables) return;
+    mageSpellTables.replaceChildren();
+    mageSpellTables.hidden = cls !== "Mago";
+    if (cls !== "Mago") return;
+    const makeTable = (titleText, headers, rows) => {
+      const title = document.createElement("h4");
+      title.textContent = titleText;
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      const headerRow = document.createElement("tr");
+      headers.forEach(text => { const th=document.createElement("th"); th.scope="col"; th.textContent=text; headerRow.append(th); });
+      thead.append(headerRow);
+      const tbody = document.createElement("tbody");
+      rows.forEach(values => {
+        const row=document.createElement("tr");
+        values.forEach((text,index) => {
+          const cell=document.createElement(index===0 ? "th" : "td");
+          if(index===0) cell.scope="row";
+          cell.textContent=text;
+          row.append(cell);
+        });
+        tbody.append(row);
+      });
+      table.append(thead,tbody);
+      mageSpellTables.append(title,table);
+    };
+    makeTable("Magias de Mago Conhecidas", ["Nível","1","2","3","4","5"], [["1","3","–","–","–","–"]]);
+    makeTable("Magias de 1º círculo", ["Magia","Duração","Alcance"], MAGE_SPELLS.map(spell => [spell.label,spell.duration,spell.range]));
+  }
+
   function talentOptions(cls){ return window.CUSTOM_CLASS_DATA?.[cls]?.talents || []; }
   function hasClassTalentChoice(cls){ return talentOptions(cls).length > 1 && window.CUSTOM_CLASS_DATA?.[cls]?.talentMode === "choice"; }
   window.app.randomClassTalent = cls => {
@@ -453,6 +507,7 @@
     if (!classInfo) return;
     classInfo.hidden = !cls;
     renderClassTalentTable(cls);
+    renderMageSpellTables(cls);
     renderClassLevelTalent(cls);
     if (classInfoTitle && cls) classInfoTitle.textContent = `Informações: ${cls}`;
     if (classInfoDescription) {
