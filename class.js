@@ -23,17 +23,17 @@
   const btnContinueClassTalent = $("#btnContinueClassTalent");
   const STAT_CODES = { Força: "STR", Destreza: "DEX", Constituição: "CON", Inteligência: "INT", Sabedoria: "WIS", Carisma: "CHA" };
   const FIGHTER_WEAPON_TYPES = [
-    { label: "Adaga", value: "Dagger" }, { label: "Arco curto", value: "Shortbow" },
-    { label: "Arco longo", value: "Longbow" }, { label: "Azagaia", value: "Javelin" },
+    { label: "Adaga", value: "Dagger" }, { label: "Arco Curto", value: "Shortbow" },
+    { label: "Arco Longo", value: "Longbow" }, { label: "Azagaia", value: "Javelin" },
     { label: "Besta", value: "Crossbow" }, { label: "Boleadeira", value: "Bolas" },
     { label: "Cajado", value: "Staff" }, { label: "Chicote", value: "Whip" },
     { label: "Cimitarra", value: "Scimitar" }, { label: "Clava", value: "Club" },
-    { label: "Corrente laminada", value: "Razor chain" }, { label: "Espada bastarda", value: "Bastard sword" },
-    { label: "Espada curta", value: "Shortsword" }, { label: "Espada grande", value: "Greatsword" },
+    { label: "Corrente Laminada", value: "Razor chain" }, { label: "Espada Bastarda", value: "Bastard sword" },
+    { label: "Espada Curta", value: "Shortsword" }, { label: "Espada Grande", value: "Greatsword" },
     { label: "Espada Longa", value: "Longsword" }, { label: "Funda", value: "Sling" },
     { label: "Lança", value: "Spear" }, { label: "Maça", value: "Mace" },
-    { label: "Maça estrela", value: "Morning Star" }, { label: "Machadinha", value: "Handaxe" },
-    { label: "Machado grande", value: "Greataxe" }, { label: "Martelo de guerra", value: "Warhammer" },
+    { label: "Maça Estrela", value: "Morning Star" }, { label: "Machadinha", value: "Handaxe" },
+    { label: "Machado Grande", value: "Greataxe" }, { label: "Martelo de Guerra", value: "Warhammer" },
     { label: "Pique", value: "Pike" }, { label: "Propulsor", value: "Spear-thrower" },
     { label: "Shuriken", value: "Shuriken" }, { label: "Zarabatana", value: "Blowgun" },
     { label: "Bastão", value: "Stave" }
