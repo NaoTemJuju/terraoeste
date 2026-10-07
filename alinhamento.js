@@ -10,6 +10,29 @@
 (function(){
   const { state, $, el, randInt } = window.app;
 
+  const ALIGNMENT_DESCRIPTIONS = {
+    "Caótico": "Personagens caóticos se alinham à destruição, ambição e perdição, adotando a mentalidade “os mais fortes sobrevivem”.",
+    "Ordeiro": "Personagens ordeiros se alinham à justiça, ordem e virtude. Personagens ordeiros agem de acordo com uma mentalidade de “pelo bem da maioria”.",
+    "Neutro": "Personagens neutros encontram um equilíbrio entre a Ordem e o Caos. Eles se alinham ao ciclo de crescimento e declínio, aderindo à uma mentalidade de que “a natureza deve seguir seu curso”."
+  };
+
+  function createAlignmentDescription(alignment){
+    const box = document.createElement("div");
+    box.className = "selection-info selection-description alignment-description";
+    const title = document.createElement("strong");
+    const description = document.createElement("p");
+    box.append(title, description);
+
+    function update(value){
+      const text = ALIGNMENT_DESCRIPTIONS[value];
+      box.hidden = !text;
+      title.textContent = text ? value.toUpperCase() : "";
+      description.textContent = text || "";
+    }
+    update(alignment);
+    return { box, update };
+  }
+
   /**
    * Exibe a interface de alinhamento. Se o alinhamento já estiver
    * bloqueado (confirmado), mostra a escolha anterior e um botão
@@ -31,11 +54,13 @@
         ? `Alinhamento definido pela classe: <strong>${state.align}</strong>`
         : `Alinhamento confirmado: <strong>${state.align || "—"}</strong>`;
       area.append( el("div",{class:"pill", html:info}) );
+      const description = createAlignmentDescription(state.align);
       const btn = el("button",{html:"Prosseguir para Divindades"});
       btn.addEventListener("click", () => {
         goToDeity();
       });
       area.append(btn);
+      area.append(description.box);
       step.scrollIntoView({ behavior:"smooth", block:"start" });
       return;
     }
@@ -43,6 +68,7 @@
     if (forced){
       state.align = forced;
       area.append( el("div",{class:"pill", html:`Alinhamento definido pela classe: <strong>${forced}</strong>`}) );
+      const description = createAlignmentDescription(forced);
       const btn = el("button",{html:"Continuar"});
       btn.addEventListener("click", () => {
         state.alignLocked = true;
@@ -52,6 +78,7 @@
         goToDeity();
       });
       area.append(btn);
+      area.append(description.box);
       step.scrollIntoView({ behavior:"smooth", block:"start" });
       return;
     }
@@ -63,10 +90,12 @@
     select.append(new Option("Caótico","Caótico"));
     const btnRand = el("button",{ class:"ghost", html:"Aleatório" });
     const btnFin  = el("button",{ html:"Continuar", disabled:true });
+    const alignmentDescription = createAlignmentDescription(select.value);
     // Pré-seleciona se já havia um valor salvo
     if (state.align) {
       select.value = state.align;
       btnFin.disabled = !select.value;
+      alignmentDescription.update(state.align);
     }
     const validate = () => {
       const ok = select.selectedIndex > 0 && select.value.trim() !== "";
@@ -74,12 +103,14 @@
     };
     select.addEventListener("change", () => {
       state.align = select.value || null;
+      alignmentDescription.update(state.align);
       validate();
     });
     btnRand.addEventListener("click", () => {
       const opts = ["Ordeiro","Neutro","Caótico"];
       state.align = opts[randInt(0,2)];
       select.value = state.align;
+      alignmentDescription.update(state.align);
       validate();
     });
     btnFin.addEventListener("click", () => {
@@ -93,6 +124,7 @@
       goToDeity();
     });
     area.append(select, btnRand, btnFin);
+    area.append(alignmentDescription.box);
     step.scrollIntoView({ behavior:"smooth", block:"start" });
   }
 

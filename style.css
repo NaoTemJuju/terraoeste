@@ -72,6 +72,7 @@ section{
 }
 .selection-description strong{display:block}
 .selection-description p{margin:4px 0 0; color:var(--muted); font-size:15px; font-style:italic}
+.alignment-description{flex:1 0 100%}
 .selection-info[hidden]{display:none}
 .selection-info h3{margin:0 0 10px; font-size:18px}
 .selection-info-grid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px}
