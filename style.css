@@ -88,6 +88,12 @@ section{
 .class-talent-table th,.class-talent-table td{padding:6px 8px;text-align:left;vertical-align:top;border-bottom:1px solid rgba(59,44,26,.22)}
 .class-talent-table thead th{font-weight:700}
 .class-talent-table tbody th{width:72px;white-space:nowrap;font-weight:700}
+.class-level-talent{margin-top:12px;padding:12px;border:1px dashed rgba(59,44,26,.38);border-radius:10px;background:rgba(255,255,255,.28)}
+.class-level-talent[hidden]{display:none}
+.class-level-talent-result{margin:10px 0 0;font-weight:600}
+.class-level-talent-choice,.class-level-talent-choice-details{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;align-items:end}
+.class-level-talent-choice label{display:grid;gap:5px;min-width:180px}
+.class-level-talent-choice select{max-width:100%;min-width:220px}
 @media (max-width:640px){.class-talent-table table{font-size:14px}.class-talent-table th,.class-talent-table td{padding:6px 5px}}
 @media (max-width:640px){
   .selection-info-grid,.selection-info-grid--class{grid-template-columns:1fr}
@@ -708,4 +714,5 @@ header > div:last-child > button:active:not(:disabled){
     flex:1 1 auto;
   }
 }
+
 

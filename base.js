@@ -186,6 +186,7 @@
     if (result.cobre || moneyBits.length === 0) moneyBits.push(`${result.cobre ?? 0} PC`);
     const moneyStr = moneyBits.join(", ");
     const raceTalentName = window.app?.getRaceTalentDisplay?.(result.raca, result.talentoRacial) || "";
+    const classLevelTalentName = window.app?.getClassLevelTalentDisplay?.(result.talentoClasseNivel1) || "";
 
     const itens = Array.isArray(result.itens) ? result.itens : [];
     const itensHTML = itens.length
@@ -201,6 +202,7 @@
           <div><strong>Raça</strong><br>${result.raca || "—"}</div>
           ${raceTalentName ? `<div><strong>Talento racial</strong><br>${escapeHTML(raceTalentName)}</div>` : ""}
           <div><strong>Classe</strong><br>${result.classe || "—"}</div>
+          ${classLevelTalentName ? `<div><strong>Talento de classe (nível 1)</strong><br>${escapeHTML(classLevelTalentName)}</div>` : ""}
           ${result.maestria ? `<div><strong>Maestria em Arma</strong><br>${escapeHTML(result.maestria)}</div>` : ""}
           <div><strong>Origem</strong><br>${result.origem || "—"}</div>
           <div><strong>Alinhamento</strong><br>${result.alinhamento || "—"}</div>
@@ -445,6 +447,7 @@
       const cls = classKeys[randInt(0, classKeys.length - 1)];
       state.cls = cls;
       state.classTalent = window.app.randomClassTalent?.(cls) || null;
+      state.classLevelTalent = window.app.randomClassLevelTalent?.(cls) || null;
       // Seleciona uma origem aleatória da classe
       const origens = window.getOriginsForClass?.(cls) || (window.ORIGENS_POR_CLASSE?.[cls] || []);
       if (origens.length > 0){
@@ -549,6 +552,11 @@
         nome: obj.name || "—",
         raca: obj.ancestry || "—",
         classe: obj.class || "—",
+        talentoClasseNivel1: Array.isArray(obj.levels) && obj.levels[0]?.talentRolledName ? {
+          talentRolledName: obj.levels[0].talentRolledName,
+          talentRolledDesc: obj.levels[0].talentRolledDesc,
+          displayDesc: obj.levels[0].Rolled12ChosenTalentDesc || obj.levels[0].talentRolledDesc
+        } : null,
         origem: obj.background || "—",
         origem_desc: "",
         alinhamento: alignmentToPT(obj.alignment) || "—",
@@ -575,6 +583,7 @@
     race:null,
     raceTalent:null,
     classTalent:null,
+    classLevelTalent:null,
     cls:null,
     origem:null,
     maestria:null,
@@ -587,7 +596,7 @@
     hpBaseRoll:null
   };
 
-  const pending = { race:null, raceTalent:null, cls:null, classTalent:null };
+  const pending = { race:null, raceTalent:null, cls:null, classTalent:null, classLevelTalent:null, classLevelTalentDraft:null };
   let attrsLocked = false;
   let __loadedRawObj = null;
 
@@ -640,7 +649,8 @@
         CHA: a["Carisma"]?.valor ?? 0
       };
       const languagesStr = Array.isArray(obj?.linguas) ? obj.linguas.join(", ") : "";
-      const level = 0;
+      const classLevelTalent = window.app.getClassLevelTalent?.(obj?.classe, obj?.talentoClasseNivel1) || { level: 0, bonuses: [], fields: {} };
+      const level = classLevelTalent.level;
       const gear = Array.isArray(obj?.itens) ? obj.itens : [];
       const shopLedger = Array.isArray(obj?.compras) ? obj.compras : [];
       const gearSlotsUsed = gear.reduce((sum, g) => sum + (g.slots || 0), 0);
@@ -650,21 +660,21 @@
         stats: { ...stats },
         rolledStats: { ...stats },
         ancestry: obj?.raca || "",
-        class: obj?.classe || "",
+        class: window.app.getFoundryClassName?.(obj?.classe) || obj?.classe || "",
         level,
         levels: [{
           level,
-          talentRolledDesc: "",
-          talentRolledName: "",
-          Rolled12TalentOrTwoStatPoints: "",
-          Rolled12ChosenTalentDesc: "",
-          Rolled12ChosenTalentName: "",
+          talentRolledDesc: classLevelTalent.fields.talentRolledDesc || "",
+          talentRolledName: classLevelTalent.fields.talentRolledName || "",
+          Rolled12TalentOrTwoStatPoints: classLevelTalent.fields.Rolled12TalentOrTwoStatPoints || "",
+          Rolled12ChosenTalentDesc: classLevelTalent.fields.Rolled12ChosenTalentDesc || "",
+          Rolled12ChosenTalentName: classLevelTalent.fields.Rolled12ChosenTalentName || "",
           HitPointRoll: 0,
           stoutHitPointRoll: 0
         }],
         XP: 0,
         ambitionTalentLevel: {
-          level: 0,
+          level,
           talentRolledDesc: "",
           talentRolledName: "",
           Rolled12TalentOrTwoStatPoints: "",
@@ -681,7 +691,10 @@
         armorClass: 10,
         gearSlotsTotal: GEAR_SLOTS_TOTAL,
         gearSlotsUsed,
-        bonuses: window.app.getRaceBonuses?.(obj?.raca, obj?.talentoRacial) || [],
+        bonuses: [
+          ...(window.app.getRaceBonuses?.(obj?.raca, obj?.talentoRacial) || []),
+          ...(classLevelTalent.bonuses || [])
+        ],
         terraOesteChoices: [
           ...(window.app.getRaceChoiceMetadata?.(obj?.raca, obj?.talentoRacial) || []),
           ...(window.app.getClassChoiceMetadata?.(obj?.classe, obj?.talentoClasse) || [])
@@ -990,4 +1003,5 @@
     set __loadedRawObj(val){ __loadedRawObj = val; }
   };
 })();
+
 

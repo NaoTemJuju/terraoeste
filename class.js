@@ -17,6 +17,8 @@
   const classInfoAbility = $("#classInfoAbility");
   const classTalentChoices = $("#classTalentChoices");
   const classTalentTable = $("#classTalentTable");
+  const classLevelTalent = $("#classLevelTalent");
+  const STAT_CODES = { Força: "STR", Destreza: "DEX", Constituição: "CON", Inteligência: "INT", Sabedoria: "WIS", Carisma: "CHA" };
 
   // Descrições da tradução PT-BR do compêndio de classes do Foundry.
   // Só associa classes do site com equivalentes claros no compêndio.
@@ -50,6 +52,161 @@
       ]
     }
   };
+
+  // Dados estruturados para o primeiro talento de classe. Novas tabelas
+  // podem usar o mesmo fluxo sem misturar essa rolagem com a escolha de
+  // habilidade especial configurada pelo GM.
+  const CLASS_LEVEL_TALENTS = {
+    "Malandro": {
+      foundryName: "Thief",
+      title: "Talentos de Ladrão",
+      entries: [
+        { min: 2, max: 2, id: "InitiativeAdvantage", name: "InitiativeAdvantage", desc: "Vantagem nas rolagens de iniciativa (role novamente se repetir)", foundryDesc: "Advantage on initiative rolls (reroll if tied)", bonusTo: "Initiative", bonusName: "InitiativeAdvantage" },
+        { min: 3, max: 5, id: "BackstabPlus1DamageDice", name: "BackstabPlus1DamageDice", desc: "Sua Apunhalada Pelas Costas causa +1 dado de dano", foundryDesc: "+1 backstab damage die", bonusTo: "Backstab", bonusName: "BackstabPlus1DamageDice" },
+        { min: 6, max: 9, id: "StatBonus", choice: "stat", desc: "+2 em Força, Destreza ou Carisma", foundryDesc: "+2 Strength, Dexterity, or Charisma", bonusName: "StatBonus" },
+        { min: 10, max: 11, id: "Plus1ToHit", name: "Plus1ToHit", desc: "+1 em ataques corpo a corpo e à distância", foundryDesc: "+1 to melee and ranged attacks", bonusTo: "Melee and ranged attacks", bonusName: "Plus1ToHit" },
+        { min: 12, max: 12, id: "ChooseTalentOrStats", choice: "twelve", desc: "Escolha um talento ou distribua +2 pontos entre os seus atributos" }
+      ]
+    },
+    "Ladrão": {
+      foundryName: "Thief",
+      title: "Talentos de Ladrão",
+      entries: null
+    }
+  };
+  CLASS_LEVEL_TALENTS.Ladrão.entries = CLASS_LEVEL_TALENTS.Malandro.entries;
+  const STAT_TALENT_OPTIONS = ["InitiativeAdvantage", "BackstabPlus1DamageDice", "StatBonus", "Plus1ToHit"];
+  const STAT_LABELS = Object.keys(STAT_CODES);
+
+  function classLevelTalentConfig(cls){ return CLASS_LEVEL_TALENTS[cls] || null; }
+  window.app.getFoundryClassName = cls => classLevelTalentConfig(cls)?.foundryName || window.CUSTOM_CLASS_DATA?.[cls]?.foundryName || cls || "";
+  function resultForEntry(entry, roll){ return { roll, id: entry.id, talentRolledName: entry.name || "", talentRolledDesc: entry.foundryDesc || entry.desc, bonusName: entry.bonusName || entry.id, bonusTo: entry.bonusTo || "", needsChoice: entry.choice || "" }; }
+  function makeTalentBonus(result, cls){
+    if (!result || !result.talentRolledName) return [];
+    const config = classLevelTalentConfig(cls);
+    const bonusTo = result.bonusTo || result.talentRolledName;
+    return [{ sourceType: "Class", sourceName: window.app.getFoundryClassName(cls) || config?.foundryName || cls, sourceCategory: "Talent", name: result.talentRolledName, bonusName: result.bonusName || result.talentRolledName, bonusTo, gainedAtLevel: 1 }];
+  }
+  function renderLevelTalentChoices(result){
+    if (!classLevelTalent) return;
+    const choiceArea = document.createElement("div");
+    choiceArea.className = "class-level-talent-choice";
+    const finish = () => { pending.classLevelTalent = result; renderClassLevelTalent(pending.cls); updateConfirmButton(); };
+    const makeStatSelect = (labelText, onChange, selected = "") => {
+      const label = document.createElement("label");
+      label.textContent = labelText;
+      const select = document.createElement("select");
+      select.append(new Option("Escolha um atributo", ""));
+      const availableStats = labelText.includes("+2") ? ["Força", "Destreza", "Carisma"] : STAT_LABELS;
+      availableStats.forEach(stat => select.append(new Option(stat, STAT_CODES[stat])));
+      select.value = selected;
+      select.addEventListener("change", () => onChange(select.value));
+      label.append(select);
+      return label;
+    };
+    if (result.needsChoice === "stat") {
+      const statLabel = makeStatSelect("Atributo para o bônus +2", code => {
+        if (!code) { pending.classLevelTalent = null; updateConfirmButton(); return; }
+        result.talentRolledName = "StatBonus";
+        result.bonusName = "StatBonus";
+        result.bonusTo = `${code}:+2`;
+        result.talentRolledDesc = `+2 ${({STR:"Strength",DEX:"Dexterity",CON:"Constitution",INT:"Intelligence",WIS:"Wisdom",CHA:"Charisma"})[code]}`;
+        result.displayDesc = `+2 em ${STAT_LABELS.find(stat => STAT_CODES[stat] === code)}`;
+        finish();
+      });
+      choiceArea.append(statLabel);
+    } else if (result.needsChoice === "twelve") {
+      const mode = document.createElement("select");
+      mode.append(new Option("Escolha: talento ou +2 nos atributos", ""), new Option("Escolher um talento da tabela", "talent"), new Option("Distribuir +2 pontos entre atributos", "stats"));
+      const details = document.createElement("div");
+      details.className = "class-level-talent-choice-details";
+      mode.addEventListener("change", () => {
+        details.replaceChildren();
+        pending.classLevelTalent = null;
+        if (mode.value === "talent") {
+          const select = document.createElement("select");
+          select.append(new Option("Escolha um talento", ""));
+          STAT_TALENT_OPTIONS.forEach(id => {
+            const entry = CLASS_LEVEL_TALENTS.Malandro.entries.find(item => item.id === id);
+            select.append(new Option(entry.desc, id));
+          });
+          select.addEventListener("change", () => {
+            const entry = CLASS_LEVEL_TALENTS.Malandro.entries.find(item => item.id === select.value);
+            if (!entry) { pending.classLevelTalent = null; updateConfirmButton(); return; }
+            const chosen = resultForEntry(entry, result.roll);
+            chosen.rolled12Mode = "talent";
+            if (entry.choice === "stat") {
+              const statLabel = makeStatSelect("Atributo para o bônus +2", code => {
+                if (!code) { pending.classLevelTalent = null; updateConfirmButton(); return; }
+                chosen.bonusTo = `${code}:+2`;
+                chosen.talentRolledDesc = `+2 ${{STR:"Strength",DEX:"Dexterity",CON:"Constitution",INT:"Intelligence",WIS:"Wisdom",CHA:"Charisma"}[code]}`;
+                chosen.displayDesc = `+2 em ${STAT_LABELS.find(stat => STAT_CODES[stat] === code)}`;
+                chosen.rolled12TalentOrTwoStatPoints = "Talent";
+                chosen.rolled12ChosenTalentName = chosen.talentRolledName;
+                chosen.rolled12ChosenTalentDesc = chosen.talentRolledDesc;
+                finishWith(chosen);
+              });
+              details.append(statLabel);
+            } else {
+              chosen.rolled12TalentOrTwoStatPoints = "Talent";
+              chosen.rolled12ChosenTalentName = chosen.talentRolledName;
+              chosen.rolled12ChosenTalentDesc = chosen.talentRolledDesc;
+              finishWith(chosen);
+            }
+          });
+          details.append(select);
+        } else if (mode.value === "stats") {
+          const selected = [];
+          const updateStats = () => {
+            if (selected.length === 2 && selected.every(Boolean)) {
+              const names = selected.map(code => STAT_LABELS.find(stat => STAT_CODES[stat] === code));
+              const counts = selected.reduce((acc, code) => ({ ...acc, [code]: (acc[code] || 0) + 1 }), {});
+              const bonusTo = Object.entries(counts).map(([code, amount]) => `${code}:+${amount}`).join(", ");
+              finishWith({ roll: result.roll, id: "TwoStatPoints", talentRolledName: "StatBonus", talentRolledDesc: "+2 to ability scores", bonusName: "StatBonus", bonusTo, rolled12Mode: "twoStatPoints", displayDesc: `+2 pontos nos atributos: ${names.join(" e ")}`, rolled12TalentOrTwoStatPoints: "TwoStatPoints" });
+            } else { pending.classLevelTalent = null; updateConfirmButton(); }
+          };
+          details.append(makeStatSelect("Primeiro ponto", code => { selected[0] = code; updateStats(); }));
+          details.append(makeStatSelect("Segundo ponto", code => { selected[1] = code; updateStats(); }));
+        }
+      });
+      choiceArea.append(mode, details);
+    }
+    function finishWith(chosen){ pending.classLevelTalent = chosen; renderClassLevelTalent(pending.cls); updateConfirmButton(); }
+    classLevelTalent.append(choiceArea);
+  }
+
+  function renderClassLevelTalent(cls){
+    if (!classLevelTalent) return;
+    const config = classLevelTalentConfig(cls);
+    classLevelTalent.replaceChildren();
+    classLevelTalent.hidden = !config;
+    if (!config) return;
+    const status = document.createElement("p");
+    status.className = "class-level-talent-result";
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "ghost";
+    button.textContent = pending.classLevelTalent || pending.classLevelTalentDraft ? "Talento rolado" : "Rolar talento de nível 1 (2d6)";
+    button.disabled = !!pending.classLevelTalent || !!pending.classLevelTalentDraft;
+    button.addEventListener("click", () => {
+      const roll = randInt(1, 6) + randInt(1, 6);
+      const entry = config.entries.find(item => roll >= item.min && roll <= item.max);
+      const result = resultForEntry(entry, roll);
+      pending.classLevelTalentDraft = result;
+      pending.classLevelTalent = result.needsChoice ? null : result;
+      renderClassLevelTalent(cls);
+      const resultLine = classLevelTalent.querySelector(".class-level-talent-result");
+      resultLine.textContent = `Resultado ${roll}: ${entry.desc}`;
+      if (result.needsChoice) renderLevelTalentChoices(result);
+      updateConfirmButton();
+    });
+    classLevelTalent.append(button, status);
+    const visibleResult = pending.classLevelTalent || pending.classLevelTalentDraft;
+    if (visibleResult) {
+      const entry = config.entries.find(item => visibleResult.roll >= item.min && visibleResult.roll <= item.max);
+      status.textContent = `Resultado ${visibleResult.roll}: ${visibleResult.displayDesc || visibleResult.talentRolledDesc || entry?.desc || "Talento registrado"}`;
+    }
+  }
 
   function renderClassTalentTable(cls){
     if (!classTalentTable) return;
@@ -95,6 +252,7 @@
     if (!classInfo) return;
     classInfo.hidden = !cls;
     renderClassTalentTable(cls);
+    renderClassLevelTalent(cls);
     if (classInfoTitle && cls) classInfoTitle.textContent = `Informações: ${cls}`;
     if (classInfoDescription) {
       classInfoDescription.textContent = cls ? (window.CUSTOM_CLASS_DATA?.[cls]?.description || CLASS_DESCRIPTIONS[cls] || "Ainda não há uma descrição correspondente no compêndio consultado.") : "A descrição da classe aparecerá aqui.";
@@ -121,7 +279,55 @@
     updateConfirmButton();
   }
 
-  function updateConfirmButton(){ if (btnConfirmClass) btnConfirmClass.disabled = !pending.cls || (hasClassTalentChoice(pending.cls) && !talentOptions(pending.cls).some(t => t.id === pending.classTalent)); }
+  function updateConfirmButton(){ if (btnConfirmClass) btnConfirmClass.disabled = !pending.cls || (hasClassTalentChoice(pending.cls) && !talentOptions(pending.cls).some(t => t.id === pending.classTalent)) || (!!classLevelTalentConfig(pending.cls) && !pending.classLevelTalent); }
+
+  window.app.getClassLevelTalent = (cls, result) => {
+    if (!classLevelTalentConfig(cls) || !result) return { level: 0, bonuses: [], fields: { talentRolledDesc: "", talentRolledName: "", Rolled12TalentOrTwoStatPoints: "", Rolled12ChosenTalentDesc: "", Rolled12ChosenTalentName: "" } };
+    return { level: 1, bonuses: makeTalentBonus(result, cls), fields: {
+      talentRolledDesc: result.talentRolledDesc || "",
+      talentRolledName: result.talentRolledName || "",
+      Rolled12TalentOrTwoStatPoints: result.rolled12TalentOrTwoStatPoints || "",
+      Rolled12ChosenTalentDesc: result.rolled12ChosenTalentDesc || "",
+      Rolled12ChosenTalentName: result.rolled12ChosenTalentName || ""
+    } };
+  };
+  window.app.getClassLevelTalentDisplay = result => result ? (result.displayDesc || result.talentRolledDesc || "") : "";
+  window.app.randomClassLevelTalent = cls => {
+    const config = classLevelTalentConfig(cls);
+    if (!config) return null;
+    const roll = randInt(1, 6) + randInt(1, 6);
+    const entry = config.entries.find(item => roll >= item.min && roll <= item.max);
+    const result = resultForEntry(entry, roll);
+    if (entry.choice === "stat") {
+      const code = ["STR", "DEX", "CHA"][randInt(0, 2)];
+      result.bonusTo = `${code}:+2`;
+      result.talentRolledDesc = `+2 ${{STR:"Strength",DEX:"Dexterity",CHA:"Charisma"}[code]}`;
+      result.displayDesc = `+2 em ${STAT_LABELS.find(stat => STAT_CODES[stat] === code)}`;
+    } else if (entry.choice === "twelve") {
+      if (randInt(0, 1) === 0) {
+        const stats = ["STR", "DEX", "CON", "INT", "WIS", "CHA"];
+        const first = stats[randInt(0, stats.length - 1)];
+        const second = stats[randInt(0, stats.length - 1)];
+        const counts = [first, second].reduce((acc, code) => ({ ...acc, [code]: (acc[code] || 0) + 1 }), {});
+        const labels = [first, second].map(code => STAT_LABELS.find(stat => STAT_CODES[stat] === code));
+        return { roll, id: "TwoStatPoints", talentRolledName: "StatBonus", talentRolledDesc: "+2 to ability scores", bonusName: "StatBonus", bonusTo: Object.entries(counts).map(([code, amount]) => `${code}:+${amount}`).join(", "), rolled12Mode: "twoStatPoints", rolled12TalentOrTwoStatPoints: "TwoStatPoints", displayDesc: `+2 pontos nos atributos: ${labels.join(" e ")}` };
+      }
+      const chosenId = STAT_TALENT_OPTIONS[randInt(0, STAT_TALENT_OPTIONS.length - 1)];
+      const chosen = resultForEntry(config.entries.find(item => item.id === chosenId), roll);
+      chosen.rolled12TalentOrTwoStatPoints = "Talent";
+      chosen.rolled12ChosenTalentName = chosen.talentRolledName;
+      chosen.rolled12ChosenTalentDesc = chosen.talentRolledDesc;
+      chosen.displayDesc = `Escolheu talento: ${chosen.talentRolledDesc}`;
+      if (chosen.needsChoice === "stat") {
+        const code = ["STR", "DEX", "CHA"][randInt(0, 2)];
+        chosen.bonusTo = `${code}:+2`;
+        chosen.talentRolledDesc = `+2 ${{STR:"Strength",DEX:"Dexterity",CHA:"Charisma"}[code]}`;
+        chosen.rolled12ChosenTalentDesc = chosen.talentRolledDesc;
+      }
+      return chosen;
+    }
+    return result;
+  };
 
   window.app.getClassContent = cls => ({
     name: cls,
@@ -147,6 +353,8 @@
         if (classSel.options.length > 0) classSel.options[0].disabled = true;
       }
       pending.cls = c;
+      pending.classLevelTalent = null;
+      pending.classLevelTalentDraft = null;
       pending.classTalent = hasClassTalentChoice(c) ? null : (talentOptions(c).length === 1 ? talentOptions(c)[0].id : null);
       updateClassInfo(c);
       updateConfirmButton();
@@ -157,6 +365,8 @@
     classSel.addEventListener("change", e => {
       const val = e.target.value;
       pending.cls = val || null;
+      pending.classLevelTalent = null;
+      pending.classLevelTalentDraft = null;
       const talents = talentOptions(pending.cls);
       pending.classTalent = hasClassTalentChoice(pending.cls) ? null : (talents.length === 1 ? talents[0].id : null);
       updateClassInfo(pending.cls);
@@ -169,6 +379,7 @@
       if (!pending.cls || (hasClassTalentChoice(pending.cls) && !talentOptions(pending.cls).some(t => t.id === pending.classTalent))) return;
       state.cls = pending.cls;
       state.classTalent = pending.classTalent;
+      state.classLevelTalent = pending.classLevelTalent ? { ...pending.classLevelTalent } : null;
       state.origem = null;
       if (classSel) classSel.disabled = true;
       if (btnRandClass) btnRandClass.disabled = true;
@@ -237,4 +448,5 @@
     });
   }
 })();
+
 

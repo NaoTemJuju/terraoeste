@@ -214,8 +214,10 @@
     const background = state.origem ? state.origem.titulo : "";
     const title      = "Aventureiro";
 
-    // Exporta como nível 0
-    const level = 0;
+    // Classes com tabela cadastrada exportam a ficha no nível 1 e incluem
+    // o resultado escolhido da rolagem inicial.
+    const classLevelTalent = window.app.getClassLevelTalent?.(cls, state.classLevelTalent) || { level: 0, bonuses: [], fields: {} };
+    const level = classLevelTalent.level;
     const hpRoll  = Number.isFinite(state.hpBaseRoll) ? state.hpBaseRoll : 0;
     const stoutHP = 0;
 
@@ -238,21 +240,21 @@
       stats: { ...stats },
       rolledStats: { ...stats },
       ancestry,
-      class: cls,
+      class: window.app.getFoundryClassName?.(cls) || cls,
       level,
       levels: [{
         level,
-        talentRolledDesc: "",
-        talentRolledName: "",
-        Rolled12TalentOrTwoStatPoints: "",
-        Rolled12ChosenTalentDesc: "",
-        Rolled12ChosenTalentName: "",
+        talentRolledDesc: classLevelTalent.fields.talentRolledDesc || "",
+        talentRolledName: classLevelTalent.fields.talentRolledName || "",
+        Rolled12TalentOrTwoStatPoints: classLevelTalent.fields.Rolled12TalentOrTwoStatPoints || "",
+        Rolled12ChosenTalentDesc: classLevelTalent.fields.Rolled12ChosenTalentDesc || "",
+        Rolled12ChosenTalentName: classLevelTalent.fields.Rolled12ChosenTalentName || "",
         HitPointRoll: hpRoll,
         stoutHitPointRoll: stoutHP
       }],
       XP: 0,
       ambitionTalentLevel: {
-        level: 0,
+        level,
         talentRolledDesc: "",
         talentRolledName: "",
         Rolled12TalentOrTwoStatPoints: "",
@@ -269,7 +271,10 @@
       armorClass: 10,
       gearSlotsTotal: GEAR_SLOTS_TOTAL,
       gearSlotsUsed,
-      bonuses: window.app.getRaceBonuses?.(ancestry, state.raceTalent) || [],
+      bonuses: [
+        ...(window.app.getRaceBonuses?.(ancestry, state.raceTalent) || []),
+        ...(classLevelTalent.bonuses || [])
+      ],
       terraOesteChoices: [
         ...(window.app.getRaceChoiceMetadata?.(ancestry, state.raceTalent) || []),
         ...(window.app.getClassChoiceMetadata?.(cls, state.classTalent) || [])
@@ -310,6 +315,7 @@
       raca: state.race || "",
       talentoRacial: state.raceTalent || null,
       talentoClasse: state.classTalent || null,
+      talentoClasseNivel1: state.classLevelTalent ? { ...state.classLevelTalent } : null,
       classe: state.cls || "",
       maestria: state.maestria ? state.maestria.nome : null,
       origem: state.origem ? state.origem.titulo : null,
@@ -448,7 +454,8 @@
       CHA: a["Carisma"]?.valor ?? 0
     };
     const languagesStr = Array.isArray(src?.linguas) ? src.linguas.join(", ") : "";
-    const level = 0;
+    const classLevelTalent = window.app.getClassLevelTalent?.(src?.classe, src?.talentoClasseNivel1) || { level: 0, bonuses: [], fields: {} };
+    const level = classLevelTalent.level;
     const gear = Array.isArray(src?.itens) ? src.itens : [];
     const shopLedger = Array.isArray(src?.compras) ? src.compras : [];
     const gearSlotsUsed = gear.reduce((sum, g) => sum + (g.slots || 0), 0);
@@ -461,21 +468,21 @@
       stats: { ...stats },
       rolledStats: { ...stats },
       ancestry: src?.raca || "",
-      class: src?.classe || "",
+      class: window.app.getFoundryClassName?.(src?.classe) || src?.classe || "",
       level,
       levels: [{
         level,
-        talentRolledDesc: "",
-        talentRolledName: "",
-        Rolled12TalentOrTwoStatPoints: "",
-        Rolled12ChosenTalentDesc: "",
-        Rolled12ChosenTalentName: "",
+        talentRolledDesc: classLevelTalent.fields.talentRolledDesc || "",
+        talentRolledName: classLevelTalent.fields.talentRolledName || "",
+        Rolled12TalentOrTwoStatPoints: classLevelTalent.fields.Rolled12TalentOrTwoStatPoints || "",
+        Rolled12ChosenTalentDesc: classLevelTalent.fields.Rolled12ChosenTalentDesc || "",
+        Rolled12ChosenTalentName: classLevelTalent.fields.Rolled12ChosenTalentName || "",
         HitPointRoll: 0,
         stoutHitPointRoll: 0
       }],
       XP: 0,
       ambitionTalentLevel: {
-        level: 0,
+        level,
         talentRolledDesc: "",
         talentRolledName: "",
         Rolled12TalentOrTwoStatPoints: "",
@@ -492,7 +499,10 @@
       armorClass: 10,
       gearSlotsTotal: GEAR_SLOTS_TOTAL,
       gearSlotsUsed,
-      bonuses: window.app.getRaceBonuses?.(src?.raca, src?.talentoRacial) || [],
+      bonuses: [
+        ...(window.app.getRaceBonuses?.(src?.raca, src?.talentoRacial) || []),
+        ...(classLevelTalent.bonuses || [])
+      ],
       terraOesteChoices: [
         ...(window.app.getRaceChoiceMetadata?.(src?.raca, src?.talentoRacial) || []),
         ...(window.app.getClassChoiceMetadata?.(src?.classe, src?.talentoClasse) || [])
@@ -588,4 +598,5 @@
   window.app.renderLanguages = renderLanguages;
   window.app.finalizeCharacter = finalize;
 })();
+
 
