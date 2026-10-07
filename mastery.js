@@ -29,7 +29,7 @@
     "Espada bastarda",
     "Espada curta",
     "Espada grande",
-    "Espada longa",
+    "Espada Longa",
     "Funda",
     "Lança",
     "Lança (obsidiana)",
