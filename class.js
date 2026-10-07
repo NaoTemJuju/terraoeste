@@ -16,11 +16,63 @@
   const classInfoDescription = $("#classInfoDescription");
   const classInfoAbility = $("#classInfoAbility");
   const classTalentChoices = $("#classTalentChoices");
+  const classFeatureChoices = $("#classFeatureChoices");
   const classTalentTable = $("#classTalentTable");
   const classLevelTalent = $("#classLevelTalent");
   const classLevelTalentTable = $("#classLevelTalentTable");
   const btnContinueClassTalent = $("#btnContinueClassTalent");
   const STAT_CODES = { Força: "STR", Destreza: "DEX", Constituição: "CON", Inteligência: "INT", Sabedoria: "WIS", Carisma: "CHA" };
+  const FIGHTER_WEAPON_TYPES = [
+    { label: "Adaga", value: "Dagger" }, { label: "Arco curto", value: "Shortbow" },
+    { label: "Arco longo", value: "Longbow" }, { label: "Azagaia", value: "Javelin" },
+    { label: "Besta", value: "Crossbow" }, { label: "Boleadeira", value: "Bolas" },
+    { label: "Cajado", value: "Staff" }, { label: "Chicote", value: "Whip" },
+    { label: "Cimitarra", value: "Scimitar" }, { label: "Clava", value: "Club" },
+    { label: "Corrente laminada", value: "Razor chain" }, { label: "Espada bastarda", value: "Bastard sword" },
+    { label: "Espada curta", value: "Shortsword" }, { label: "Espada grande", value: "Greatsword" },
+    { label: "Espada longa", value: "Longsword" }, { label: "Funda", value: "Sling" },
+    { label: "Lança", value: "Spear" }, { label: "Maça", value: "Mace" },
+    { label: "Maça estrela", value: "Morning Star" }, { label: "Machadinha", value: "Handaxe" },
+    { label: "Machado grande", value: "Greataxe" }, { label: "Martelo de guerra", value: "Warhammer" },
+    { label: "Pique", value: "Pike" }, { label: "Propulsor", value: "Spear-thrower" },
+    { label: "Shuriken", value: "Shuriken" }, { label: "Zarabatana", value: "Blowgun" },
+    { label: "Bastão", value: "Stave" }
+  ];
+  const FIGHTER_CLASS_FEATURES = {
+    "Guerreiro": {
+      fixedDescription: "Carregador: some seu modificador de Constituição, se positivo, aos espaços de equipamento.",
+      choiceDescription: "Maestria em Armas: escolha um tipo de arma para receber +1 em ataques e dano, além de metade do seu nível (arredondada para baixo). Bravura: escolha Força ou Destreza para ter vantagem em testes dessa categoria usados para superar uma força oposta."
+    }
+  };
+  const FIGHTER_WEAPON_LABELS = Object.fromEntries(FIGHTER_WEAPON_TYPES.map(item => [item.value, item.label]));
+
+  function makeClassFeatureBonuses(cls, choices){
+    if (!["Guerreiro", "Fighter"].includes(cls) || !choices) return [];
+    const weapon = FIGHTER_WEAPON_TYPES.find(item => item.value === choices.weaponMastery);
+    const grit = choices.grit;
+    const sourceName = "Fighter";
+    const bonuses = [];
+    if (weapon) bonuses.push({
+      sourceType: "Class", sourceName, sourceCategory: "Ability", name: "WeaponMastery",
+      bonusName: "Plus1AttackAndDamagePlusHalfLevel", bonusTo: weapon.value, gainedAtLevel: 1
+    });
+    if (grit === "Strength" || grit === "Dexterity") bonuses.push({
+      sourceType: "Class", sourceName, sourceCategory: "Ability", name: "Grit",
+      bonusName: grit, bonusTo: "AdvantageOnStatChecks", gainedAtLevel: 1
+    });
+    return bonuses;
+  }
+  window.app.getClassFeatureBonuses = makeClassFeatureBonuses;
+  window.app.getClassFeatureDisplay = (cls, choices) => {
+    if (!["Guerreiro", "Fighter"].includes(cls) || !choices) return "";
+    const weapon = FIGHTER_WEAPON_LABELS[choices.weaponMastery];
+    const grit = choices.grit === "Strength" ? "Força" : choices.grit === "Dexterity" ? "Destreza" : "";
+    return [weapon ? `Maestria em Armas: ${weapon}` : "", grit ? `Bravura: ${grit}` : ""].filter(Boolean).join("; ");
+  };
+  window.app.randomClassFeatureChoices = cls => cls === "Guerreiro" ? {
+    weaponMastery: FIGHTER_WEAPON_TYPES[randInt(0, FIGHTER_WEAPON_TYPES.length - 1)].value,
+    grit: randInt(0, 1) ? "Strength" : "Dexterity"
+  } : null;
 
   // Descrições da tradução PT-BR do compêndio de classes do Foundry.
   // Só associa classes do site com equivalentes claros no compêndio.
@@ -299,6 +351,35 @@
     if (classInfoAbility) classInfoAbility.textContent = talents.length
       ? (hasClassTalentChoice(cls) ? "Escolha um dos talentos da classe:" : talents.map(t => `${t.name}: ${t.description || ""}`).join("; "))
       : "Nenhuma habilidade da classe cadastrada.";
+    const featureConfig = FIGHTER_CLASS_FEATURES[cls] || (cls === "Fighter" ? FIGHTER_CLASS_FEATURES.Guerreiro : null);
+    if (classInfoAbility && featureConfig) classInfoAbility.textContent = `${featureConfig.fixedDescription} ${featureConfig.choiceDescription}`;
+    if (classFeatureChoices) {
+      classFeatureChoices.replaceChildren();
+      classFeatureChoices.hidden = !featureConfig;
+      if (featureConfig) {
+        const makeFeatureSelect = (title, description, options, value, onChange) => {
+          const wrap = document.createElement("label");
+          wrap.className = "class-feature-choice";
+          const heading = document.createElement("strong"); heading.textContent = title;
+          const detail = document.createElement("small"); detail.textContent = description;
+          const select = document.createElement("select");
+          select.append(new Option("Escolha uma opção", ""));
+          options.forEach(option => select.append(new Option(option.label, option.value)));
+          select.value = value || "";
+          select.addEventListener("change", () => { onChange(select.value); updateConfirmButton(); });
+          wrap.append(heading, detail, select);
+          return wrap;
+        };
+        pending.classFeatureChoices = pending.classFeatureChoices || {};
+        classFeatureChoices.append(
+          makeFeatureSelect("Maestria em Armas", "Escolha um tipo de arma.", FIGHTER_WEAPON_TYPES, pending.classFeatureChoices.weaponMastery,
+            value => { pending.classFeatureChoices.weaponMastery = value; }),
+          makeFeatureSelect("Bravura", "Escolha Força ou Destreza.", [
+            { label: "Força", value: "Strength" }, { label: "Destreza", value: "Dexterity" }
+          ], pending.classFeatureChoices.grit, value => { pending.classFeatureChoices.grit = value; })
+        );
+      }
+    }
     if (classTalentChoices) {
       classTalentChoices.replaceChildren();
       classTalentChoices.hidden = !hasClassTalentChoice(cls);
@@ -326,7 +407,13 @@
     const complete = count > 0 && Array.isArray(pending.classLevelTalents) && pending.classLevelTalents.length >= count && pending.classLevelTalents.slice(0, count).every(Boolean) && !pending.classLevelTalentDraft;
     if (btnContinueClassTalent) btnContinueClassTalent.disabled = !complete;
   }
-  function updateConfirmButton(){ if (btnConfirmClass) btnConfirmClass.disabled = !pending.cls || (hasClassTalentChoice(pending.cls) && !talentOptions(pending.cls).some(t => t.id === pending.classTalent)); }
+  function updateConfirmButton(){
+    if (!btnConfirmClass) return;
+    const missingTalentChoice = hasClassTalentChoice(pending.cls) && !talentOptions(pending.cls).some(t => t.id === pending.classTalent);
+    const featureChoices = pending.classFeatureChoices || {};
+    const missingCoreFeatureChoice = pending.cls === "Guerreiro" && (!featureChoices.weaponMastery || !featureChoices.grit);
+    btnConfirmClass.disabled = !pending.cls || missingTalentChoice || missingCoreFeatureChoice;
+  }
 
   function goToClassLevelTalent(){
     const cls = state.cls;
@@ -450,6 +537,7 @@
       pending.cls = c;
       pending.classLevelTalents = [];
       pending.classLevelTalentDraft = null;
+      pending.classFeatureChoices = window.app.randomClassFeatureChoices?.(c) || null;
       pending.classTalent = hasClassTalentChoice(c) ? null : (talentOptions(c).length === 1 ? talentOptions(c)[0].id : null);
       updateClassInfo(c);
       updateConfirmButton();
@@ -462,6 +550,7 @@
       pending.cls = val || null;
       pending.classLevelTalents = [];
       pending.classLevelTalentDraft = null;
+      pending.classFeatureChoices = null;
       const talents = talentOptions(pending.cls);
       pending.classTalent = hasClassTalentChoice(pending.cls) ? null : (talents.length === 1 ? talents[0].id : null);
       updateClassInfo(pending.cls);
@@ -474,6 +563,7 @@
       if (!pending.cls || (hasClassTalentChoice(pending.cls) && !talentOptions(pending.cls).some(t => t.id === pending.classTalent))) return;
       state.cls = pending.cls;
       state.classTalent = pending.classTalent;
+      state.classFeatures = pending.classFeatureChoices ? { ...pending.classFeatureChoices } : null;
       state.classLevelTalent = null;
       state.origem = null;
       if (classSel) classSel.disabled = true;

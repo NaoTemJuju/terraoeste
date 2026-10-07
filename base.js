@@ -204,6 +204,7 @@
           <div><strong>Classe</strong><br>${result.classe || "—"}</div>
           ${classLevelTalentName ? `<div><strong>Talento de classe (nível 1)</strong><br>${escapeHTML(classLevelTalentName)}</div>` : ""}
           ${result.maestria ? `<div><strong>Maestria em Arma</strong><br>${escapeHTML(result.maestria)}</div>` : ""}
+          ${result.habilidadesClasse ? `<div><strong>Habilidades de classe</strong><br>${escapeHTML(result.habilidadesClasse)}</div>` : ""}
           <div><strong>Origem</strong><br>${result.origem || "—"}</div>
           <div><strong>Alinhamento</strong><br>${result.alinhamento || "—"}</div>
           <div><strong>Divindade</strong><br>${result.divindade || "—"}</div>
@@ -456,6 +457,7 @@
       const cls = classKeys[randInt(0, classKeys.length - 1)];
       state.cls = cls;
       state.classTalent = window.app.randomClassTalent?.(cls) || null;
+      state.classFeatures = window.app.randomClassFeatureChoices?.(cls) || null;
       // Seleciona uma origem aleatória da classe
       const origens = window.getOriginsForClass?.(cls) || (window.ORIGENS_POR_CLASSE?.[cls] || []);
       if (origens.length > 0){
@@ -560,10 +562,17 @@
       let linguas = obj.languages;
       if (typeof linguas === "string") linguas = linguas.split(",").map(s=>s.trim()).filter(Boolean);
       if (!Array.isArray(linguas)) linguas = [];
+      const classFeatureBonuses = Array.isArray(obj.bonuses) ? obj.bonuses : [];
+      const fighterOptions = obj.opcoesClasse || obj.terraOesteClassOptions || {
+        weaponMastery: classFeatureBonuses.find(bonus => bonus.bonusName === "Plus1AttackAndDamagePlusHalfLevel")?.bonusTo || "",
+        grit: classFeatureBonuses.find(bonus => bonus.bonusTo === "AdvantageOnStatChecks" && ["Strength", "Dexterity"].includes(bonus.bonusName))?.bonusName || ""
+      };
       return {
         nome: obj.name || "—",
         raca: obj.ancestry || "—",
         classe: obj.class || "—",
+        opcoesClasse: fighterOptions,
+        habilidadesClasse: window.app?.getClassFeatureDisplay?.(obj.class, fighterOptions) || "",
         talentoClasseNivel1: Array.isArray(obj.terraOesteClassTalents) && obj.terraOesteClassTalents.length ? obj.terraOesteClassTalents : Array.isArray(obj.levels) && obj.levels[0]?.talentRolledName ? [{
           talentRolledName: obj.levels[0].talentRolledName,
           talentRolledDesc: obj.levels[0].talentRolledDesc,
@@ -597,6 +606,7 @@
     classTalent:null,
     classLevelTalent:null,
     cls:null,
+    classFeatures:null,
     origem:null,
     maestria:null,
     hp:null,
@@ -608,7 +618,7 @@
     hpBaseRoll:null
   };
 
-  const pending = { race:null, raceTalent:null, cls:null, classTalent:null, classLevelTalents:[], classLevelTalentDraft:null, classLevelTalentRollCount:1 };
+  const pending = { race:null, raceTalent:null, cls:null, classTalent:null, classFeatureChoices:null, classLevelTalents:[], classLevelTalentDraft:null, classLevelTalentRollCount:1 };
   let attrsLocked = false;
   let __loadedRawObj = null;
 
@@ -706,6 +716,7 @@
         gearSlotsUsed,
         bonuses: [
           ...(window.app.getRaceBonuses?.(obj?.raca, obj?.talentoRacial) || []),
+          ...(window.app.getClassFeatureBonuses?.(obj?.classe, obj?.opcoesClasse || obj?.terraOesteClassOptions) || []),
           ...(classLevelTalent.bonuses || [])
         ],
         terraOesteChoices: [

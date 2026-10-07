@@ -213,6 +213,7 @@
     // Classes com tabela cadastrada exportam a ficha no nível 1 e incluem
     // o resultado escolhido da rolagem inicial.
     const classLevelTalent = window.app.getClassLevelTalent?.(cls, state.classLevelTalent) || { level: 0, bonuses: [], fields: {} };
+    const classFeatureBonuses = window.app.getClassFeatureBonuses?.(cls, state.classFeatures) || [];
     const level = classLevelTalent.level;
     const hpRoll  = Number.isFinite(state.hpBaseRoll) ? state.hpBaseRoll : 0;
     const stoutHP = 0;
@@ -227,8 +228,8 @@
     const copperFinal = state.copper ?? 0;
     const gearSlotsUsed = shopGear.reduce((sum, g) => sum + (g.slots || 0), 0);
 
-    // A Maestria em Arma é apenas informativa: aparece na ficha final
-    // do site, mas não gera bônus/efeito no .json exportado para o Foundry.
+    // A escolha antiga de maestria de Cavaleiro continua informativa.
+    // As escolhas nativas do Guerreiro são exportadas como bônus abaixo.
 
     // Objeto para import no Foundry (estrutura em EN)
     const exportObj = {
@@ -270,6 +271,7 @@
       gearSlotsUsed,
       bonuses: [
         ...(window.app.getRaceBonuses?.(ancestry, state.raceTalent) || []),
+        ...classFeatureBonuses,
         ...(classLevelTalent.bonuses || [])
       ],
       terraOesteChoices: [
@@ -314,6 +316,8 @@
       talentoClasse: state.classTalent || null,
       talentoClasseNivel1: Array.isArray(state.classLevelTalent) ? state.classLevelTalent.map(talent => ({ ...talent })) : state.classLevelTalent ? [{ ...state.classLevelTalent }] : null,
       classe: state.cls || "",
+      opcoesClasse: state.classFeatures ? { ...state.classFeatures } : null,
+      habilidadesClasse: window.app.getClassFeatureDisplay?.(state.cls, state.classFeatures) || "",
       maestria: state.maestria ? state.maestria.nome : null,
       origem: state.origem ? state.origem.titulo : null,
       origem_desc: state.origem ? state.origem.descricao : null,
@@ -452,6 +456,7 @@
     };
     const languagesStr = Array.isArray(src?.linguas) ? src.linguas.join(", ") : "";
     const classLevelTalent = window.app.getClassLevelTalent?.(src?.classe, src?.terraOesteClassTalents || src?.talentoClasseNivel1) || { level: 0, bonuses: [], talents: [], fields: {} };
+    const classFeatureBonuses = window.app.getClassFeatureBonuses?.(src?.classe, src?.opcoesClasse || src?.terraOesteClassOptions) || [];
     const level = classLevelTalent.level;
     const gear = Array.isArray(src?.itens) ? src.itens : [];
     const shopLedger = Array.isArray(src?.compras) ? src.compras : [];
@@ -499,6 +504,7 @@
       gearSlotsUsed,
       bonuses: [
         ...(window.app.getRaceBonuses?.(src?.raca, src?.talentoRacial) || []),
+        ...classFeatureBonuses,
         ...(classLevelTalent.bonuses || [])
       ],
       terraOesteChoices: [
