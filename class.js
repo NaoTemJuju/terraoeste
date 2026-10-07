@@ -556,7 +556,8 @@
     }
     if (classFeatureChoices) {
       classFeatureChoices.replaceChildren();
-      classFeatureChoices.hidden = !featureConfig;
+      const isMage = cls === "Mago";
+      classFeatureChoices.hidden = !featureConfig && !isMage;
       if (featureConfig) {
         const makeFeatureSelect = (title, description, options, value, onChange) => {
           const wrap = document.createElement("label");
@@ -579,6 +580,43 @@
             { label: "Força", value: "Strength" }, { label: "Destreza", value: "Dexterity" }
           ], pending.classFeatureChoices.grit, value => { pending.classFeatureChoices.grit = value; })
         );
+      } else if (isMage) {
+        pending.classFeatureChoices = pending.classFeatureChoices || {};
+        const selectedSpells = Array.isArray(pending.classFeatureChoices.mageSpells) ? pending.classFeatureChoices.mageSpells : [];
+        pending.classFeatureChoices.mageSpells = selectedSpells.slice(0, 3);
+        const heading = document.createElement("strong");
+        heading.textContent = "Magias conhecidas de 1º círculo (escolha 3)";
+        classFeatureChoices.append(heading);
+        const selects = [];
+        const refreshSpellOptions = () => {
+          const selected = pending.classFeatureChoices.mageSpells.filter(Boolean);
+          selects.forEach((select, index) => {
+            [...select.options].forEach(option => {
+              option.disabled = !!option.value && option.value !== select.value && selected.includes(option.value);
+            });
+            const wrap=select.closest("label");
+            if(wrap) wrap.querySelector("strong").textContent = `Magia ${index + 1}`;
+          });
+        };
+        for (let index = 0; index < 3; index++) {
+          const wrap = document.createElement("label");
+          wrap.className = "class-feature-choice";
+          const label = document.createElement("strong");
+          label.textContent = `Magia ${index + 1}`;
+          const select = document.createElement("select");
+          select.append(new Option("Escolha uma magia", ""));
+          MAGE_SPELLS.forEach(spell => select.append(new Option(spell.label, spell.value)));
+          select.value = pending.classFeatureChoices.mageSpells[index] || "";
+          select.addEventListener("change", () => {
+            pending.classFeatureChoices.mageSpells[index] = select.value;
+            refreshSpellOptions();
+            updateConfirmButton();
+          });
+          wrap.append(label,select);
+          classFeatureChoices.append(wrap);
+          selects.push(select);
+        }
+        refreshSpellOptions();
       }
     }
     if (classTalentChoices) {
@@ -613,7 +651,9 @@
     const missingTalentChoice = hasClassTalentChoice(pending.cls) && !talentOptions(pending.cls).some(t => t.id === pending.classTalent);
     const featureChoices = pending.classFeatureChoices || {};
     const missingCoreFeatureChoice = pending.cls === "Guerreiro" && (!featureChoices.weaponMastery || !featureChoices.grit);
-    btnConfirmClass.disabled = !pending.cls || missingTalentChoice || missingCoreFeatureChoice;
+    const mageSpells = Array.isArray(featureChoices.mageSpells) ? featureChoices.mageSpells.filter(Boolean) : [];
+    const missingMageSpells = pending.cls === "Mago" && (mageSpells.length !== 3 || new Set(mageSpells).size !== 3);
+    btnConfirmClass.disabled = !pending.cls || missingTalentChoice || missingCoreFeatureChoice || missingMageSpells;
   }
 
   function goToClassLevelTalent(){
