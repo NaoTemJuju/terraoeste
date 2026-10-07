@@ -10,6 +10,25 @@
 (function(){
   const { state, $, el } = window.app;
   const GEAR_SLOTS_TOTAL = Number(window.app.GEAR_SLOTS_TOTAL) || 10;
+  const MAGE_SPELL_LABELS = {
+    "alarm": "Alarme",
+    "mage armor": "Armadura Arcana",
+    "arcane armor": "Armadura Arcana",
+    "detect magic": "Detectar Magia",
+    "floating disk": "Disco Flutuante",
+    "charm person": "Encantar Pessoa",
+    "light": "Luz",
+    "burning hands": "Mãos Flamejantes",
+    "magic missile": "Míssil Mágico",
+    "hold portal": "Obstruir Porta",
+    "protection from evil": "Proteção contra o Mal",
+    "feather fall": "Queda Suave",
+    "sleep": "Sono"
+  };
+  const normalizeMageSpellName = spell =>
+    String(spell || "").trim().toLowerCase() === "arcane armor" ? "Mage Armor" : String(spell || "").trim();
+  const localizedMageSpellName = spell =>
+    MAGE_SPELL_LABELS[String(spell || "").trim().toLowerCase()] || String(spell || "").trim();
 
   // =====================
   // Navegar para Línguas
@@ -214,14 +233,14 @@
     // o resultado escolhido da rolagem inicial.
     const classLevelTalent = window.app.getClassLevelTalent?.(cls, state.classLevelTalent) || { level: 1, bonuses: [], fields: {} };
     const mageExtraSpells = cls === "Mago" ? (classLevelTalent.talents || []).filter(talent => talent.bonusName === "PickExtraSpell").map(talent => talent.bonusTo).filter(Boolean) : [];
-    const mageSpellsKnown = cls === "Mago" ? [...new Set([...(state.classFeatures?.mageSpells || []), ...mageExtraSpells].map(spell => String(spell).toLowerCase() === "arcane armor" ? "Mage Armor" : spell))] : [];
-    const spellsKnown = mageSpellsKnown.join(", ") || "None";
+    const mageSpellsKnown = cls === "Mago" ? [...new Set([...(state.classFeatures?.mageSpells || []), ...mageExtraSpells].map(normalizeMageSpellName))] : [];
+    const spellsKnown = mageSpellsKnown.map(localizedMageSpellName).join(", ") || "None";
     const mageSpellBonuses = cls === "Mago" ? mageSpellsKnown.map((spell, index) => ({
       sourceType: "Class",
-      sourceName: "Wizard",
+      sourceName: "Mago",
       sourceCategory: "Ability",
-      name: `Spell: Wizard, Tier 1, Spell ${index + 1}`,
-      bonusName: spell,
+      name: `Spell: Mago, Tier 1, Spell ${index + 1}`,
+      bonusName: localizedMageSpellName(spell),
       bonusTo: `Tier:1, Spell:${index + 1}`,
       gainedAtLevel: 1
     })) : [];
@@ -471,14 +490,14 @@
     const languagesStr = Array.isArray(src?.linguas) ? src.linguas.join(", ") : "";
     const classLevelTalent = window.app.getClassLevelTalent?.(src?.classe, src?.terraOesteClassTalents || src?.talentoClasseNivel1) || { level: 0, bonuses: [], talents: [], fields: {} };
     const mageExtraSpells = src?.classe === "Mago" ? (classLevelTalent.talents || []).filter(talent => talent.bonusName === "PickExtraSpell").map(talent => talent.bonusTo).filter(Boolean) : [];
-    const mageSpellsKnown = src?.classe === "Mago" ? [...new Set([...(src?.opcoesClasse?.mageSpells || src?.terraOesteClassOptions?.mageSpells || []), ...mageExtraSpells].map(spell => String(spell).toLowerCase() === "arcane armor" ? "Mage Armor" : spell))] : [];
-    const spellsKnown = mageSpellsKnown.join(", ") || "None";
+    const mageSpellsKnown = src?.classe === "Mago" ? [...new Set([...(src?.opcoesClasse?.mageSpells || src?.terraOesteClassOptions?.mageSpells || []), ...mageExtraSpells].map(normalizeMageSpellName))] : [];
+    const spellsKnown = mageSpellsKnown.map(localizedMageSpellName).join(", ") || "None";
     const mageSpellBonuses = src?.classe === "Mago" ? mageSpellsKnown.map((spell, index) => ({
       sourceType: "Class",
-      sourceName: "Wizard",
+      sourceName: "Mago",
       sourceCategory: "Ability",
-      name: `Spell: Wizard, Tier 1, Spell ${index + 1}`,
-      bonusName: spell,
+      name: `Spell: Mago, Tier 1, Spell ${index + 1}`,
+      bonusName: localizedMageSpellName(spell),
       bonusTo: `Tier:1, Spell:${index + 1}`,
       gainedAtLevel: 1
     })) : [];
