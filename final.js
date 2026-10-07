@@ -214,7 +214,7 @@
     // o resultado escolhido da rolagem inicial.
     const classLevelTalent = window.app.getClassLevelTalent?.(cls, state.classLevelTalent) || { level: 1, bonuses: [], fields: {} };
     const mageExtraSpells = cls === "Mago" ? (classLevelTalent.talents || []).filter(talent => talent.bonusName === "PickExtraSpell").map(talent => talent.bonusTo).filter(Boolean) : [];
-    const mageSpellsKnown = cls === "Mago" ? [...new Set([...(state.classFeatures?.mageSpells || []), ...mageExtraSpells])] : [];
+    const mageSpellsKnown = cls === "Mago" ? [...new Set([...(state.classFeatures?.mageSpells || []), ...mageExtraSpells].map(spell => String(spell).toLowerCase() === "arcane armor" ? "Mage Armor" : spell))] : [];
     const spellsKnown = mageSpellsKnown.join(", ") || "None";
     const mageSpellBonuses = cls === "Mago" ? mageSpellsKnown.map((spell, index) => ({
       sourceType: "Class",
@@ -471,7 +471,7 @@
     const languagesStr = Array.isArray(src?.linguas) ? src.linguas.join(", ") : "";
     const classLevelTalent = window.app.getClassLevelTalent?.(src?.classe, src?.terraOesteClassTalents || src?.talentoClasseNivel1) || { level: 0, bonuses: [], talents: [], fields: {} };
     const mageExtraSpells = src?.classe === "Mago" ? (classLevelTalent.talents || []).filter(talent => talent.bonusName === "PickExtraSpell").map(talent => talent.bonusTo).filter(Boolean) : [];
-    const mageSpellsKnown = src?.classe === "Mago" ? [...new Set([...(src?.opcoesClasse?.mageSpells || src?.terraOesteClassOptions?.mageSpells || []), ...mageExtraSpells])] : [];
+    const mageSpellsKnown = src?.classe === "Mago" ? [...new Set([...(src?.opcoesClasse?.mageSpells || src?.terraOesteClassOptions?.mageSpells || []), ...mageExtraSpells].map(spell => String(spell).toLowerCase() === "arcane armor" ? "Mage Armor" : spell))] : [];
     const spellsKnown = mageSpellsKnown.join(", ") || "None";
     const mageSpellBonuses = src?.classe === "Mago" ? mageSpellsKnown.map((spell, index) => ({
       sourceType: "Class",
