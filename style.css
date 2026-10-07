@@ -584,8 +584,16 @@ button.primary:active:not(:disabled){background:linear-gradient(#7c2624,#5c1c1a)
   padding:10px 14px; background:rgba(255,255,255,.35);
 }
 .shop-item-info{display:flex; flex-direction:column; gap:2px; min-width:0}
+.shop-item-heading{display:flex; align-items:center; gap:8px}
 .shop-item-name{font-weight:700}
 .shop-item-meta{font-size:14px}
+.shop-item-info-button{
+  width:22px; height:22px; min-width:22px; padding:0; border-radius:50%;
+  font-size:13px; font-weight:700; line-height:1;
+}
+.shop-kit-details{margin-top:5px; font-size:14px}
+.shop-kit-details[hidden]{display:none}
+.shop-kit-details ul{margin:2px 0 0; padding-left:20px}
 .shop-item-controls{display:flex; align-items:center; gap:10px; flex-shrink:0}
 .shop-item-controls button{
   padding:6px 14px; min-width:0; border-radius:999px; font-size:16px; line-height:1;

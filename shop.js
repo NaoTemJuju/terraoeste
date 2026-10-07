@@ -19,6 +19,16 @@
   const TYPE_LABELS = { weapon: "Armas", armor: "Armaduras", sundry: "Diversos", potion: "Poções" };
   const TYPE_ORDER = ["weapon","armor","sundry","potion"];
   const CURRENCY_LABEL = { gp: "PO", sp: "PP", cp: "PC" };
+  const EXPLORATION_KIT_ID = "sundry-crawling-kit";
+  const EXPLORATION_KIT_CONTENTS = [
+    { id: "sundry-backpack", label: "Mochila", quantity: 1, slots: 0, cost: 2, currency: "gp" },
+    { id: "sundry-flint-and-steel", label: "Pederneira", quantity: 1, slots: 1, cost: 5, currency: "sp" },
+    { id: "sundry-torch", label: "Tochas", quantity: 2, slots: 2, cost: 1, currency: "gp" },
+    { id: "sundry-rations", label: "Rações", quantity: 3, slots: 1, cost: 5, currency: "sp" },
+    { id: "sundry-iron-spikes", label: "Cravos de ferro", quantity: 10, slots: 1, cost: 1, currency: "gp" },
+    { id: "sundry-grappling-hook", label: "Arpéu", quantity: 1, slots: 1, cost: 1, currency: "gp" },
+    { id: "sundry-rope-60", label: "Corda (18 m)", quantity: 1, slots: 1, cost: 1, currency: "gp" }
+  ];
 
   let catalog = [];          // itens carregados de /api/gear
   let cart = {};             // { itemId: quantidade }
@@ -147,7 +157,36 @@
       const row = el("div", { class: "shop-item" });
 
       const info = el("div", { class: "shop-item-info" });
-      info.append(el("div", { class: "shop-item-name" }, item.name));
+      const heading = el("div", { class: "shop-item-heading" });
+      heading.append(el("div", { class: "shop-item-name" }, item.name));
+      if (item.id === EXPLORATION_KIT_ID){
+        const details = el("div", { class: "shop-kit-details", id: "shopKitDetails", hidden: true });
+        const list = document.createElement("ul");
+        EXPLORATION_KIT_CONTENTS.forEach(component => {
+          const li = document.createElement("li");
+          li.textContent = `${component.label} ×${component.quantity}`;
+          list.append(li);
+        });
+        details.append(el("div", { class: "muted" }, "O kit inclui:"), list);
+
+        const infoButton = document.createElement("button");
+        infoButton.type = "button";
+        infoButton.className = "shop-item-info-button ghost";
+        infoButton.textContent = "i";
+        infoButton.title = "Ver o que vem no kit";
+        infoButton.setAttribute("aria-label", "Ver o que vem no Kit de Exploração");
+        infoButton.setAttribute("aria-expanded", "false");
+        infoButton.setAttribute("aria-controls", "shopKitDetails");
+        infoButton.addEventListener("click", () => {
+          const expanded = infoButton.getAttribute("aria-expanded") === "true";
+          infoButton.setAttribute("aria-expanded", String(!expanded));
+          details.hidden = expanded;
+        });
+        heading.append(infoButton);
+        info.append(heading, details);
+      } else {
+        info.append(heading);
+      }
       const metaBits = [formatItemCost(item)];
       metaBits.push(item.slots === 0 ? "sem peso" : `${item.slots} espaço${item.slots > 1 ? "s" : ""}`);
       info.append(el("div", { class: "shop-item-meta muted" }, metaBits.join(" · ")));
@@ -225,16 +264,47 @@
   function buildGearFromCart(){
     const gear = [];
     const ledger = [];
+    const makeInstanceId = () => (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function")
+      ? crypto.randomUUID().slice(0, 8)
+      : Math.random().toString(36).slice(2, 10);
     catalog.forEach(item => {
       const qty = cart[item.id] || 0;
       if (qty <= 0) return;
+
+      if (item.id === EXPLORATION_KIT_ID){
+        EXPLORATION_KIT_CONTENTS.forEach(component => {
+          const catalogItem = catalog.find(entry => entry.id === component.id);
+          const units = component.quantity * qty;
+          gear.push({
+            instanceId: makeInstanceId(),
+            gearId: component.id,
+            name: catalogItem?.name || component.label,
+            type: catalogItem?.type || "sundry",
+            quantity: units,
+            totalUnits: units,
+            slots: component.slots * qty,
+            cost: component.cost * qty,
+            currency: component.currency
+          });
+        });
+
+        const totalCost = item.cost * qty;
+        const change = { goldChange: 0, silverChange: 0, copperChange: 0 };
+        if (item.currency === "gp") change.goldChange = -totalCost;
+        else if (item.currency === "sp") change.silverChange = -totalCost;
+        else change.copperChange = -totalCost;
+        ledger.push({
+          ...change,
+          desc: `Compra: ${item.name}${qty > 1 ? ` (x${qty})` : ""}`,
+          notes: "Kit de Exploração com os componentes discriminados no inventário."
+        });
+        return;
+      }
+
       const totalCost = item.cost * qty;
       const totalSlots = item.slots * qty;
-      const instanceId = (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function")
-        ? crypto.randomUUID().slice(0, 8)
-        : Math.random().toString(36).slice(2, 10);
       gear.push({
-        instanceId,
+        instanceId: makeInstanceId(),
         gearId: item.id,
         name: item.name,
         type: item.type === "weapon" ? "weapon" : (item.type === "armor" ? "armor" : (item.type === "potion" ? "potion" : "sundry")),
