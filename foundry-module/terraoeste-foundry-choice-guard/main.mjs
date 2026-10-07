@@ -172,8 +172,46 @@ async function applyWeaponMasteryChoice(importer, json) {
   return true;
 }
 
+function isClassTalentTable(document) {
+  const names = [
+    document?.name,
+    document?.flags?.babele?.originalName,
+    document?._source?.name,
+    document?._source?.flags?.babele?.originalName
+  ].filter(value => typeof value === "string");
+  return names.some(name =>
+    /class\\s+talents/i.test(name) || /talentos?\\s+de\\s+classe/i.test(name)
+  );
+}
+
+function installLocalizedClassTalentTables() {
+  const compendiums = globalThis.shadowdark?.compendiums;
+  if (!compendiums?.classTalentTables || !compendiums?._documents || !compendiums?._collectionFromArray) {
+    console.warn(`${MODULE_ID}: seletor de tabelas do Shadowdark não encontrado.`);
+    return;
+  }
+  if (compendiums.__terraOesteLocalizedClassTalentTables) return;
+
+  const original = compendiums.classTalentTables;
+  compendiums.classTalentTables = async function(filterSources = true) {
+    const [current, allRollTables] = await Promise.all([
+      original.call(this, filterSources),
+      this._documents("RollTable", null, filterSources)
+    ]);
+    const tables = new Map();
+    for (const table of current ?? []) tables.set(table._id, table);
+    for (const table of allRollTables ?? []) {
+      if (isClassTalentTable(table)) tables.set(table._id, table);
+    }
+    return this._collectionFromArray([...tables.values()]);
+  };
+  compendiums.__terraOesteLocalizedClassTalentTables = true;
+}
+
 Hooks.once("ready", () => {
   if (game.system.id !== "shadowdark") return;
+  installLocalizedClassTalentTables();
+
   const Importer = globalThis.shadowdark?.apps?.ShadowdarklingImporterSD;
   if (!Importer?.prototype?._importActor) {
     console.warn(`${MODULE_ID}: importador Shadowdark não encontrado.`);
@@ -207,4 +245,3 @@ Hooks.once("ready", () => {
   };
   prototype.__terraOesteChoiceGuard = true;
 });
-
