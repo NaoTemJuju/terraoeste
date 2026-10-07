@@ -164,6 +164,7 @@ async function applyWeaponMasteryChoice(importer, json) {
 
   for (const { bonus, weapon } of uniqueSelections) {
     const talent = sourceTalent.toObject();
+    talent._id = globalThis.foundry?.utils?.randomID?.() || `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
     const attackType = await weaponAttackType(weapon);
     if (!setWeaponMasteryEffect(talent, weapon, attackType)) {
       console.warn(`${MODULE_ID}: não foi possível adaptar Maestria em Armas para ${weapon}.`);
