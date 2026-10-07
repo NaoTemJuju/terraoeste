@@ -24,8 +24,8 @@
     { id: "sundry-backpack", label: "Mochila", quantity: 1, slots: 0, cost: 2, currency: "gp" },
     { id: "sundry-flint-and-steel", label: "Pederneira", quantity: 1, slots: 1, cost: 5, currency: "sp" },
     { id: "sundry-torch", label: "Tochas", quantity: 2, slots: 2, cost: 1, currency: "gp" },
-    { id: "sundry-rations", label: "Rações", quantity: 3, slots: 1, cost: 5, currency: "sp" },
-    { id: "sundry-iron-spikes", label: "Cravos de ferro", quantity: 10, slots: 1, cost: 1, currency: "gp" },
+    { id: "sundry-rations", label: "Rações", quantity: 3, inventoryQuantity: 1, slots: 1, cost: 5, currency: "sp" },
+    { id: "sundry-iron-spikes", label: "Cravos de ferro", quantity: 10, inventoryQuantity: 1, slots: 1, cost: 1, currency: "gp" },
     { id: "sundry-grappling-hook", label: "Arpéu", quantity: 1, slots: 1, cost: 1, currency: "gp" },
     { id: "sundry-rope-60", label: "Corda (18 m)", quantity: 1, slots: 1, cost: 1, currency: "gp" }
   ];
@@ -274,7 +274,7 @@
       if (item.id === EXPLORATION_KIT_ID){
         EXPLORATION_KIT_CONTENTS.forEach(component => {
           const catalogItem = catalog.find(entry => entry.id === component.id);
-          const units = component.quantity * qty;
+          const units = (component.inventoryQuantity ?? component.quantity) * qty;
           gear.push({
             instanceId: makeInstanceId(),
             gearId: component.id,
