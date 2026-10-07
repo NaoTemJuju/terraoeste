@@ -22,7 +22,7 @@
     "Bumerangue",
     "Cajado",
     "Chicote",
-    "Chicote de Laminas",
+    "Chicote de Lâminas",
     "Cimitarra",
     "Clava",
     "Clava (Obsidiana)",
