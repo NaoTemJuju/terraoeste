@@ -174,6 +174,33 @@
     }[m]));
   }
 
+  function showToast(message, duration = 2800){
+    let container = document.querySelector(".toast-container");
+    if (!container) {
+      container = document.createElement("div");
+      container.className = "toast-container";
+      container.setAttribute("aria-live", "polite");
+      container.setAttribute("aria-atomic", "false");
+      container.style.cssText = "position:fixed;top:20px;right:20px;z-index:10000;display:grid;gap:10px;pointer-events:none;";
+      document.body.append(container);
+    }
+
+    const toast = document.createElement("div");
+    toast.textContent = message;
+    toast.style.cssText = "max-width:min(360px,calc(100vw - 40px));padding:12px 16px;border:1px solid #c59a4a;border-radius:10px;background:rgba(42,36,31,.96);color:#f6eedc;box-shadow:0 6px 18px rgba(30,20,10,.28);font:600 15px/1.4 Montserrat,Arial,sans-serif;opacity:0;transform:translateY(-8px);transition:opacity .18s ease,transform .18s ease;";
+    container.append(toast);
+    requestAnimationFrame(() => { toast.style.opacity = "1"; toast.style.transform = "translateY(0)"; });
+
+    window.setTimeout(() => {
+      toast.style.opacity = "0";
+      toast.style.transform = "translateY(-8px)";
+      window.setTimeout(() => {
+        toast.remove();
+        if (!container.childElementCount) container.remove();
+      }, 220);
+    }, duration);
+  }
+
   function renderFinal(result, container) {
     const attrsRows = ATTRS.map(a => {
       const o = result.atributos[a];
@@ -787,7 +814,9 @@
 
     const btnCopyLoaded = $("#btnCopyLoaded");
     if (btnCopyLoaded) btnCopyLoaded.addEventListener("click", () => {
-      navigator.clipboard.writeText(location.href).then(() => alert("Link copiado!"));
+      navigator.clipboard.writeText(location.href)
+        .then(() => window.app?.showToast("Link copiado!"))
+        .catch(() => prompt("Copie o link:", location.href));
     });
 
     const btnCopyLoadedJSON = $("#btnCopyLoadedJSON");
@@ -802,7 +831,7 @@
       if (!exportObj){ alert("Nenhum JSON carregado."); return; }
       const pretty = JSON.stringify(exportObj, null, 2);
       navigator.clipboard.writeText(pretty).then(() => {
-        alert(".json copiado!");
+        window.app?.showToast("JSON copiado!");
       }).catch(() => {
         prompt("Copie o JSON:", pretty);
       });
@@ -1004,6 +1033,7 @@
     prettyMod,
     escapeHTML,
     renderFinal,
+    showToast,
     hideCreationUI,
     normalizeForView,
     alignmentToEN,
