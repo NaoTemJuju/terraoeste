@@ -1,7 +1,7 @@
 /*
  * Módulo da Lojinha
  *
- * Etapa que ocorre após os Atributos e antes do Nome. Permite ao
+ * Etapa que ocorre após as rolagens de Ouro e antes do Nome. Permite ao
  * jogador gastar (ou não) o ouro inicial rolado na etapa de Ouro,
  * comprando itens de um catálogo carregado do backend (/api/gear).
  * Esse catálogo é o mesmo que o Mestre pode editar na aba "Loja" do
@@ -331,3 +331,4 @@
 
   window.app.goToShop = goToShop;
 })();
+

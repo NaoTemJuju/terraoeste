@@ -1,11 +1,10 @@
 /*
  * Módulo de Vida (Pontos de Vida)
  *
- * Lida com a rolagem de pontos de vida iniciais do personagem. O
- * cálculo considera o dado de vida da classe e o modificador de
- * Constituição. Anões possuem vantagem (duas rolagens e escolhe o
- * melhor). Após gerar os PV, exibe o resultado e habilita a etapa
- * seguinte (ouro).
+ * Lida com a rolagem de pontos de vida iniciais do personagem. Como
+ * esta etapa ocorre depois dos atributos, o cálculo já considera o
+ * modificador de Constituição. Anões recebem +2 PV. Após gerar os PV,
+ * exibe o resultado e habilita a etapa seguinte (ouro).
  */
 (function(){
   const { CLASS_DICE, ATTRS, state, roll, $ } = window.app;
@@ -49,10 +48,8 @@
           const bonusStr = bonus === 0 ? "" : ` + MOD CON ${bonusFmt}`;
 
           state.hpBaseRoll = base;
-          // Guarda o "detalhe puro" do dado (sem o bônus de CON), pois neste
-          // momento os Atributos ainda não foram rolados/alocados. O bônus
-          // de CON será somado depois, na etapa de Atributos, e o texto
-          // final (state.hpDetail) será reconstruído lá.
+          // Guarda também o resultado base para permitir que a etapa de
+          // atributos reconstrua o total caso o fluxo seja retomado.
           state.hpDiceDetail = `${state.cls} d${sides} ${detail}`;
           state.hp = hp;
           state.hpDetail = `${state.hpDiceDetail}${bonusStr}`;
@@ -61,7 +58,7 @@
           const hpOut = $("#hpOut");
           if (hpOut) {
             hpOut.style.display = "";
-            hpOut.textContent = `PV: ${hp}  —  ${state.hpDetail}  (provisório; bônus de CON entra após os Atributos)`;
+            hpOut.textContent = `PV: ${hp}  —  ${state.hpDetail}`;
           }
 
           // Feedback visual
@@ -78,3 +75,4 @@
     });
   }
 })();
+

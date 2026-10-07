@@ -1,7 +1,7 @@
 /*
  * Módulo de Atributos
  *
- * Última etapa antes do Nome. O jogador rola 3d6 seis vezes (formando
+ * Etapa após as escolhas de identidade. O jogador rola 3d6 seis vezes (formando
  * uma "pool" de 6 cartas) e depois aloca livremente cada carta em um
  * dos 6 atributos (Força, Destreza, Constituição, Inteligência,
  * Sabedoria e Carisma), arrastando a cartinha até a caixinha do
@@ -317,8 +317,8 @@
 
       try { showCheck?.(btnConfirmAttrs); } catch {}
 
-      if (typeof window.app.goToShop === "function") {
-        window.app.goToShop();
+      if (typeof window.app.goToClassLevelTalent === "function") {
+        window.app.goToClassLevelTalent();
       } else if (typeof window.app.goToName === "function") {
         window.app.goToName();
       } else {
@@ -332,8 +332,8 @@
   }
 
   /**
-   * Exibe a etapa de Atributos. Chamada pela etapa de Ouro ao final
-   * do fluxo, já que Atributos agora vem por último, antes do Nome.
+   * Exibe a etapa de Atributos depois que o jogador conclui as escolhas
+   * de raça, classe, origem, alinhamento, divindade e idiomas.
    */
   function goToAttrs(){
     const step = $("#stepAttrs");
@@ -361,3 +361,4 @@
 
   window.app.goToAttrs = goToAttrs;
 })();
+

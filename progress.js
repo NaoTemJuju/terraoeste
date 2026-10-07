@@ -15,9 +15,10 @@
     { id: "stepAlign",     label: "Alinhamento" },
     { id: "stepDeity",     label: "Divindade" },
     { id: "stepLang",      label: "Línguas" },
+    { id: "stepAttrs",     label: "Atributos" },
+    { id: "stepClassTalent", label: "Talento da classe" },
     { id: "stepHP",        label: "Pontos de Vida" },
     { id: "stepGold",      label: "Ouro" },
-    { id: "stepAttrs",     label: "Atributos" },
     { id: "stepShop",      label: "Equipamentos" },
     { id: "stepNameEntry", label: "Nome" },
     { id: "stepFinal",     label: "Ficha Final" }
@@ -43,8 +44,13 @@
     return !!(opts && opts.length);
   }
 
+  function classHasTalentRoll() {
+    const cls = window.app && window.app.state && window.app.state.cls;
+    return !!window.app?.hasClassLevelTalent?.(cls);
+  }
+
   function effectiveSteps() {
-    return STEPS.filter(s => s.id !== "stepMastery" || classHasMastery());
+    return STEPS.filter(s => (s.id !== "stepMastery" || classHasMastery()) && (s.id !== "stepClassTalent" || classHasTalentRoll()));
   }
 
   function render() {
@@ -93,3 +99,4 @@
   window.addEventListener("load", scheduleRender);
   scheduleRender();
 })();
+

@@ -109,7 +109,6 @@
           </div>
         </div>
         <div id="classTalentTable" class="class-talent-table" hidden></div>
-        <div id="classLevelTalent" class="class-level-talent" hidden></div>
       </div>
     </section>
 
@@ -155,36 +154,7 @@
       </div>
     </section>
 
-    <!-- Etapa 6: Pontos de Vida (movida para após Línguas) -->
-    <section id="stepHP" style="display:none">
-      <h2>Pontos de Vida</h2>
-      <div class="row">
-        <button id="btnRollHP">Rolar PV</button>
-        <div id="hpOut" class="pill" style="display:none"></div>
-      </div>
-      <div id="hpRolling" style="display:none">
-       <div id="hpCountdownContainer"><span id="hpCountdown"></span> </div>
-        <div class="progress"><div class="bar" id="hpBar"></div></div>
-      </div>
-      <div class="hint">PV = dado da classe <em>+-</em> modificador de Constituição (mínimo 1 PV). O bônus de Constituição só é somado depois, quando você alocar os Atributos.</div>
-    </section>
-
-    <!-- Etapa 7: Ouro (movida para após PV) -->
-    <section id="stepGold" style="display:none">
-      <h2>Ouro Inicial</h2>
-	  
-      <div class="row">
-        <button id="btnRollGold">Rolar Ouro</button>
-        <div id="goldOut" class="pill" style="display:none"></div>
-      </div>
-      <div id="goldRolling" style="display:none">
-        <div id="goldCountdownContainer"><span id="goldCountdown"></span> </div>
-        <div class="progress"><div class="bar" id="goldBar"></div></div>
-      </div>
-      <div class="hint">Este resultado não pode ser rolado novamente para este personagem.</div>
-    </section>
-
-    <!-- Etapa 8.75: Atributos (agora é a última etapa antes do Nome) -->
+    <!-- Etapa 9: Atributos, depois de todas as escolhas de identidade -->
     <section id="stepAttrs" style="display:none">
       <div class="attrs-head">
         <h2>Atributos</h2>
@@ -213,7 +183,44 @@
       </div>
     </section>
 
-    <!-- Etapa 8.9: Lojinha (compra de equipamentos com o ouro inicial) -->
+    <!-- Talento de nível 1 é rolado depois dos atributos para permitir escolhas informadas -->
+    <section id="stepClassTalent" style="display:none">
+      <h2>Talento de Classe (Nível 1)</h2>
+      <div id="classLevelTalent" class="class-level-talent" hidden></div>
+      <div class="row" style="margin-top:12px">
+        <button id="btnContinueClassTalent" disabled>Continuar</button>
+      </div>
+    </section>
+
+    <!-- Pontos de vida usam o modificador de Constituição já definido -->
+    <section id="stepHP" style="display:none">
+      <h2>Pontos de Vida</h2>
+      <div class="row">
+        <button id="btnRollHP">Rolar PV</button>
+        <div id="hpOut" class="pill" style="display:none"></div>
+      </div>
+      <div id="hpRolling" style="display:none">
+        <div id="hpCountdownContainer"><span id="hpCountdown"></span> </div>
+        <div class="progress"><div class="bar" id="hpBar"></div></div>
+      </div>
+      <div class="hint">PV = dado da classe + modificador de Constituição (mínimo 1 PV). Para anões, some também o bônus racial de +2.</div>
+    </section>
+
+    <!-- Ouro é rolado depois dos atributos e do talento -->
+    <section id="stepGold" style="display:none">
+      <h2>Ouro Inicial</h2>
+      <div class="row">
+        <button id="btnRollGold">Rolar Ouro</button>
+        <div id="goldOut" class="pill" style="display:none"></div>
+      </div>
+      <div id="goldRolling" style="display:none">
+        <div id="goldCountdownContainer"><span id="goldCountdown"></span> </div>
+        <div class="progress"><div class="bar" id="goldBar"></div></div>
+      </div>
+      <div class="hint">Este resultado não pode ser rolado novamente para este personagem.</div>
+    </section>
+
+    <!-- Etapa posterior ao Ouro: loja de equipamentos -->
     <section id="stepShop" style="display:none">
       <div class="shop-head">
         <h2>Lojinha</h2>
@@ -239,7 +246,7 @@
       </div>
     </section>
 
-    <!-- Etapa 9: Nome (após Atributos) -->
+    <!-- Nome fica depois das escolhas e rolagens da criação -->
     <section id="stepNameEntry" style="display:none">
       <h2>Nome</h2>
       <div class="name-row">
@@ -251,7 +258,7 @@
       <small id="nameHint" class="muted">Insira ou gere um nome e clique em Continuar.</small>
     </section>
 
-    <!-- Etapa 9: Final -->
+    <!-- Ficha final -->
     <section id="stepFinal" style="display:none">
       <h2>Ficha de Personagem</h2>
       <div id="finalOut" class="final"></div>

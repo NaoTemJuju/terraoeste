@@ -322,9 +322,10 @@
     { id: "stepAlign",     label: "Alinhamento" },
     { id: "stepDeity",     label: "Divindade" },
     { id: "stepLang",      label: "Línguas" },
+    { id: "stepAttrs",     label: "Atributos" },
+    { id: "stepClassTalent", label: "Talento de Classe" },
     { id: "stepHP",        label: "Pontos de Vida" },
     { id: "stepGold",      label: "Ouro Inicial" },
-    { id: "stepAttrs",     label: "Atributos" },
     { id: "stepShop",      label: "Lojinha" },
     { id: "stepNameEntry", label: "Nome" },
     { id: "stepFinal",     label: "Ficha Final" }
@@ -336,7 +337,8 @@
     const mastery = window.MAESTRIA_POR_CLASSE && window.MAESTRIA_POR_CLASSE[cls];
     const hasMastery = (Array.isArray(customMastery) && customMastery.length > 0)
       || (Array.isArray(mastery) && mastery.length > 0);
-    return STEP_DEFS.filter(step => step.id !== "stepMastery" || hasMastery);
+    const hasClassTalent = window.app?.hasClassLevelTalent?.(cls);
+    return STEP_DEFS.filter(step => (step.id !== "stepMastery" || hasMastery) && (step.id !== "stepClassTalent" || hasClassTalent));
   }
 
   function initStepper(){
@@ -380,7 +382,7 @@
 
   function hideCreationUI(){
     const ids = [
-      "stepName","stepAttrs","stepRace","stepClass","stepOrigin","stepHP",
+      "stepName","stepAttrs","stepClassTalent","stepRace","stepClass","stepOrigin","stepHP",
       "stepGold","stepAlign","stepDeity","stepLang","stepShop","stepNameEntry","stepFinal"
     ];
     ids.forEach(id => {

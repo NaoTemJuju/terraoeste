@@ -18,6 +18,7 @@
   const classTalentChoices = $("#classTalentChoices");
   const classTalentTable = $("#classTalentTable");
   const classLevelTalent = $("#classLevelTalent");
+  const btnContinueClassTalent = $("#btnContinueClassTalent");
   const STAT_CODES = { Força: "STR", Destreza: "DEX", Constituição: "CON", Inteligência: "INT", Sabedoria: "WIS", Carisma: "CHA" };
 
   // Descrições da tradução PT-BR do compêndio de classes do Foundry.
@@ -102,14 +103,19 @@
     if (!classLevelTalent) return;
     const choiceArea = document.createElement("div");
     choiceArea.className = "class-level-talent-choice";
-    const finish = () => { pending.classLevelTalent = result; renderClassLevelTalent(pending.cls); updateConfirmButton(); };
+    const finish = () => { pending.classLevelTalent = result; renderClassLevelTalent(pending.cls); updateTalentContinueButton(); };
     const makeStatSelect = (labelText, onChange, selected = "") => {
       const label = document.createElement("label");
       label.textContent = labelText;
       const select = document.createElement("select");
       select.append(new Option("Escolha um atributo", ""));
       const availableStats = labelText.includes("+2") ? ["Força", "Destreza", "Carisma"] : STAT_LABELS;
-      availableStats.forEach(stat => select.append(new Option(stat, STAT_CODES[stat])));
+      availableStats.forEach(stat => {
+        const current = state.attrs?.[STAT_LABELS.indexOf(stat)];
+        const increase = labelText.includes("+2") ? 2 : 1;
+        const optionLabel = Number.isFinite(current) ? `${stat} (${current} → ${current + increase})` : stat;
+        select.append(new Option(optionLabel, STAT_CODES[stat]));
+      });
       select.value = selected;
       select.addEventListener("change", () => onChange(select.value));
       label.append(select);
@@ -183,7 +189,7 @@
       });
       choiceArea.append(mode, details);
     }
-    function finishWith(chosen){ pending.classLevelTalent = chosen; renderClassLevelTalent(pending.cls); updateConfirmButton(); }
+    function finishWith(chosen){ pending.classLevelTalent = chosen; renderClassLevelTalent(pending.cls); updateTalentContinueButton(); }
     classLevelTalent.append(choiceArea);
   }
 
@@ -210,6 +216,7 @@
       const resultLine = classLevelTalent.querySelector(".class-level-talent-result");
       resultLine.textContent = `Resultado ${roll}: ${entry.desc}`;
       if (result.needsChoice) renderLevelTalentChoices(result);
+      updateTalentContinueButton();
       updateConfirmButton();
     });
     classLevelTalent.append(button, status);
@@ -291,7 +298,43 @@
     updateConfirmButton();
   }
 
-  function updateConfirmButton(){ if (btnConfirmClass) btnConfirmClass.disabled = !pending.cls || (hasClassTalentChoice(pending.cls) && !talentOptions(pending.cls).some(t => t.id === pending.classTalent)) || (!!classLevelTalentConfig(pending.cls) && !pending.classLevelTalent); }
+  function updateTalentContinueButton(){ if (btnContinueClassTalent) btnContinueClassTalent.disabled = !pending.classLevelTalent; }
+  function updateConfirmButton(){ if (btnConfirmClass) btnConfirmClass.disabled = !pending.cls || (hasClassTalentChoice(pending.cls) && !talentOptions(pending.cls).some(t => t.id === pending.classTalent)); }
+
+  function showHitPointsStep(){
+    const step = $("#stepHP");
+    if (!step) return;
+    step.style.display = "";
+    step.scrollIntoView({ behavior:"smooth", block:"start" });
+  }
+
+  function goToClassLevelTalent(){
+    const cls = state.cls;
+    const step = $("#stepClassTalent");
+    if (!classLevelTalentConfig(cls)) {
+      if (step) step.style.display = "none";
+      state.classLevelTalent = null;
+      showHitPointsStep();
+      return;
+    }
+    pending.cls = cls;
+    pending.classLevelTalent = null;
+    pending.classLevelTalentDraft = null;
+    if (step) step.style.display = "";
+    renderClassLevelTalent(cls);
+    updateTalentContinueButton();
+    step?.scrollIntoView({ behavior:"smooth", block:"start" });
+  }
+  window.app.hasClassLevelTalent = cls => !!classLevelTalentConfig(cls);
+  window.app.goToClassLevelTalent = goToClassLevelTalent;
+
+  btnContinueClassTalent?.addEventListener("click", () => {
+    if (!pending.classLevelTalent) return;
+    state.classLevelTalent = { ...pending.classLevelTalent };
+    const step = $("#stepClassTalent");
+    if (step) step.style.display = "none";
+    showHitPointsStep();
+  });
 
   window.app.getClassLevelTalent = (cls, result) => {
     if (!classLevelTalentConfig(cls) || !result) return { level: 0, bonuses: [], fields: { talentRolledDesc: "", talentRolledName: "", Rolled12TalentOrTwoStatPoints: "", Rolled12ChosenTalentDesc: "", Rolled12ChosenTalentName: "" } };
@@ -394,7 +437,7 @@
       if (!pending.cls || (hasClassTalentChoice(pending.cls) && !talentOptions(pending.cls).some(t => t.id === pending.classTalent))) return;
       state.cls = pending.cls;
       state.classTalent = pending.classTalent;
-      state.classLevelTalent = pending.classLevelTalent ? { ...pending.classLevelTalent } : null;
+      state.classLevelTalent = null;
       state.origem = null;
       if (classSel) classSel.disabled = true;
       if (btnRandClass) btnRandClass.disabled = true;
@@ -404,12 +447,14 @@
       // Reseta visibilidade das seções subsequentes
       const stepMastery = $("#stepMastery");
       const stepOrigin = $("#stepOrigin");
+      const stepClassTalent = $("#stepClassTalent");
       const stepHP    = $("#stepHP");
       const stepGold  = $("#stepGold");
       const stepAlign = $("#stepAlign");
       const stepFinal = $("#stepFinal");
       if (stepMastery) stepMastery.style.display = "none";
       if (stepOrigin) stepOrigin.style.display = "none";
+      if (stepClassTalent) stepClassTalent.style.display = "none";
       if (stepHP)    stepHP.style.display = "none";
       if (stepGold)  stepGold.style.display = "none";
       if (stepAlign) stepAlign.style.display = "none";

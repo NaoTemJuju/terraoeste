@@ -165,12 +165,8 @@
       btn.disabled = true;
       // Feedback visual
       try { window.app && window.app.showCheck && window.app.showCheck(btn); } catch {}
-      // Em vez de finalizar aqui, avança para a etapa de Pontos de Vida
-      const stepHP = document.getElementById('stepHP');
-      if (stepHP) {
-        stepHP.style.display = '';
-        stepHP.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+      // Os atributos vêm depois das escolhas de identidade e antes das rolagens dependentes.
+      if (typeof window.app?.goToAttrs === 'function') window.app.goToAttrs();
     };
 
     // Botão de Língua aleatória
@@ -557,7 +553,7 @@
       } catch {}
 
       // Esconde etapas do fluxo e mostra seção de "carregado"
-      ["#stepName","#stepAttrs","#stepRace","#stepClass","#stepOrigin",
+      ["#stepName","#stepAttrs","#stepClassTalent","#stepRace","#stepClass","#stepOrigin",
        "#stepHP","#stepGold","#stepAlign","#stepDeity","#stepLang","#stepShop","#stepNameEntry","#stepFinal"]
        .forEach(sel => { const n = document.querySelector(sel); if (n) n.style.display = "none"; });
 

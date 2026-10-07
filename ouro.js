@@ -3,7 +3,7 @@
  *
  * Responsável por gerar a quantidade inicial de ouro do personagem.
  * A rolagem utiliza 2d6 multiplicado por 5. Após determinar o
- * resultado, avança para a etapa de Alinhamento.
+ * resultado, avança para a etapa da loja.
  */
 (function(){
   const { state, roll, $ } = window.app;
@@ -40,12 +40,9 @@
           // Feedback visual
           try { window.app && window.app.showCheck && window.app.showCheck(btnRollGold); } catch {}
 
-          // Após definir o ouro, avança para a etapa de Atributos
-          // (agora a última etapa antes do Nome). Se a função de
-          // navegação de atributos não existir, cai para Nome e,
-          // por fim, para a finalização direta como antes.
-          if (window.app && typeof window.app.goToAttrs === 'function') {
-            try { window.app.goToAttrs(); } catch {}
+          // O ouro vem depois dos atributos, talento e PV.
+          if (window.app && typeof window.app.goToShop === 'function') {
+            try { window.app.goToShop(); } catch {}
           } else if (window.app && typeof window.app.goToName === 'function') {
             try { window.app.goToName(); } catch {}
           } else if (window.app && typeof window.app.finalizeCharacter === 'function') {
@@ -63,3 +60,4 @@
     });
   }
 })();
+
