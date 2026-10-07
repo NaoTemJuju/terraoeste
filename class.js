@@ -18,6 +18,7 @@
   const classTalentChoices = $("#classTalentChoices");
   const classTalentTable = $("#classTalentTable");
   const classLevelTalent = $("#classLevelTalent");
+  const classLevelTalentTable = $("#classLevelTalentTable");
   const btnContinueClassTalent = $("#btnContinueClassTalent");
   const STAT_CODES = { Força: "STR", Destreza: "DEX", Constituição: "CON", Inteligência: "INT", Sabedoria: "WIS", Carisma: "CHA" };
 
@@ -227,11 +228,11 @@
     }
   }
 
-  function renderClassTalentTable(cls){
-    if (!classTalentTable) return;
+  function renderClassTalentTable(cls, target = classTalentTable){
+    if (!target) return;
     const data = CLASS_TALENT_TABLES[cls];
-    classTalentTable.replaceChildren();
-    classTalentTable.hidden = !data;
+    target.replaceChildren();
+    target.hidden = !data;
     if (!data) return;
 
     const title = document.createElement("h4");
@@ -258,7 +259,7 @@
       tbody.append(row);
     });
     table.append(thead, tbody);
-    classTalentTable.append(title, table);
+    target.append(title, table);
   }
 
   function talentOptions(cls){ return window.CUSTOM_CLASS_DATA?.[cls]?.talents || []; }
@@ -301,26 +302,20 @@
   function updateTalentContinueButton(){ if (btnContinueClassTalent) btnContinueClassTalent.disabled = !pending.classLevelTalent; }
   function updateConfirmButton(){ if (btnConfirmClass) btnConfirmClass.disabled = !pending.cls || (hasClassTalentChoice(pending.cls) && !talentOptions(pending.cls).some(t => t.id === pending.classTalent)); }
 
-  function showHitPointsStep(){
-    const step = $("#stepHP");
-    if (!step) return;
-    step.style.display = "";
-    step.scrollIntoView({ behavior:"smooth", block:"start" });
-  }
-
   function goToClassLevelTalent(){
     const cls = state.cls;
     const step = $("#stepClassTalent");
     if (!classLevelTalentConfig(cls)) {
       if (step) step.style.display = "none";
       state.classLevelTalent = null;
-      showHitPointsStep();
+      if (typeof window.app.goToShop === "function") window.app.goToShop();
       return;
     }
     pending.cls = cls;
     pending.classLevelTalent = null;
     pending.classLevelTalentDraft = null;
     if (step) step.style.display = "";
+    renderClassTalentTable(cls, classLevelTalentTable);
     renderClassLevelTalent(cls);
     updateTalentContinueButton();
     step?.scrollIntoView({ behavior:"smooth", block:"start" });
@@ -333,7 +328,7 @@
     state.classLevelTalent = { ...pending.classLevelTalent };
     const step = $("#stepClassTalent");
     if (step) step.style.display = "none";
-    showHitPointsStep();
+    if (typeof window.app.goToShop === "function") window.app.goToShop();
   });
 
   window.app.getClassLevelTalent = (cls, result) => {

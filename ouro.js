@@ -3,7 +3,7 @@
  *
  * Responsável por gerar a quantidade inicial de ouro do personagem.
  * A rolagem utiliza 2d6 multiplicado por 5. Após determinar o
- * resultado, avança para a etapa da loja.
+ * resultado, avança para a rolagem do talento de classe.
  */
 (function(){
   const { state, roll, $ } = window.app;
@@ -40,9 +40,9 @@
           // Feedback visual
           try { window.app && window.app.showCheck && window.app.showCheck(btnRollGold); } catch {}
 
-          // O ouro vem depois dos atributos, talento e PV.
-          if (window.app && typeof window.app.goToShop === 'function') {
-            try { window.app.goToShop(); } catch {}
+          // O talento é a última rolagem antes da loja.
+          if (window.app && typeof window.app.goToClassLevelTalent === 'function') {
+            try { window.app.goToClassLevelTalent(); } catch {}
           } else if (window.app && typeof window.app.goToName === 'function') {
             try { window.app.goToName(); } catch {}
           } else if (window.app && typeof window.app.finalizeCharacter === 'function') {

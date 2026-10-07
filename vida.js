@@ -10,6 +10,14 @@
   const { CLASS_DICE, ATTRS, state, roll, $ } = window.app;
   const btnRollHP = $("#btnRollHP");
 
+  function goToHitPointsStep(){
+    const step = $("#stepHP");
+    if (!step) return;
+    step.style.display = "";
+    step.scrollIntoView({ behavior:"smooth", block:"start" });
+  }
+  window.app.goToHitPointsStep = goToHitPointsStep;
+
   if (btnRollHP) {
     btnRollHP.addEventListener("click", () => {
       if (!state.cls || btnRollHP.disabled) return; // Se já estiver desabilitado, não faz nada.
@@ -48,8 +56,8 @@
           const bonusStr = bonus === 0 ? "" : ` + MOD CON ${bonusFmt}`;
 
           state.hpBaseRoll = base;
-          // Guarda também o resultado base para permitir que a etapa de
-          // atributos reconstrua o total caso o fluxo seja retomado.
+          // Guarda também o resultado base para manter o detalhe da rolagem
+          // disponível caso o fluxo precise reconstruir o total.
           state.hpDiceDetail = `${state.cls} d${sides} ${detail}`;
           state.hp = hp;
           state.hpDetail = `${state.hpDiceDetail}${bonusStr}`;

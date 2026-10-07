@@ -183,15 +183,6 @@
       </div>
     </section>
 
-    <!-- Talento de nível 1 é rolado depois dos atributos para permitir escolhas informadas -->
-    <section id="stepClassTalent" style="display:none">
-      <h2>Talento de Classe (Nível 1)</h2>
-      <div id="classLevelTalent" class="class-level-talent" hidden></div>
-      <div class="row" style="margin-top:12px">
-        <button id="btnContinueClassTalent" disabled>Continuar</button>
-      </div>
-    </section>
-
     <!-- Pontos de vida usam o modificador de Constituição já definido -->
     <section id="stepHP" style="display:none">
       <h2>Pontos de Vida</h2>
@@ -206,7 +197,7 @@
       <div class="hint">PV = dado da classe + modificador de Constituição (mínimo 1 PV). Para anões, some também o bônus racial de +2.</div>
     </section>
 
-    <!-- Ouro é rolado depois dos atributos e do talento -->
+    <!-- Ouro é rolado depois dos atributos e dos pontos de vida -->
     <section id="stepGold" style="display:none">
       <h2>Ouro Inicial</h2>
       <div class="row">
@@ -220,7 +211,17 @@
       <div class="hint">Este resultado não pode ser rolado novamente para este personagem.</div>
     </section>
 
-    <!-- Etapa posterior ao Ouro: loja de equipamentos -->
+    <!-- O talento de nível 1 é rolado por último, depois do ouro -->
+    <section id="stepClassTalent" style="display:none">
+      <h2>Talento de Classe (Nível 1)</h2>
+      <div id="classLevelTalentTable" class="class-talent-table" hidden></div>
+      <div id="classLevelTalent" class="class-level-talent" hidden></div>
+      <div class="row" style="margin-top:12px">
+        <button id="btnContinueClassTalent" disabled>Continuar</button>
+      </div>
+    </section>
+
+    <!-- Etapa posterior ao Ouro e ao Talento: loja de equipamentos -->
     <section id="stepShop" style="display:none">
       <div class="shop-head">
         <h2>Lojinha</h2>

@@ -16,9 +16,9 @@
     { id: "stepDeity",     label: "Divindade" },
     { id: "stepLang",      label: "Línguas" },
     { id: "stepAttrs",     label: "Atributos" },
-    { id: "stepClassTalent", label: "Talento da classe" },
     { id: "stepHP",        label: "Pontos de Vida" },
     { id: "stepGold",      label: "Ouro" },
+    { id: "stepClassTalent", label: "Talento da classe" },
     { id: "stepShop",      label: "Equipamentos" },
     { id: "stepNameEntry", label: "Nome" },
     { id: "stepFinal",     label: "Ficha Final" }

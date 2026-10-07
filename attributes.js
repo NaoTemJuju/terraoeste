@@ -292,8 +292,8 @@
       state.attrs = scores;
       state.mods  = mods;
 
-      // Recalcula o PV agora que o modificador de Constituição é conhecido
-      // (o PV foi rolado antes desta etapa, sem o bônus de CON).
+      // Mantém compatibilidade com fluxos que possam ter rolado PV antes
+      // dos atributos; na criação normal, PV vem depois desta etapa.
       if (Number.isFinite(state.hpBaseRoll)) {
         const conMod = mods[ATTRS.indexOf("Constituição")] || 0;
         const bonusFmt = conMod > 0 ? `+${conMod}` : `${conMod}`;
@@ -317,8 +317,8 @@
 
       try { showCheck?.(btnConfirmAttrs); } catch {}
 
-      if (typeof window.app.goToClassLevelTalent === "function") {
-        window.app.goToClassLevelTalent();
+      if (typeof window.app.goToHitPointsStep === "function") {
+        window.app.goToHitPointsStep();
       } else if (typeof window.app.goToName === "function") {
         window.app.goToName();
       } else {

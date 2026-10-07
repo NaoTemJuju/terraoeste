@@ -323,9 +323,9 @@
     { id: "stepDeity",     label: "Divindade" },
     { id: "stepLang",      label: "Línguas" },
     { id: "stepAttrs",     label: "Atributos" },
-    { id: "stepClassTalent", label: "Talento de Classe" },
     { id: "stepHP",        label: "Pontos de Vida" },
     { id: "stepGold",      label: "Ouro Inicial" },
+    { id: "stepClassTalent", label: "Talento de Classe" },
     { id: "stepShop",      label: "Lojinha" },
     { id: "stepNameEntry", label: "Nome" },
     { id: "stepFinal",     label: "Ficha Final" }
@@ -456,7 +456,6 @@
       const cls = classKeys[randInt(0, classKeys.length - 1)];
       state.cls = cls;
       state.classTalent = window.app.randomClassTalent?.(cls) || null;
-      state.classLevelTalent = window.app.randomClassLevelTalent?.(cls) || null;
       // Seleciona uma origem aleatória da classe
       const origens = window.getOriginsForClass?.(cls) || (window.ORIGENS_POR_CLASSE?.[cls] || []);
       if (origens.length > 0){
@@ -519,6 +518,7 @@
         state.gold = g.total * 5;
         state.goldRolled = state.gold;
       }
+      state.classLevelTalent = window.app.randomClassLevelTalent?.(cls) || null;
       // Define nome aleatório baseado na raça
       // randomNameByRace é definido em nome.js e anexado ao namespace app
       const nameGenFn = (window.app && typeof window.app.randomNameByRace === 'function') ? window.app.randomNameByRace : null;
