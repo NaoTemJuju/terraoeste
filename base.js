@@ -250,6 +250,13 @@
     const countdownContainer = countdownContainerId ? document.getElementById(countdownContainerId) : null;
     const countdownEl = countdownId ? document.getElementById(countdownId) : null;
 
+    if (__availability?.instantRolls === true) {
+      if (bar) { bar.classList.remove("bar--rolling"); bar.style.width = "100%"; }
+      if (rolling) rolling.style.display = "none";
+      if (typeof onDone === "function") onDone();
+      return;
+    }
+
     if (rolling) rolling.style.display = "";
     if (bar) {
       bar.classList.add("bar--rolling");
@@ -555,7 +562,7 @@
         talentoClasseNivel1: Array.isArray(obj.levels) && obj.levels[0]?.talentRolledName ? {
           talentRolledName: obj.levels[0].talentRolledName,
           talentRolledDesc: obj.levels[0].talentRolledDesc,
-          displayDesc: obj.levels[0].Rolled12ChosenTalentDesc || obj.levels[0].talentRolledDesc
+          displayDesc: window.app?.getClassLevelTalentDisplay?.({ talentRolledName: obj.levels[0].talentRolledName, talentRolledDesc: obj.levels[0].talentRolledDesc }) || obj.levels[0].Rolled12ChosenTalentDesc || obj.levels[0].talentRolledDesc
         } : null,
         origem: obj.background || "—",
         origem_desc: "",
@@ -868,10 +875,10 @@
   }
 
   // ====================== Disponibilidade (GM) via Cloudflare KV ======================
-  let __availability = { classes:{}, races:{} };
+  let __availability = { classes:{}, races:{}, instantRolls:false };
 
   function availabilityDefault(){
-    const def = { classes:{}, races:{} };
+    const def = { classes:{}, races:{}, instantRolls:false };
     (ALL_CLASSES||CLASSES).forEach(c => def.classes[c] = true);
     (ALL_RACES||RACES).forEach(r => def.races[r] = true);
     return def;

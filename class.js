@@ -62,7 +62,7 @@
       title: "Talentos de Ladrão",
       entries: [
         { min: 2, max: 2, id: "InitiativeAdvantage", name: "Vantagem na Iniciativa", desc: "Vantagem nas rolagens de iniciativa (role novamente se repetir)", foundryDesc: "Advantage on initiative rolls (reroll if tied)", bonusTo: "Initiative", bonusName: "InitiativeAdvantage" },
-        { min: 3, max: 5, id: "BackstabPlus1DamageDice", name: "Apunhalada pelas Costas: +1 Dado de Dano", desc: "Sua Apunhalada pelas Costas causa +1 dado de dano", foundryDesc: "+1 backstab damage die", bonusTo: "Backstab", bonusName: "BackstabPlus1DamageDice" },
+        { min: 3, max: 5, id: "BackstabIncrease", name: "BackstabIncrease", desc: "Sua Apunhalada pelas Costas causa +1 dado de dano", foundryDesc: "Your Backstab deals +1 dice of damage", bonusTo: "Backstab", bonusName: "BackstabIncrease" },
         { min: 6, max: 9, id: "StatBonus", choice: "stat", desc: "+2 em Força, Destreza ou Carisma", foundryDesc: "+2 Strength, Dexterity, or Charisma", bonusName: "StatBonus" },
         { min: 10, max: 11, id: "Plus1ToHit", name: "+1 para Ataques Corpo a Corpo ou à Distância", desc: "+1 em ataques corpo a corpo e à distância", foundryDesc: "+1 to melee and ranged attacks", bonusTo: "Melee and ranged attacks", bonusName: "Plus1ToHit" },
         { min: 12, max: 12, id: "ChooseTalentOrStats", choice: "twelve", desc: "Escolha um talento ou distribua +2 pontos entre os seus atributos" }
@@ -75,12 +75,22 @@
     }
   };
   CLASS_LEVEL_TALENTS.Ladrão.entries = CLASS_LEVEL_TALENTS.Malandro.entries;
-  const STAT_TALENT_OPTIONS = ["InitiativeAdvantage", "BackstabPlus1DamageDice", "StatBonus", "Plus1ToHit"];
+  const STAT_TALENT_OPTIONS = ["InitiativeAdvantage", "BackstabIncrease", "StatBonus", "Plus1ToHit"];
+  const CLASS_TALENT_DISPLAY = {
+    InitiativeAdvantage: "Vantagem nas rolagens de iniciativa (role novamente se repetir)",
+    BackstabIncrease: "Sua Apunhalada pelas Costas causa +1 dado de dano",
+    BackstabPlus1DamageDice: "Sua Apunhalada pelas Costas causa +1 dado de dano",
+    StatBonus: "+2 em atributo",
+    Plus1ToHit: "+1 em ataques corpo a corpo e à distância",
+    "Vantagem na Iniciativa": "Vantagem nas rolagens de iniciativa (role novamente se repetir)",
+    "+1 para Ataques Corpo a Corpo ou à Distância": "+1 em ataques corpo a corpo e à distância",
+    "Apunhalada pelas Costas: +1 Dado de Dano": "Sua Apunhalada pelas Costas causa +1 dado de dano"
+  };
   const STAT_LABELS = Object.keys(STAT_CODES);
 
   function classLevelTalentConfig(cls){ return CLASS_LEVEL_TALENTS[cls] || null; }
   window.app.getFoundryClassName = cls => classLevelTalentConfig(cls)?.foundryName || window.CUSTOM_CLASS_DATA?.[cls]?.foundryName || cls || "";
-  function resultForEntry(entry, roll){ return { roll, id: entry.id, talentRolledName: entry.name || "", talentRolledDesc: entry.foundryDesc || entry.desc, bonusName: entry.bonusName || entry.id, bonusTo: entry.bonusTo || "", needsChoice: entry.choice || "" }; }
+  function resultForEntry(entry, roll){ return { roll, id: entry.id, talentRolledName: entry.name || "", talentRolledDesc: entry.foundryDesc || entry.desc, displayDesc: entry.desc, bonusName: entry.bonusName || entry.id, bonusTo: entry.bonusTo || "", needsChoice: entry.choice || "" }; }
   function makeTalentBonus(result, cls){
     if (!result || !(result.bonusName || result.id)) return [];
     const config = classLevelTalentConfig(cls);
@@ -293,7 +303,7 @@
       Rolled12ChosenTalentName: result.rolled12ChosenTalentName || ""
     } };
   };
-  window.app.getClassLevelTalentDisplay = result => result ? (result.displayDesc || result.talentRolledDesc || "") : "";
+  window.app.getClassLevelTalentDisplay = result => result ? (result.displayDesc || CLASS_TALENT_DISPLAY[result.talentRolledName] || result.talentRolledDesc || "") : "";
   window.app.randomClassLevelTalent = cls => {
     const config = classLevelTalentConfig(cls);
     if (!config) return null;
@@ -320,7 +330,7 @@
       chosen.rolled12TalentOrTwoStatPoints = "Talent";
       chosen.rolled12ChosenTalentName = chosen.talentRolledName;
       chosen.rolled12ChosenTalentDesc = chosen.talentRolledDesc;
-      chosen.displayDesc = `Escolheu talento: ${chosen.talentRolledDesc}`;
+      chosen.displayDesc = `Escolheu talento: ${CLASS_TALENT_DISPLAY[chosen.talentRolledName] || chosen.talentRolledDesc}`;
       if (chosen.needsChoice === "stat") {
         const code = ["STR", "DEX", "CHA"][randInt(0, 2)];
         chosen.bonusTo = `${code}:+2`;

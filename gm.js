@@ -57,6 +57,7 @@
   const btnTabClasses = $("#btnTabClasses");
   const btnTabContent = $("#btnTabContent");
   const btnTabShop = $("#btnTabShop");
+  const instantRolls = $("#instantRolls");
 
   function makeCheck(name, kind, checked){
     const label = document.createElement('label');
@@ -73,7 +74,7 @@
   }
 
   function readAvailabilityUI(){
-    const av = { classes:{}, races:{} };
+    const av = { classes:{}, races:{}, instantRolls: !!instantRolls?.checked };
     classesList.querySelectorAll('input[type=checkbox]').forEach(ch => av.classes[ch.dataset.name] = ch.checked);
     racesList.querySelectorAll('input[type=checkbox]').forEach(ch => av.races[ch.dataset.name] = ch.checked);
     return av;
@@ -86,6 +87,7 @@
   }
 
   function renderAvailability(av){
+    if (instantRolls) instantRolls.checked = av.instantRolls === true;
     classesList.innerHTML = '';
     racesList.innerHTML = '';
     const allC = app.ALL_CLASSES || app.CLASSES;
@@ -463,4 +465,5 @@
     listShopItems();
   })();
 })();
+
 
