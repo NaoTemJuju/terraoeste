@@ -178,9 +178,7 @@ async function applyWeaponMasteryChoice(importer, json) {
   }
 
   if (!talents.length) return false;
-  importer.talents = (importer.talents ?? []).filter(item =>
-    item._id !== mappedId || !currentCopies.includes(item)
-  );
+  importer.talents = (importer.talents ?? []).filter(item => !currentCopies.includes(item));
   importer.talents.push(...talents);
   return true;
 }
