@@ -1,0 +1,29 @@
+{
+  "id": "terraoeste-character-creator",
+  "title": "Terra Oeste: criador de personagens (teste)",
+  "description": "Protótipo de criação de personagem diretamente no Foundry para Shadowdark.",
+  "version": "0.1.0",
+  "compatibility": {
+    "minimum": "13",
+    "verified": "14"
+  },
+  "authors": [
+    {
+      "name": "TerraOeste"
+    }
+  ],
+  "esmodules": [
+    "main.mjs"
+  ],
+  "styles": [
+    "creator.css"
+  ],
+  "relationships": {
+    "systems": [
+      {
+        "id": "shadowdark",
+        "type": "system"
+      }
+    ]
+  }
+}
