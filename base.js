@@ -518,7 +518,10 @@
         state.gold = g.total * 5;
         state.goldRolled = state.gold;
       }
-      state.classLevelTalent = window.app.randomClassLevelTalent?.(cls) || null;
+      const initialClassTalents = window.app.randomClassLevelTalents
+        ? window.app.randomClassLevelTalents(cls, race, state.raceTalent)
+        : [window.app.randomClassLevelTalent?.(cls)].filter(Boolean);
+      state.classLevelTalent = initialClassTalents.length ? initialClassTalents : null;
       // Define nome aleatório baseado na raça
       // randomNameByRace é definido em nome.js e anexado ao namespace app
       const nameGenFn = (window.app && typeof window.app.randomNameByRace === 'function') ? window.app.randomNameByRace : null;
@@ -561,11 +564,11 @@
         nome: obj.name || "—",
         raca: obj.ancestry || "—",
         classe: obj.class || "—",
-        talentoClasseNivel1: Array.isArray(obj.levels) && obj.levels[0]?.talentRolledName ? {
+        talentoClasseNivel1: Array.isArray(obj.terraOesteClassTalents) && obj.terraOesteClassTalents.length ? obj.terraOesteClassTalents : Array.isArray(obj.levels) && obj.levels[0]?.talentRolledName ? [{
           talentRolledName: obj.levels[0].talentRolledName,
           talentRolledDesc: obj.levels[0].talentRolledDesc,
           displayDesc: window.app?.getClassLevelTalentDisplay?.({ talentRolledName: obj.levels[0].talentRolledName, talentRolledDesc: obj.levels[0].talentRolledDesc }) || obj.levels[0].Rolled12ChosenTalentDesc || obj.levels[0].talentRolledDesc
-        } : null,
+        }] : null,
         origem: obj.background || "—",
         origem_desc: "",
         alinhamento: alignmentToPT(obj.alignment) || "—",
@@ -605,7 +608,7 @@
     hpBaseRoll:null
   };
 
-  const pending = { race:null, raceTalent:null, cls:null, classTalent:null, classLevelTalent:null, classLevelTalentDraft:null };
+  const pending = { race:null, raceTalent:null, cls:null, classTalent:null, classLevelTalents:[], classLevelTalentDraft:null, classLevelTalentRollCount:1 };
   let attrsLocked = false;
   let __loadedRawObj = null;
 
@@ -658,7 +661,7 @@
         CHA: a["Carisma"]?.valor ?? 0
       };
       const languagesStr = Array.isArray(obj?.linguas) ? obj.linguas.join(", ") : "";
-      const classLevelTalent = window.app.getClassLevelTalent?.(obj?.classe, obj?.talentoClasseNivel1) || { level: 0, bonuses: [], fields: {} };
+      const classLevelTalent = window.app.getClassLevelTalent?.(obj?.classe, obj?.terraOesteClassTalents || obj?.talentoClasseNivel1) || { level: 0, bonuses: [], fields: {} };
       const level = classLevelTalent.level;
       const gear = Array.isArray(obj?.itens) ? obj.itens : [];
       const shopLedger = Array.isArray(obj?.compras) ? obj.compras : [];
@@ -681,6 +684,7 @@
           HitPointRoll: 0,
           stoutHitPointRoll: 0
         }],
+        terraOesteClassTalents: classLevelTalent.talents || [],
         XP: 0,
         ambitionTalentLevel: {
           level,
@@ -1012,5 +1016,4 @@
     set __loadedRawObj(val){ __loadedRawObj = val; }
   };
 })();
-
 

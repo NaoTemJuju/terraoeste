@@ -100,11 +100,16 @@
     const bonusTo = result.bonusTo || result.talentRolledName || effectName;
     return [{ sourceType: "Class", sourceName: window.app.getFoundryClassName(cls) || config?.foundryName || cls, sourceCategory: "Talent", name: result.talentRolledName || effectName, bonusName: effectName, bonusTo, gainedAtLevel: 1 }];
   }
-  function renderLevelTalentChoices(result){
+  function renderLevelTalentChoices(result, rollIndex){
     if (!classLevelTalent) return;
     const choiceArea = document.createElement("div");
     choiceArea.className = "class-level-talent-choice";
-    const finish = () => { pending.classLevelTalent = result; renderClassLevelTalent(pending.cls); updateTalentContinueButton(); };
+    const finish = chosen => {
+      pending.classLevelTalents[rollIndex] = chosen || result;
+      pending.classLevelTalentDraft = null;
+      renderClassLevelTalent(pending.cls);
+      updateTalentContinueButton();
+    };
     const makeStatSelect = (labelText, onChange, selected = "") => {
       const label = document.createElement("label");
       label.textContent = labelText;
@@ -124,13 +129,13 @@
     };
     if (result.needsChoice === "stat") {
       const statLabel = makeStatSelect("Atributo para o bônus +2", code => {
-        if (!code) { pending.classLevelTalent = null; updateConfirmButton(); return; }
+        if (!code) { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); return; }
         result.talentRolledName = `+2 de ${STAT_LABELS.find(stat => STAT_CODES[stat] === code)}`;
         result.bonusName = "StatBonus";
         result.bonusTo = `${code}:+2`;
         result.talentRolledDesc = `+2 ${({STR:"Strength",DEX:"Dexterity",CON:"Constitution",INT:"Intelligence",WIS:"Wisdom",CHA:"Charisma"})[code]}`;
         result.displayDesc = `+2 em ${STAT_LABELS.find(stat => STAT_CODES[stat] === code)}`;
-        finish();
+        finish(result);
       });
       choiceArea.append(statLabel);
     } else if (result.needsChoice === "twelve") {
@@ -140,7 +145,7 @@
       details.className = "class-level-talent-choice-details";
       mode.addEventListener("change", () => {
         details.replaceChildren();
-        pending.classLevelTalent = null;
+        pending.classLevelTalents[rollIndex] = null;
         if (mode.value === "talent") {
           const select = document.createElement("select");
           select.append(new Option("Escolha um talento", ""));
@@ -150,12 +155,12 @@
           });
           select.addEventListener("change", () => {
             const entry = CLASS_LEVEL_TALENTS.Malandro.entries.find(item => item.id === select.value);
-            if (!entry) { pending.classLevelTalent = null; updateConfirmButton(); return; }
+            if (!entry) { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); return; }
             const chosen = resultForEntry(entry, result.roll);
             chosen.rolled12Mode = "talent";
             if (entry.choice === "stat") {
               const statLabel = makeStatSelect("Atributo para o bônus +2", code => {
-                if (!code) { pending.classLevelTalent = null; updateConfirmButton(); return; }
+                if (!code) { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); return; }
                 chosen.bonusTo = `${code}:+2`;
                 chosen.talentRolledDesc = `+2 ${{STR:"Strength",DEX:"Dexterity",CON:"Constitution",INT:"Intelligence",WIS:"Wisdom",CHA:"Charisma"}[code]}`;
                 chosen.displayDesc = `+2 em ${STAT_LABELS.find(stat => STAT_CODES[stat] === code)}`;
@@ -182,7 +187,7 @@
               const counts = selected.reduce((acc, code) => ({ ...acc, [code]: (acc[code] || 0) + 1 }), {});
               const bonusTo = Object.entries(counts).map(([code, amount]) => `${code}:+${amount}`).join(", ");
           finishWith({ roll: result.roll, id: "TwoStatPoints", talentRolledName: "", talentRolledDesc: "+2 to ability scores", bonusName: "StatBonus", bonusTo, rolled12Mode: "twoStatPoints", displayDesc: `+2 pontos nos atributos: ${names.join(" e ")}`, rolled12TalentOrTwoStatPoints: "TwoStatPoints" });
-            } else { pending.classLevelTalent = null; updateConfirmButton(); }
+              } else { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); }
           };
           details.append(makeStatSelect("Primeiro ponto", code => { selected[0] = code; updateStats(); }));
           details.append(makeStatSelect("Segundo ponto", code => { selected[1] = code; updateStats(); }));
@@ -190,7 +195,7 @@
       });
       choiceArea.append(mode, details);
     }
-    function finishWith(chosen){ pending.classLevelTalent = chosen; renderClassLevelTalent(pending.cls); updateTalentContinueButton(); }
+    function finishWith(chosen){ finish(chosen); }
     classLevelTalent.append(choiceArea);
   }
 
@@ -200,31 +205,43 @@
     classLevelTalent.replaceChildren();
     classLevelTalent.hidden = !config;
     if (!config) return;
-    const status = document.createElement("p");
-    status.className = "class-level-talent-result";
+    const count = Math.max(1, Number(pending.classLevelTalentRollCount) || 1);
+    pending.classLevelTalents = Array.isArray(pending.classLevelTalents) ? pending.classLevelTalents : [];
+    pending.classLevelTalents.forEach((result, index) => {
+      if (!result) return;
+      const status = document.createElement("p");
+      status.className = "class-level-talent-result";
+      status.textContent = `Talento ${index + 1}/${count} — Resultado ${result.roll}: ${result.displayDesc || result.talentRolledDesc || "Talento registrado"}`;
+      classLevelTalent.append(status);
+    });
+    const nextIndex = pending.classLevelTalents.length;
     const button = document.createElement("button");
     button.type = "button";
     button.className = "ghost";
-    button.textContent = pending.classLevelTalent || pending.classLevelTalentDraft ? "Talento rolado" : "Rolar talento de nível 1 (2d6)";
-    button.disabled = !!pending.classLevelTalent || !!pending.classLevelTalentDraft;
+    button.textContent = `Rolar talento ${Math.min(nextIndex + 1, count)}/${count} (2d6)`;
+    button.disabled = nextIndex >= count || !!pending.classLevelTalentDraft;
     button.addEventListener("click", () => {
       const roll = randInt(1, 6) + randInt(1, 6);
       const entry = config.entries.find(item => roll >= item.min && roll <= item.max);
       const result = resultForEntry(entry, roll);
-      pending.classLevelTalentDraft = result;
-      pending.classLevelTalent = result.needsChoice ? null : result;
+      pending.classLevelTalentDraft = { result, index: nextIndex };
+      if (!result.needsChoice) {
+        pending.classLevelTalents[nextIndex] = result;
+        pending.classLevelTalentDraft = null;
+      }
       renderClassLevelTalent(cls);
-      const resultLine = classLevelTalent.querySelector(".class-level-talent-result");
-      resultLine.textContent = `Resultado ${roll}: ${entry.desc}`;
-      if (result.needsChoice) renderLevelTalentChoices(result);
       updateTalentContinueButton();
       updateConfirmButton();
     });
-    classLevelTalent.append(button, status);
-    const visibleResult = pending.classLevelTalent || pending.classLevelTalentDraft;
-    if (visibleResult) {
-      const entry = config.entries.find(item => visibleResult.roll >= item.min && visibleResult.roll <= item.max);
-      status.textContent = `Resultado ${visibleResult.roll}: ${visibleResult.displayDesc || visibleResult.talentRolledDesc || entry?.desc || "Talento registrado"}`;
+    if (nextIndex < count && !pending.classLevelTalentDraft) classLevelTalent.append(button);
+    if (pending.classLevelTalentDraft) {
+      const { result, index } = pending.classLevelTalentDraft;
+      const status = document.createElement("p");
+      status.className = "class-level-talent-result";
+      const entry = config.entries.find(item => result.roll >= item.min && result.roll <= item.max);
+      status.textContent = `Talento ${index + 1}/${count} — Resultado ${result.roll}: ${entry?.desc || "Escolha uma opção"}`;
+      classLevelTalent.append(status);
+      renderLevelTalentChoices(result, index);
     }
   }
 
@@ -299,7 +316,15 @@
     updateConfirmButton();
   }
 
-  function updateTalentContinueButton(){ if (btnContinueClassTalent) btnContinueClassTalent.disabled = !pending.classLevelTalent; }
+  function classLevelTalentRollCount(cls, race = state.race, raceTalent = state.raceTalent){
+    if (!classLevelTalentConfig(cls)) return 0;
+    return 1 + Math.max(0, Number(window.app.getRaceExtraClassTalentRolls?.(race, raceTalent)) || 0);
+  }
+  function updateTalentContinueButton(){
+    const count = Number(pending.classLevelTalentRollCount) || 0;
+    const complete = count > 0 && Array.isArray(pending.classLevelTalents) && pending.classLevelTalents.length >= count && pending.classLevelTalents.slice(0, count).every(Boolean) && !pending.classLevelTalentDraft;
+    if (btnContinueClassTalent) btnContinueClassTalent.disabled = !complete;
+  }
   function updateConfirmButton(){ if (btnConfirmClass) btnConfirmClass.disabled = !pending.cls || (hasClassTalentChoice(pending.cls) && !talentOptions(pending.cls).some(t => t.id === pending.classTalent)); }
 
   function goToClassLevelTalent(){
@@ -312,8 +337,9 @@
       return;
     }
     pending.cls = cls;
-    pending.classLevelTalent = null;
+    pending.classLevelTalents = [];
     pending.classLevelTalentDraft = null;
+    pending.classLevelTalentRollCount = classLevelTalentRollCount(cls);
     if (step) step.style.display = "";
     if (btnContinueClassTalent) btnContinueClassTalent.textContent = "Confirmar talento e continuar";
     renderClassTalentTable(cls, classLevelTalentTable);
@@ -323,10 +349,12 @@
   }
   window.app.hasClassLevelTalent = cls => !!classLevelTalentConfig(cls);
   window.app.goToClassLevelTalent = goToClassLevelTalent;
+  window.app.getClassLevelTalentRollCount = classLevelTalentRollCount;
 
   btnContinueClassTalent?.addEventListener("click", () => {
-    if (!pending.classLevelTalent) return;
-    state.classLevelTalent = { ...pending.classLevelTalent };
+    const count = Number(pending.classLevelTalentRollCount) || 0;
+    if (!count || pending.classLevelTalents.length < count || !pending.classLevelTalents.slice(0, count).every(Boolean)) return;
+    state.classLevelTalent = pending.classLevelTalents.slice(0, count).map(result => ({ ...result }));
     btnContinueClassTalent.disabled = true;
     btnContinueClassTalent.textContent = "Talento confirmado";
     try { window.app.showCheck?.(btnContinueClassTalent); } catch {}
@@ -334,16 +362,24 @@
   });
 
   window.app.getClassLevelTalent = (cls, result) => {
-    if (!classLevelTalentConfig(cls) || !result) return { level: 0, bonuses: [], fields: { talentRolledDesc: "", talentRolledName: "", Rolled12TalentOrTwoStatPoints: "", Rolled12ChosenTalentDesc: "", Rolled12ChosenTalentName: "" } };
-    return { level: 1, bonuses: makeTalentBonus(result, cls), fields: {
-      talentRolledDesc: result.talentRolledDesc || "",
-      talentRolledName: result.talentRolledName || "",
-      Rolled12TalentOrTwoStatPoints: result.rolled12TalentOrTwoStatPoints || "",
-      Rolled12ChosenTalentDesc: result.rolled12ChosenTalentDesc || "",
-      Rolled12ChosenTalentName: result.rolled12ChosenTalentName || ""
+    const empty = { level: 0, bonuses: [], talents: [], fields: { talentRolledDesc: "", talentRolledName: "", Rolled12TalentOrTwoStatPoints: "", Rolled12ChosenTalentDesc: "", Rolled12ChosenTalentName: "" } };
+    if (!classLevelTalentConfig(cls) || !result) return empty;
+    const results = (Array.isArray(result) ? result : [result]).filter(Boolean);
+    if (!results.length) return empty;
+    const first = results[0];
+    return { level: 1, talents: results, bonuses: results.flatMap(item => makeTalentBonus(item, cls)), fields: {
+      talentRolledDesc: first.talentRolledDesc || "",
+      talentRolledName: first.talentRolledName || "",
+      Rolled12TalentOrTwoStatPoints: first.rolled12TalentOrTwoStatPoints || "",
+      Rolled12ChosenTalentDesc: first.rolled12ChosenTalentDesc || "",
+      Rolled12ChosenTalentName: first.rolled12ChosenTalentName || ""
     } };
   };
-  window.app.getClassLevelTalentDisplay = result => result ? (result.displayDesc || CLASS_TALENT_DISPLAY[result.talentRolledName] || result.talentRolledDesc || "") : "";
+  window.app.getClassLevelTalentDisplay = result => (Array.isArray(result) ? result : result ? [result] : []).map(item => item.displayDesc || CLASS_TALENT_DISPLAY[item.talentRolledName] || item.talentRolledDesc || "Talento de atributo registrado").filter(Boolean).join("; ");
+  window.app.randomClassLevelTalents = (cls, race = state.race, raceTalent = state.raceTalent) => {
+    const count = classLevelTalentRollCount(cls, race, raceTalent);
+    return Array.from({ length: count }, () => window.app.randomClassLevelTalent?.(cls)).filter(Boolean);
+  };
   window.app.randomClassLevelTalent = cls => {
     const config = classLevelTalentConfig(cls);
     if (!config) return null;
@@ -408,7 +444,7 @@
         if (classSel.options.length > 0) classSel.options[0].disabled = true;
       }
       pending.cls = c;
-      pending.classLevelTalent = null;
+      pending.classLevelTalents = [];
       pending.classLevelTalentDraft = null;
       pending.classTalent = hasClassTalentChoice(c) ? null : (talentOptions(c).length === 1 ? talentOptions(c)[0].id : null);
       updateClassInfo(c);
@@ -420,7 +456,7 @@
     classSel.addEventListener("change", e => {
       const val = e.target.value;
       pending.cls = val || null;
-      pending.classLevelTalent = null;
+      pending.classLevelTalents = [];
       pending.classLevelTalentDraft = null;
       const talents = talentOptions(pending.cls);
       pending.classTalent = hasClassTalentChoice(pending.cls) ? null : (talents.length === 1 ? talents[0].id : null);
@@ -505,5 +541,4 @@
     });
   }
 })();
-
 

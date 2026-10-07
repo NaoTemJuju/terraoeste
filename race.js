@@ -56,7 +56,7 @@
       { id: "stealthy", name: "Furtivo", description: "Uma vez por dia, você pode ficar invisível por 3 rodadas." }
     ],
     "Humano": [
-      { id: "ambitious", name: "Ambicioso", description: "Ganha uma rolagem de talento adicional no nível 1." }
+      { id: "ambitious", name: "Ambicioso", description: "Faça duas rolagens na tabela de talentos da classe no nível 1 e mantenha os dois resultados.", extraClassTalentRolls: 1 }
     ],
     "Meio-Orc": [
       { id: "mighty", name: "Poderoso", description: "Recebe +1 em jogadas de ataque e dano com armas corpo a corpo." }
@@ -75,6 +75,11 @@
     if (!hasRaceTalentChoice(race)) return talentOptions(race).length === 1 ? talentOptions(race)[0].id : null;
     const options = talentOptions(race);
     return options.length ? options[randInt(0, options.length - 1)].id : null;
+  }
+  function getRaceExtraClassTalentRolls(race, talentId){
+    const options = talentOptions(race);
+    const talent = options.find(item => item.id === talentId) || (options.length === 1 ? options[0] : null);
+    return Math.max(0, Number(talent?.extraClassTalentRolls) || 0);
   }
   function getRaceTalentDisplay(race, talentId){
     const options = talentOptions(race);
@@ -108,6 +113,7 @@
   window.app.hasRaceTalentChoice = hasRaceTalentChoice;
   window.app.isRaceTalentValid = isRaceTalentValid;
   window.app.randomRaceTalent = randomRaceTalent;
+  window.app.getRaceExtraClassTalentRolls = getRaceExtraClassTalentRolls;
   window.app.getRaceTalentDisplay = getRaceTalentDisplay;
   window.app.getRaceBonuses = getRaceBonuses;
   window.app.getRaceChoiceMetadata = getRaceChoiceMetadata;

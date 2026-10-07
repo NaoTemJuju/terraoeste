@@ -248,6 +248,7 @@
         HitPointRoll: hpRoll,
         stoutHitPointRoll: stoutHP
       }],
+      terraOesteClassTalents: classLevelTalent.talents || [],
       XP: 0,
       ambitionTalentLevel: {
         level,
@@ -311,7 +312,7 @@
       raca: state.race || "",
       talentoRacial: state.raceTalent || null,
       talentoClasse: state.classTalent || null,
-      talentoClasseNivel1: state.classLevelTalent ? { ...state.classLevelTalent } : null,
+      talentoClasseNivel1: Array.isArray(state.classLevelTalent) ? state.classLevelTalent.map(talent => ({ ...talent })) : state.classLevelTalent ? [{ ...state.classLevelTalent }] : null,
       classe: state.cls || "",
       maestria: state.maestria ? state.maestria.nome : null,
       origem: state.origem ? state.origem.titulo : null,
@@ -450,7 +451,7 @@
       CHA: a["Carisma"]?.valor ?? 0
     };
     const languagesStr = Array.isArray(src?.linguas) ? src.linguas.join(", ") : "";
-    const classLevelTalent = window.app.getClassLevelTalent?.(src?.classe, src?.talentoClasseNivel1) || { level: 0, bonuses: [], fields: {} };
+    const classLevelTalent = window.app.getClassLevelTalent?.(src?.classe, src?.terraOesteClassTalents || src?.talentoClasseNivel1) || { level: 0, bonuses: [], talents: [], fields: {} };
     const level = classLevelTalent.level;
     const gear = Array.isArray(src?.itens) ? src.itens : [];
     const shopLedger = Array.isArray(src?.compras) ? src.compras : [];
@@ -476,6 +477,7 @@
         HitPointRoll: 0,
         stoutHitPointRoll: 0
       }],
+      terraOesteClassTalents: classLevelTalent.talents || [],
       XP: 0,
       ambitionTalentLevel: {
         level,
@@ -594,5 +596,4 @@
   window.app.renderLanguages = renderLanguages;
   window.app.finalizeCharacter = finalize;
 })();
-
 
