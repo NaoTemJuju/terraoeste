@@ -135,11 +135,18 @@ function setWeaponMasteryEffect(item, weaponName, attackType) {
 }
 
 async function applyWeaponMasteryChoice(importer, json) {
-  const bonus = (Array.isArray(json?.bonuses) ? json.bonuses : []).find(item =>
+  const bonuses = (Array.isArray(json?.bonuses) ? json.bonuses : []).filter(item =>
     item?.bonusName === WEAPON_MASTERY_BONUS && typeof item.bonusTo === "string" && item.bonusTo.trim()
   );
-  const selectedWeapon = bonus?.bonusTo || json?.terraOesteClassOptions?.weaponMastery;
-  if (!selectedWeapon) return false;
+  const selections = bonuses.length
+    ? bonuses.map(bonus => ({ bonus, weapon: bonus.bonusTo.trim() }))
+    : json?.terraOesteClassOptions?.weaponMastery
+      ? [{ bonus: null, weapon: json.terraOesteClassOptions.weaponMastery }]
+      : [];
+  const uniqueSelections = selections.filter((selection, index, all) =>
+    all.findIndex(item => key(item.weapon) === key(selection.weapon)) === index
+  );
+  if (!uniqueSelections.length) return false;
 
   const talentUuid = importer.itemMapping?.bonus?.[WEAPON_MASTERY_BONUS];
   if (!talentUuid) return false;
@@ -152,25 +159,29 @@ async function applyWeaponMasteryChoice(importer, json) {
       key(item.flags?.babele?.originalName ?? item.name)
     )
   );
-  const talent = sourceTalent.toObject();
-  const attackType = await weaponAttackType(selectedWeapon);
-  if (!setWeaponMasteryEffect(talent, selectedWeapon, attackType)) {
-    console.warn(`${MODULE_ID}: não foi possível adaptar os efeitos de Maestria em Armas.`);
-    return false;
+  const displayedBaseName = currentCopies[0]?.name || sourceTalent.name;
+  const talents = [];
+
+  for (const { bonus, weapon } of uniqueSelections) {
+    const talent = sourceTalent.toObject();
+    const attackType = await weaponAttackType(weapon);
+    if (!setWeaponMasteryEffect(talent, weapon, attackType)) {
+      console.warn(`${MODULE_ID}: não foi possível adaptar Maestria em Armas para ${weapon}.`);
+      continue;
+    }
+
+    talent.name = `${displayedBaseName} (${weaponDisplayName(weapon)})`;
+    if (bonus?.gainedAtLevel && talent.system?.talentClass === "level") {
+      talent.system.level = bonus.gainedAtLevel;
+    }
+    talents.push(talent);
   }
 
-  const displayedBaseName = currentCopies[0]?.name || talent.name;
-  talent.name = `${displayedBaseName} (${weaponDisplayName(selectedWeapon)})`;
-  if (bonus?.gainedAtLevel && talent.system?.talentClass === "level") {
-    talent.system.level = bonus.gainedAtLevel;
-  }
-
+  if (!talents.length) return false;
   importer.talents = (importer.talents ?? []).filter(item =>
-    item._id !== mappedId && !["weapon mastery", "maestria em armas"].includes(
-      key(item.flags?.babele?.originalName ?? item.name)
-    )
+    item._id !== mappedId || !currentCopies.includes(item)
   );
-  importer.talents.push(talent);
+  importer.talents.push(...talents);
   return true;
 }
 
