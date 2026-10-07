@@ -171,7 +171,7 @@
 	  btnConfirm.disabled = true;
 
 	  const descBox = document.createElement("div");
-	  descBox.className = "final";
+	  descBox.className = "selection-info selection-description";
 	  descBox.style.display = "none";
 	  const emptyDescHTML = "<em class='muted'>Selecione uma origem para ver a descrição.</em>";
 
@@ -197,7 +197,7 @@
 		// Seleção válida
 		state.origem = { titulo: o.titulo, descricao: o.d };
 		descBox.style.display = "";
-		descBox.innerHTML = `<strong>${o.titulo}</strong><br>${o.d}`;
+		descBox.innerHTML = `<strong>${o.titulo}</strong><p>${o.d}</p>`;
 		btnConfirm.disabled = false;
 		select.value = String(idx);
 	  }
@@ -252,4 +252,5 @@
   window.getOriginsForClass = name => (window.CUSTOM_ORIGENS?.[name] || ORIGENS_POR_CLASSE[name] || []).map(item => ({ ...item }));
   window.attachOriginStep = attachOriginStep;
 })();
+
 
