@@ -1,5 +1,6 @@
 const MODULE_ID = "terraoeste-foundry-choice-guard";
 const WEAPON_MASTERY_BONUS = "Plus1AttackAndDamagePlusHalfLevel";
+const ARMOR_MASTERY_BONUS = "ArmorMastery";
 
 function key(value) {
   return String(value ?? "").trim().toLocaleLowerCase("en");
@@ -134,6 +135,79 @@ function setWeaponMasteryEffect(item, weaponName, attackType) {
   return replaced > 0;
 }
 
+function armorDisplayName(armorName) {
+  const names = {
+    "leather armor": "Armadura de Couro",
+    "chainmail": "Cota de Malha",
+    "plate mail": "Armadura de Placas",
+    "mithral chainmail": "Cota de Malha de Mitral",
+    "mithral plate mail": "Armadura de Placas de Mitral"
+  };
+  return names[key(armorName)] || String(armorName ?? "").trim();
+}
+
+function setArmorMasteryEffect(item, armorName) {
+  const armorSlug = slug(armorDisplayName(armorName));
+  let replaced = 0;
+  for (const effect of item.effects ?? []) {
+    const changes = Array.isArray(effect.changes)
+      ? effect.changes
+      : Array.isArray(effect.system?.changes) ? effect.system.changes : [];
+    for (const change of changes) {
+      const match = String(change.key ?? "").match(/^system\\.attributes\\.ac\\.REPLACEME$/i);
+      if (!match) continue;
+      change.key = `system.attributes.ac.${armorSlug}`;
+      replaced += 1;
+    }
+  }
+  return replaced > 0;
+}
+
+async function applyArmorMasteryChoice(importer, json) {
+  const bonuses = (Array.isArray(json?.bonuses) ? json.bonuses : []).filter(item =>
+    item?.bonusName === ARMOR_MASTERY_BONUS && typeof item.bonusTo === "string" && item.bonusTo.trim()
+  );
+  const selections = bonuses.map(bonus => ({ bonus, armor: bonus.bonusTo.trim() }));
+  const uniqueSelections = selections.filter((selection, index, all) =>
+    all.findIndex(item => key(item.armor) === key(selection.armor)) === index
+  );
+  if (!uniqueSelections.length) return false;
+
+  const talentUuid = importer.itemMapping?.bonus?.[ARMOR_MASTERY_BONUS];
+  if (!talentUuid) return false;
+  const sourceTalent = await fromUuid(talentUuid);
+  if (!sourceTalent) return false;
+
+  const mappedId = String(talentUuid).split(".").pop();
+  const currentCopies = (importer.talents ?? []).filter(item =>
+    item._id === mappedId || ["armor mastery", "maestria em armaduras"].includes(
+      key(item.flags?.babele?.originalName ?? item.name)
+    )
+  );
+  const displayedBaseName = currentCopies[0]?.name || sourceTalent.name;
+  const talents = [];
+
+  for (const { bonus, armor } of uniqueSelections) {
+    const talent = sourceTalent.toObject();
+    talent._id = globalThis.foundry?.utils?.randomID?.() || `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
+    if (!setArmorMasteryEffect(talent, armor)) {
+      console.warn(`${MODULE_ID}: não foi possível adaptar Maestria em Armaduras para ${armor}.`);
+      continue;
+    }
+
+    talent.name = `${displayedBaseName} (${armorDisplayName(armor)})`;
+    if (bonus?.gainedAtLevel && talent.system?.talentClass === "level") {
+      talent.system.level = bonus.gainedAtLevel;
+    }
+    talents.push(talent);
+  }
+
+  if (!talents.length) return false;
+  importer.talents = (importer.talents ?? []).filter(item => !currentCopies.includes(item));
+  importer.talents.push(...talents);
+  return true;
+}
+
 async function applyWeaponMasteryChoice(importer, json) {
   const bonuses = (Array.isArray(json?.bonuses) ? json.bonuses : []).filter(item =>
     item?.bonusName === WEAPON_MASTERY_BONUS && typeof item.bonusTo === "string" && item.bonusTo.trim()
@@ -239,6 +313,11 @@ Hooks.once("ready", () => {
       changed = await applyWeaponMasteryChoice(this, json);
     } catch (error) {
       console.error(`${MODULE_ID}: não foi possível aplicar a arma escolhida na Maestria em Armas.`, error);
+    }
+    try {
+      changed = (await applyArmorMasteryChoice(this, json)) || changed;
+    } catch (error) {
+      console.error(`${MODULE_ID}: não foi possível aplicar a armadura escolhida na Maestria em Armaduras.`, error);
     }
     for (const choice of readChoices(json)) {
       try {
