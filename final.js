@@ -434,7 +434,7 @@
     if (btnCopyLink) btnCopyLink.onclick = async () => {
       try {
         await navigator.clipboard.writeText(window.__lastShareLink || link);
-        alert("Link copiado!");
+        window.app?.showToast("Link copiado!");
       } catch {
         prompt("Copie o link:", window.__lastShareLink || link);
       }
@@ -631,7 +631,7 @@
       if (btnCopyLoaded) btnCopyLoaded.onclick = async () => {
         try {
           await navigator.clipboard.writeText(location.href);
-          alert("Link copiado!");
+          window.app?.showToast("Link copiado!");
         } catch {
           prompt("Copie o link:", location.href);
         }
