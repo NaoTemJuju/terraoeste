@@ -250,7 +250,6 @@
         stoutHitPointRoll: stoutHP
       }],
       terraOesteClassTalents: classLevelTalent.talents || [],
-      terraOesteClassOptions: src?.opcoesClasse || src?.terraOesteClassOptions || null,
       terraOesteClassOptions: state.classFeatures ? { ...state.classFeatures } : null,
       XP: 0,
       ambitionTalentLevel: {
@@ -485,6 +484,7 @@
         stoutHitPointRoll: 0
       }],
       terraOesteClassTalents: classLevelTalent.talents || [],
+      terraOesteClassOptions: src?.opcoesClasse || src?.terraOesteClassOptions || null,
       XP: 0,
       ambitionTalentLevel: {
         level,
