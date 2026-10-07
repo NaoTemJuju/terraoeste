@@ -30,7 +30,7 @@
     { label: "Cimitarra", value: "Scimitar" }, { label: "Clava", value: "Club" },
     { label: "Corrente laminada", value: "Razor chain" }, { label: "Espada bastarda", value: "Bastard sword" },
     { label: "Espada curta", value: "Shortsword" }, { label: "Espada grande", value: "Greatsword" },
-    { label: "Espada longa", value: "Longsword" }, { label: "Funda", value: "Sling" },
+    { label: "Espada Longa", value: "Longsword" }, { label: "Funda", value: "Sling" },
     { label: "Lança", value: "Spear" }, { label: "Maça", value: "Mace" },
     { label: "Maça estrela", value: "Morning Star" }, { label: "Machadinha", value: "Handaxe" },
     { label: "Machado grande", value: "Greataxe" }, { label: "Martelo de guerra", value: "Warhammer" },
@@ -450,7 +450,7 @@
   });
 
   window.app.getClassLevelTalent = (cls, result) => {
-    const empty = { level: 0, bonuses: [], talents: [], fields: { talentRolledDesc: "", talentRolledName: "", Rolled12TalentOrTwoStatPoints: "", Rolled12ChosenTalentDesc: "", Rolled12ChosenTalentName: "" } };
+    const empty = { level: 1, bonuses: [], talents: [], fields: { talentRolledDesc: "", talentRolledName: "", Rolled12TalentOrTwoStatPoints: "", Rolled12ChosenTalentDesc: "", Rolled12ChosenTalentName: "" } };
     if (!classLevelTalentConfig(cls) || !result) return empty;
     const results = (Array.isArray(result) ? result : [result]).filter(Boolean).map(item => {
       const isInitiativeAdvantage = item.id === "InitiativeAdvantage" || item.bonusName === "InitiativeAdvantage" || item.bonusName === "AdvOnInitiative" || item.talentRolledName === "Vantagem na Iniciativa" || item.talentRolledName === "Initiative Advantage";
