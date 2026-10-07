@@ -261,6 +261,7 @@ async function applyWeaponMasteryChoice(importer, json) {
 function spellDisplayName(value) {
   const names = {
     "alarm": "Alarme",
+    "mage armor": "Armadura Arcana",
     "arcane armor": "Armadura Arcana",
     "detect magic": "Detectar Magia",
     "floating disk": "Disco Flutuante",
