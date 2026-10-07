@@ -58,7 +58,7 @@
   // habilidade especial configurada pelo GM.
   const CLASS_LEVEL_TALENTS = {
     "Malandro": {
-      foundryName: "Thief",
+      foundryName: "Ladrão",
       title: "Talentos de Ladrão",
       entries: [
         { min: 2, max: 2, id: "InitiativeAdvantage", name: "Vantagem na Iniciativa", desc: "Vantagem nas rolagens de iniciativa (role novamente se repetir)", foundryDesc: "Advantage on initiative rolls (reroll if tied)", bonusTo: "Initiative", bonusName: "InitiativeAdvantage" },
@@ -69,7 +69,7 @@
       ]
     },
     "Ladrão": {
-      foundryName: "Thief",
+      foundryName: "Ladrão",
       title: "Talentos de Ladrão",
       entries: null
     }
@@ -86,7 +86,7 @@
     const config = classLevelTalentConfig(cls);
     const effectName = result.bonusName || result.id;
     const bonusTo = result.bonusTo || result.talentRolledName || effectName;
-    return [{ sourceType: "Class", sourceName: window.app.getFoundryClassName(cls) || config?.foundryName || cls, sourceCategory: "Talent", name: effectName, bonusName: effectName, bonusTo, gainedAtLevel: 1 }];
+    return [{ sourceType: "Class", sourceName: window.app.getFoundryClassName(cls) || config?.foundryName || cls, sourceCategory: "Talent", name: result.talentRolledName || effectName, bonusName: effectName, bonusTo, gainedAtLevel: 1 }];
   }
   function renderLevelTalentChoices(result){
     if (!classLevelTalent) return;
