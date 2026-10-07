@@ -84,13 +84,14 @@
   const THIEF_DESCRIPTION = "Assassinos que se esgueiram por telhados, vigaristas sorridentes ou escaladores encapuzados que podem arrancar uma pedra preciosa das garras de um demônio adormecido e vendê-la pelo dobro de seu preço.";
   const THIEF_SPECIAL_ABILITY = [
     "Apunhalada Pelas Costas. Se acertar uma criatura que não esteja ciente do seu ataque, você causa dano extra com o dado da arma. Adicione dados de arma adicionais equivalentes à metade do seu nível (arredondando para baixo).",
+    "",
     "Ladroagem. Você tem proficiência em habilidades de roubo e possui as ferramentas necessárias para isso escondidas com você (elas não ocupam espaços de equipamento). Você é treinado nas habilidades a seguir e tem Vantagem em qualquer teste associado a elas:",
     "• Escalar.",
     "• Esgueirar-se e esconder-se.",
     "• Usar disfarces.",
     "• Encontrar e desarmar armadilhas.",
     "• Tarefas delicadas como roubar bolsos e abrir fechaduras."
-  ].join("\n\n");
+  ].join("\n");
   const CLASS_DESCRIPTIONS = {
     "Malandro": THIEF_DESCRIPTION,
     "Ladrão": THIEF_DESCRIPTION,
