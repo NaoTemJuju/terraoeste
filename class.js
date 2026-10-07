@@ -164,20 +164,10 @@
       title: "Talentos de Patrulheiro",
       entries: [
         { roll: "2", effect: "Dado de Dano de Arma Aumentado" },
-        { roll: "3–6", effect: "Escolha 1" },
-        { roll: "3–6", effect: "+1 para Ataques Corpo a Corpo e Dano" },
-        { roll: "3–6", effect: "+1 para Ataques à Distância e Dano" },
-        { roll: "7–9", effect: "Escolha 1" },
-        { roll: "7–9", effect: "+2 de Força" },
-        { roll: "7–9", effect: "+2 de Destreza" },
-        { roll: "7–9", effect: "+2 de Inteligência" },
+        { roll: "3–6", effect: "Escolha +1 para ataques corpo a corpo e dano ou ataques à distância e dano" },
+        { roll: "7–9", effect: "Escolha +2 em Força, Destreza ou Inteligência" },
         { roll: "10–11", effect: "Vantagem em Teste de Herbalismo" },
-        { roll: "12", effect: "Escolha 1" },
-        { roll: "12", effect: "Dado de Dano de Arma Aumentado" },
-        { roll: "12", effect: "+1 para Ataques Corpo a Corpo e Dano" },
-        { roll: "12", effect: "+1 para Ataques à Distância e Dano" },
-        { roll: "12", effect: "Vantagem em Teste de Herbalismo" },
-        { roll: "12", effect: "Distribuir entre Atributos" }
+        { roll: "12", effect: "Escolha um talento da tabela ou distribua +2 pontos entre os seus atributos" }
       ]
     },
     "Malandro": {
