@@ -98,11 +98,11 @@ function weaponDisplayName(value) {
 }
 
 async function weaponAttackType(weaponName) {
-  const wanted = key(weaponName);
+  const aliases = new Set([weaponName, weaponDisplayName(weaponName)].map(key));
   for (const pack of game.packs) {
     if (pack.metadata.type !== "Item") continue;
     const entry = pack.index.find(item =>
-      item.type === "Weapon" && key(item.name) === wanted
+      item.type === "Weapon" && aliases.has(key(item.name))
     );
     if (!entry) continue;
     const weapon = await pack.getDocument(entry._id);
@@ -116,7 +116,9 @@ async function weaponAttackType(weaponName) {
 }
 
 function setWeaponMasteryEffect(item, weaponName, attackType) {
-  const weaponSlug = slug(weaponName);
+  // O Shadowdark localizado usa o slug do nome PT-BR do item, por exemplo
+  // "Espada Longa" -> "espada-longa", não o identificador inglês "Longsword".
+  const weaponSlug = slug(weaponDisplayName(weaponName));
   let replaced = 0;
   for (const effect of item.effects ?? []) {
     const changes = Array.isArray(effect.changes)
