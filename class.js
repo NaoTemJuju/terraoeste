@@ -47,7 +47,7 @@
   };
   const MAGE_SPELLS = [
     { label: "Alarme", value: "Alarm", duration: "1 dia", range: "Adjacente" },
-    { label: "Armadura Arcana", value: "Arcane Armor", duration: "10 rodadas", range: "Você" },
+    { label: "Armadura Arcana", value: "Mage Armor", duration: "10 rodadas", range: "Você" },
     { label: "Detectar Magia", value: "Detect Magic", duration: "Concentração", range: "Perto" },
     { label: "Disco Flutuante", value: "Floating Disk", duration: "10 rodadas", range: "Perto" },
     { label: "Encantar Pessoa", value: "Charm Person", duration: "1d8 dias", range: "Perto" },
