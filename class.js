@@ -222,10 +222,10 @@
       foundryName: "Patrulheiro",
       title: "Talentos de Patrulheiro",
       entries: [
-        { min: 2, max: 2, id: "IncreasedWeaponDamageDie", name: "Increased Weapon Damage Die", choice: "rangerWeaponDamage", desc: "Dado de Dano de Arma Aumentado", foundryDesc: "Increased Weapon Damage Die", bonusName: "Increased Weapon Damage Die" },
+        { min: 2, max: 2, id: "IncreasedWeaponDamageDie", name: "Dado de Dano de Arma Aumentado", choice: "rangerWeaponDamage", desc: "Dado de Dano de Arma Aumentado", foundryDesc: "Increased Weapon Damage Die", bonusName: "Increased Weapon Damage Die" },
         { min: 3, max: 6, id: "RangerAttackBonus", choice: "rangerAttackBonus", desc: "Escolha +1 para ataques corpo a corpo e dano ou ataques à distância e dano", foundryDesc: "Choose +1 to melee attacks and damage or ranged attacks and damage" },
         { min: 7, max: 9, id: "StatBonus", choice: "stat", statOptions: ["STR", "DEX", "INT"], desc: "+2 em Força, Destreza ou Inteligência", foundryDesc: "+2 Strength, Dexterity, or Intelligence", bonusName: "StatBonus" },
-        { min: 10, max: 11, id: "HerbalismCheckAdvantage", name: "Herbalism Check Advantage", choice: "rangerHerbalism", desc: "Vantagem em Teste de Herbalismo", foundryDesc: "Herbalism Check Advantage", bonusName: "Herbalism Check Advantage" },
+        { min: 10, max: 11, id: "HerbalismCheckAdvantage", name: "Vantagem em Teste de Herbalismo", choice: "rangerHerbalism", desc: "Vantagem em Teste de Herbalismo", foundryDesc: "Herbalism Check Advantage", bonusName: "Herbalism Check Advantage" },
         { min: 12, max: 12, id: "RangerChooseTalentOrStats", choice: "rangerTwelve", desc: "Escolha um talento da tabela ou distribua +2 pontos entre os atributos", foundryDesc: "Choose a talent from the table or distribute +2 points among ability scores" }
       ]
     },
@@ -349,7 +349,7 @@
         select.addEventListener("change", () => {
           if (!select.value) { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); return; }
           const weapon = FIGHTER_WEAPON_TYPES.find(item => item.value === select.value);
-          chosen.talentRolledName = "Increased Weapon Damage Die";
+          chosen.talentRolledName = "Dado de Dano de Arma Aumentado";
           chosen.bonusName = "Increased Weapon Damage Die";
           chosen.bonusTo = weapon.value;
           chosen.displayDesc = `Dado de dano aumentado: ${weapon.label}`;
@@ -360,7 +360,7 @@
         const applyAttackBonus = attackType => {
           const melee = attackType === "melee";
           chosen.id = melee ? "RangerMeleeAttackDamage" : "RangerRangedAttackDamage";
-          chosen.talentRolledName = melee ? "+1 to Melee Attacks and Damage" : "+1 to Ranged Attacks and Damage";
+          chosen.talentRolledName = melee ? "+1 para Ataques Corpo a Corpo e Dano" : "+1 para Ataques à Distância e Dano";
           chosen.bonusName = chosen.talentRolledName;
           chosen.bonusTo = chosen.talentRolledName;
           chosen.displayDesc = melee ? "+1 para ataques corpo a corpo e dano" : "+1 para ataques à distância e dano";
@@ -385,7 +385,7 @@
         input.placeholder = "Digite o nome da erva";
         input.addEventListener("change", () => {
           if (!input.value.trim()) { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); return; }
-          chosen.talentRolledName = "Herbalism Check Advantage";
+          chosen.talentRolledName = "Vantagem em Teste de Herbalismo";
           chosen.bonusName = "Herbalism Check Advantage";
           chosen.bonusTo = input.value.trim();
           chosen.displayDesc = `Vantagem em Herbalismo: ${input.value.trim()}`;
@@ -915,19 +915,19 @@
     const randomChoice = (entry, chosen, rolled12 = false) => {
       if (entry.choice === "rangerWeaponDamage") {
         const weapon = FIGHTER_WEAPON_TYPES[randInt(0, FIGHTER_WEAPON_TYPES.length - 1)];
-        chosen.talentRolledName = "Increased Weapon Damage Die";
+        chosen.talentRolledName = "Dado de Dano de Arma Aumentado";
         chosen.bonusName = "Increased Weapon Damage Die";
         chosen.bonusTo = weapon.value;
         chosen.displayDesc = `Dado de dano aumentado: ${weapon.label}`;
       } else if (entry.choice === "rangerAttackBonus") {
         const melee = entry.rangerAttackType ? entry.rangerAttackType === "melee" : randInt(0, 1) === 0;
         chosen.id = melee ? "RangerMeleeAttackDamage" : "RangerRangedAttackDamage";
-        chosen.talentRolledName = melee ? "+1 to Melee Attacks and Damage" : "+1 to Ranged Attacks and Damage";
+        chosen.talentRolledName = melee ? "+1 para Ataques Corpo a Corpo e Dano" : "+1 para Ataques à Distância e Dano";
         chosen.bonusName = chosen.talentRolledName;
         chosen.bonusTo = chosen.talentRolledName;
         chosen.displayDesc = melee ? "+1 para ataques corpo a corpo e dano" : "+1 para ataques à distância e dano";
       } else if (entry.choice === "rangerHerbalism") {
-        chosen.talentRolledName = "Herbalism Check Advantage";
+        chosen.talentRolledName = "Vantagem em Teste de Herbalismo";
         chosen.bonusName = "Herbalism Check Advantage";
         chosen.bonusTo = "herb";
         chosen.displayDesc = "Vantagem em Teste de Herbalismo";
