@@ -1,8 +1,8 @@
 {
   "id": "terraoeste-foundry-choice-guard",
   "title": "TerraOeste: escolhas de talentos",
-  "description": "Aplica escolhas de talentos, chaves localizadas de Maestria em Armas e mantém tabelas acessíveis com Babele em português.",
-  "version": "0.7.0",
+  "description": "Aplica escolhas de talentos, magias de Mago e efeitos localizados de Maestria em Armas e Armaduras.",
+  "version": "0.8.0",
   "compatibility": {
     "minimum": "13",
     "verified": "14"
