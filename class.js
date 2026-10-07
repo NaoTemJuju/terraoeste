@@ -528,14 +528,36 @@
     if (!config) return null;
     const roll = randInt(1, 6) + randInt(1, 6);
     const entry = config.entries.find(item => roll >= item.min && roll <= item.max);
-    const result = resultForEntry(entry, roll);
-    if (entry.choice === "stat") {
-      const code = ["STR", "DEX", "CHA"][randInt(0, 2)];
-      result.bonusTo = `${code}:+2`;
-      result.talentRolledName = `+2 de ${STAT_LABELS.find(stat => STAT_CODES[stat] === code)}`;
-      result.talentRolledDesc = `+2 ${{STR:"Strength",DEX:"Dexterity",CHA:"Charisma"}[code]}`;
-      result.displayDesc = `+2 em ${STAT_LABELS.find(stat => STAT_CODES[stat] === code)}`;
-    } else if (entry.choice === "twelve") {
+    const randomChoice = (entry, chosen, rolled12 = false) => {
+      if (entry.choice === "stat") {
+        const options = entry.statOptions || ["STR", "DEX", "CHA"];
+        const code = options[randInt(0, options.length - 1)];
+        const stat = STAT_LABELS.find(name => STAT_CODES[name] === code);
+        const english = {STR:"Strength",DEX:"Dexterity",CON:"Constitution",INT:"Intelligence",WIS:"Wisdom",CHA:"Charisma"}[code];
+        chosen.bonusTo = `${code}:+2`;
+        chosen.talentRolledName = `+2 de ${stat}`;
+        chosen.talentRolledDesc = `+2 ${english}`;
+        chosen.displayDesc = `+2 em ${stat}`;
+      } else if (entry.choice === "weaponMastery") {
+        const weapon = FIGHTER_WEAPON_TYPES[randInt(0, FIGHTER_WEAPON_TYPES.length - 1)];
+        chosen.bonusTo = weapon.value;
+        chosen.talentRolledName = entry.name || "WeaponMastery";
+        chosen.displayDesc = `Maestria em Armas adicional: ${weapon.label}`;
+      } else if (entry.choice === "armorMastery") {
+        const armor = FIGHTER_ARMOR_TYPES[randInt(0, FIGHTER_ARMOR_TYPES.length - 1)];
+        chosen.bonusTo = armor.value;
+        chosen.talentRolledName = entry.name || "ArmorMastery";
+        chosen.displayDesc = `+1 na CA usando ${armor.label}`;
+      }
+      if (rolled12) {
+        chosen.rolled12TalentOrTwoStatPoints = "Talent";
+        chosen.rolled12ChosenTalentName = chosen.talentRolledName;
+        chosen.rolled12ChosenTalentDesc = chosen.talentRolledDesc;
+      }
+      return chosen;
+    };
+    let result = resultForEntry(entry, roll);
+    if (entry.choice === "twelve") {
       if (randInt(0, 1) === 0) {
         const stats = ["STR", "DEX", "CON", "INT", "WIS", "CHA"];
         const first = stats[randInt(0, stats.length - 1)];
@@ -544,23 +566,14 @@
         const labels = [first, second].map(code => STAT_LABELS.find(stat => STAT_CODES[stat] === code));
         return { roll, id: "TwoStatPoints", talentRolledName: "", talentRolledDesc: "+2 to ability scores", bonusName: "StatBonus", bonusTo: Object.entries(counts).map(([code, amount]) => `${code}:+${amount}`).join(", "), rolled12Mode: "twoStatPoints", rolled12TalentOrTwoStatPoints: "TwoStatPoints", displayDesc: `+2 pontos nos atributos: ${labels.join(" e ")}` };
       }
-      const chosenId = STAT_TALENT_OPTIONS[randInt(0, STAT_TALENT_OPTIONS.length - 1)];
-      const chosen = resultForEntry(config.entries.find(item => item.id === chosenId), roll);
-      chosen.rolled12TalentOrTwoStatPoints = "Talent";
-      chosen.rolled12ChosenTalentName = chosen.talentRolledName;
-      chosen.rolled12ChosenTalentDesc = chosen.talentRolledDesc;
-      chosen.displayDesc = `Escolheu talento: ${CLASS_TALENT_DISPLAY[chosen.talentRolledName] || chosen.talentRolledDesc}`;
-      if (chosen.needsChoice === "stat") {
-        const code = ["STR", "DEX", "CHA"][randInt(0, 2)];
-        chosen.bonusTo = `${code}:+2`;
-        chosen.talentRolledName = `+2 de ${STAT_LABELS.find(stat => STAT_CODES[stat] === code)}`;
-        chosen.rolled12ChosenTalentName = chosen.talentRolledName;
-        chosen.talentRolledDesc = `+2 ${{STR:"Strength",DEX:"Dexterity",CHA:"Charisma"}[code]}`;
-        chosen.rolled12ChosenTalentDesc = chosen.talentRolledDesc;
-      }
-      return chosen;
+      const choices = config.entries.filter(item => item.choice !== "twelve");
+      const chosenEntry = choices[randInt(0, choices.length - 1)];
+      result = randomChoice(chosenEntry, resultForEntry(chosenEntry, roll), true);
+      result.rolled12Mode = "talent";
+      result.displayDesc = `Escolheu talento: ${result.displayDesc || chosenEntry.desc}`;
+      return result;
     }
-    return result;
+    return entry.choice ? randomChoice(entry, result) : result;
   };
 
   window.app.getClassContent = cls => ({
