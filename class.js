@@ -315,6 +315,7 @@
     pending.classLevelTalent = null;
     pending.classLevelTalentDraft = null;
     if (step) step.style.display = "";
+    if (btnContinueClassTalent) btnContinueClassTalent.textContent = "Confirmar talento e continuar";
     renderClassTalentTable(cls, classLevelTalentTable);
     renderClassLevelTalent(cls);
     updateTalentContinueButton();
@@ -326,8 +327,9 @@
   btnContinueClassTalent?.addEventListener("click", () => {
     if (!pending.classLevelTalent) return;
     state.classLevelTalent = { ...pending.classLevelTalent };
-    const step = $("#stepClassTalent");
-    if (step) step.style.display = "none";
+    btnContinueClassTalent.disabled = true;
+    btnContinueClassTalent.textContent = "Talento confirmado";
+    try { window.app.showCheck?.(btnContinueClassTalent); } catch {}
     if (typeof window.app.goToShop === "function") window.app.goToShop();
   });
 
