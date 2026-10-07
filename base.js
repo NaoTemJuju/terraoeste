@@ -672,7 +672,7 @@
         CHA: a["Carisma"]?.valor ?? 0
       };
       const languagesStr = Array.isArray(obj?.linguas) ? obj.linguas.join(", ") : "";
-      const classLevelTalent = window.app.getClassLevelTalent?.(obj?.classe, obj?.terraOesteClassTalents || obj?.talentoClasseNivel1) || { level: 0, bonuses: [], fields: {} };
+      const classLevelTalent = window.app.getClassLevelTalent?.(obj?.classe, obj?.terraOesteClassTalents || obj?.talentoClasseNivel1) || { level: 1, bonuses: [], fields: {} };
       const level = classLevelTalent.level;
       const gear = Array.isArray(obj?.itens) ? obj.itens : [];
       const shopLedger = Array.isArray(obj?.compras) ? obj.compras : [];
