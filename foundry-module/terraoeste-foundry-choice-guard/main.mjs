@@ -180,7 +180,7 @@ function isClassTalentTable(document) {
     document?._source?.flags?.babele?.originalName
   ].filter(value => typeof value === "string");
   return names.some(name =>
-    /class\\s+talents/i.test(name) || /talentos?\\s+de\\s+classe/i.test(name)
+    /class\s+talents/i.test(name) || /talentos?\s+de\s+classe/i.test(name)
   );
 }
 
