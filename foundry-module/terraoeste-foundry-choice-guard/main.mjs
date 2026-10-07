@@ -280,19 +280,23 @@ function spellDisplayName(value) {
 function setSpellcastingAdvantageEffect(item, spellName) {
   const spellSlug = slug(spellDisplayName(spellName));
   let replaced = 0;
-  for (const effect of item.effects ?? []) {
+  const effects = [
+    ...(Array.isArray(item.effects) ? item.effects : []),
+    ...(Array.isArray(item.system?.effects) ? item.system.effects : [])
+  ];
+  for (const effect of effects) {
     const changes = Array.isArray(effect.changes)
       ? effect.changes
       : Array.isArray(effect.system?.changes) ? effect.system.changes : [];
     for (const change of changes) {
-      if (!/^system\.roll\.spellcasting\.advantage\.REPLACEME$/i.test(String(change.key ?? ""))) continue;
-      change.key = `system.roll.spellcasting.advantage.${spellSlug}`;
+      const effectKey = String(change.key ?? "");
+      if (!/advantage/i.test(effectKey) || !/REPLACEME$/i.test(effectKey)) continue;
+      change.key = effectKey.replace(/REPLACEME$/i, spellSlug);
       replaced += 1;
     }
   }
   return replaced > 0;
 }
-
 async function applySpellcastingAdvantageChoice(importer, json) {
   const bonuses = (Array.isArray(json?.bonuses) ? json.bonuses : []).filter(item =>
     item?.bonusName === "AdvOnCastOneSpell" && typeof item.bonusTo === "string" && item.bonusTo.trim()
@@ -318,7 +322,7 @@ async function applySpellcastingAdvantageChoice(importer, json) {
 
   for (const bonus of uniqueSelections) {
     const spellName = spellDisplayName(bonus.bonusTo);
-    const talent = sourceTalent.toObject();
+    const talent = JSON.parse(JSON.stringify(currentCopies[0] || sourceTalent.toObject()));
     talent._id = globalThis.foundry?.utils?.randomID?.() || `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
     if (!setSpellcastingAdvantageEffect(talent, spellName)) {
       console.warn(`${MODULE_ID}: não foi possível aplicar Vantagem em Conjuração para ${spellName}.`);
