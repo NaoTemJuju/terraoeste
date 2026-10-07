@@ -87,7 +87,7 @@ function weaponDisplayName(value) {
     "staff": "Cajado", "whip": "Chicote", "scimitar": "Cimitarra",
     "club": "Clava", "razor chain": "Corrente laminada",
     "bastard sword": "Espada bastarda", "shortsword": "Espada curta",
-    "greatsword": "Espada grande", "longsword": "Espada longa", "sling": "Funda",
+    "greatsword": "Espada grande", "longsword": "Espada Longa", "sling": "Funda",
     "spear": "Lança", "mace": "Maça", "morning star": "Maça estrela",
     "handaxe": "Machadinha", "greataxe": "Machado grande",
     "warhammer": "Martelo de guerra", "pike": "Pique",
