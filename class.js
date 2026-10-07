@@ -63,7 +63,7 @@
       foundryName: "Ladrão",
       title: "Talentos de Ladrão",
       entries: [
-        { min: 2, max: 2, id: "InitiativeAdvantage", name: "Initiative Advantage", desc: "Vantagem nas rolagens de iniciativa (role novamente se repetir)", foundryDesc: "Advantage on initiative rolls (reroll if tied)", bonusTo: "Initiative", bonusName: "InitiativeAdvantage" },
+        { min: 2, max: 2, id: "InitiativeAdvantage", name: "Vantagem na Iniciativa", desc: "Vantagem nas rolagens de iniciativa (role novamente se repetir)", foundryDesc: "Advantage on initiative rolls (reroll if tied)", bonusTo: "Initiative", bonusName: "AdvOnInitiative" },
         { min: 3, max: 5, id: "BackstabIncrease", name: "BackstabIncrease", desc: "Sua Apunhalada pelas Costas causa +1 dado de dano", foundryDesc: "Your Backstab deals +1 dice of damage", bonusTo: "Backstab", bonusName: "BackstabIncrease" },
         { min: 6, max: 9, id: "StatBonus", choice: "stat", desc: "+2 em Força, Destreza ou Carisma", foundryDesc: "+2 Strength, Dexterity, or Charisma", bonusName: "StatBonus" },
         { min: 10, max: 11, id: "Plus1ToHit", name: "+1 para Ataques Corpo a Corpo ou à Distância", desc: "+1 em ataques corpo a corpo e à distância", foundryDesc: "+1 to melee and ranged attacks", bonusTo: "Melee and ranged attacks", bonusName: "Plus1ToHit" },
@@ -366,8 +366,8 @@
     const empty = { level: 0, bonuses: [], talents: [], fields: { talentRolledDesc: "", talentRolledName: "", Rolled12TalentOrTwoStatPoints: "", Rolled12ChosenTalentDesc: "", Rolled12ChosenTalentName: "" } };
     if (!classLevelTalentConfig(cls) || !result) return empty;
     const results = (Array.isArray(result) ? result : [result]).filter(Boolean).map(item => {
-      const isInitiativeAdvantage = item.id === "InitiativeAdvantage" || item.bonusName === "InitiativeAdvantage" || item.talentRolledName === "Vantagem na Iniciativa";
-      return isInitiativeAdvantage ? { ...item, talentRolledName: "Initiative Advantage", bonusName: "InitiativeAdvantage" } : item;
+      const isInitiativeAdvantage = item.id === "InitiativeAdvantage" || item.bonusName === "InitiativeAdvantage" || item.bonusName === "AdvOnInitiative" || item.talentRolledName === "Vantagem na Iniciativa" || item.talentRolledName === "Initiative Advantage";
+      return isInitiativeAdvantage ? { ...item, bonusName: "AdvOnInitiative" } : item;
     });
     if (!results.length) return empty;
     const first = results[0];
