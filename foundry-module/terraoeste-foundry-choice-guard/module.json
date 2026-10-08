@@ -1,8 +1,8 @@
 {
   "id": "terraoeste-foundry-choice-guard",
   "title": "TerraOeste: escolhas de talentos",
-  "description": "Aplica escolhas de talentos, magias de Mago, Maestrias e Dado de Dano de Arma Aumentado do Patrulheiro.",
-  "version": "0.8.3",
+  "description": "Aplica escolhas de talentos, incluindo seleção de remédio e vantagem em Herbalismo no avanço de nível e na importação.",
+  "version": "0.8.8",
   "compatibility": {
     "minimum": "13",
     "verified": "14"
@@ -24,3 +24,4 @@
     ]
   }
 }
+
