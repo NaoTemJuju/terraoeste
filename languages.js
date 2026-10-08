@@ -61,7 +61,7 @@
    *   Feiticeiro.
    */
   const CLASS_SPEC = {
-    "Assassino":   { bonus: { common: 1 } },
+    "Assassino":   { grant: ["Diabólico"] },
     "Bárbaro":     { },
     "Bardo":       { bonus: { common: 4, rare: 1 } },
     "Bruxo":       { pickOne: ["Diabólico","Primordial","Silvestre"] },

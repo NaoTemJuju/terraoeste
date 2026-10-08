@@ -146,7 +146,15 @@
     "14 — Restaurador: encerra um veneno ou uma doença.",
     "15 — Curativo: equivale a uma Poção de Cura."
   ].join("\n");
+  const ASSASSIN_SPECIAL_ABILITY = [
+    "Assassino. Você tem Vantagem em testes para se esgueirar e se esconder. Seus ataques causam dano dobrado em alvos que não estão cientes de sua presença.",
+    "",
+    "Passo de Fumaça. 3 vezes por dia, você pode se teleportar para um local visível e próximo. Isso não gasta sua ação.",
+    "",
+    "Lótus Negra. Você conquistou o direito de comer uma pétala da lendária flor de lótus negra e sobreviveu aos seus efeitos místicos. Role um talento na tabela Talentos da Lótus Negra."
+  ].join("\n");
   const CLASS_DESCRIPTIONS = {
+    "Assassino": "Assassinos vestidos de preto, treinados desde a infância em um mosteiro oculto no deserto. Eles ganham poderes místicos de uma lendária flor de lótus negra, concedida por um demônio.",
     "Malandro": THIEF_DESCRIPTION,
     "Ladrão": THIEF_DESCRIPTION,
     "Bardo": "Bardos são viajantes bem-vindos e conselheiros sábios; sua tarefa é proteger e compartilhar o conhecimento que é repassado através das eras.",
@@ -156,6 +164,7 @@
     "Sacerdote": "Templários cruzados, xamãs proféticos, ou fanáticos com olhos enlouquecidos que empunham o poder de seus deuses para expurgar os impuros."
   };
   const CLASS_EQUIPMENT_INFO = {
+    "Assassino": { weapons: "Adaga, boleadeira, chicote de lâminas, cimitarra, lança, shuriken e zarabatana", armor: "Armadura de couro", hp: "1d6 por nível", languages: "Diabólico" },
     "Patrulheiro": { weapons: "Adaga, arco longo, espada longa, arco curto, espada curta, lança e cajado", armor: "Armadura de couro e cota de malha", hp: "1d8 por nível" },
     "Guerreiro": { weapons: "Todas as armas", armor: "Todas as armaduras", hp: "1d8 por nível" },
     "Malandro": { weapons: "Adaga, besta, clava, espada curta e arco curto", armor: "Armadura de couro e cota de malha de mithral", hp: "1d4 por nível" },
@@ -164,6 +173,32 @@
   };
 
   const CLASS_TALENT_TABLES = {
+    "Assassino": {
+      title: "Talentos de Ras-Godai",
+      entries: [
+        { roll: "2", effect: "Você é treinado no uso de venenos (veja pág. 27)" },
+        { roll: "3–6", effect: "Role um talento adicional da tabela Talentos da Lótus Negra" },
+        { roll: "7–9", effect: "+2 em Força ou Destreza, ou +1 em ataques corpo a corpo" },
+        { roll: "10–11", effect: "Ganhe um uso adicional do talento Passo de Fumaça" },
+        { roll: "12", effect: "Escolha um talento ou distribua +2 pontos entre os seus atributos" }
+      ],
+      secondaryTitle: "Talentos da Lótus Negra",
+      secondaryDice: "d12",
+      secondaryEntries: [
+        { roll: "1", effect: "Ganhe dois talentos da Lótus Negra; role novamente qualquer 1 adicional" },
+        { roll: "2", effect: "1/dia, ao causar dano com uma arma, paralise um alvo de NV 9 ou menor por 1d4 rodadas" },
+        { roll: "3", effect: "Vantagem em testes de Destreza para evitar aprisionamentos ou ferimentos" },
+        { roll: "4", effect: "+1 na CA ao empunhar uma arma corpo a corpo em cada mão" },
+        { roll: "5", effect: "Ganhe um dado de pontos de vida adicional" },
+        { roll: "6", effect: "Você causa o triplo de dano com seu talento Assassino" },
+        { roll: "7", effect: "Inimigos que veem você fazem teste de moral CD 18 em vez de 15" },
+        { roll: "8", effect: "1/dia, ande sobre a água por 1d4 rodadas como se fosse uma superfície sólida" },
+        { roll: "9", effect: "1/dia, escolha uma criatura viva de NV 5 ou menor perto de você; ela deve passar em um teste de Constituição CD 15 ou adormece" },
+        { roll: "10", effect: "1/dia, ande em superfícies íngremes, como paredes, por 1d4 rodadas" },
+        { roll: "11", effect: "Cause +1 de dano com armas corpo a corpo" },
+        { roll: "12", effect: "1/dia, escolha uma criatura viva de NV 9 ou menor que esteja perto; ela deve passar em um teste de Sabedoria CD 15 ou não poderá vê-lo nem ouvi-lo por 1d4 rodadas" }
+      ]
+    },
     "Mago": {
       title: "Talentos de Mago",
       entries: [
@@ -225,13 +260,52 @@
     "Conjuração. Você pode conjurar as magias de mago que você conhece. Você conhece três magias de grau 1, à sua escolha, da lista de magias de mago. A cada nível que você ganhar, escolha novas magias de mago para aprender, de acordo com a tabela de Magias de Mago Conhecidas. Para conjurar magias de mago, veja Conjuração, na pág. 44."
   ].join("\n");
   const CLASS_SPECIAL_ABILITIES = {
+    "Assassino": ASSASSIN_SPECIAL_ABILITY,
     "Mago": MAGE_SPECIAL_ABILITY,
     "Patrulheiro": RANGER_SPECIAL_ABILITY,
     "Malandro": THIEF_SPECIAL_ABILITY,
     "Ladrão": THIEF_SPECIAL_ABILITY
   };
 
+  const ASSASSIN_BLACK_LOTUS_TALENTS = [
+    null,
+    { id: "AssassinLotusParalysis", name: "Lótus Negra: Paralisia", effect: "1/dia, ao causar dano com uma arma, paralise um alvo de NV 9 ou menor por 1d4 rodadas" },
+    { id: "AssassinLotusDexterityAdvantage", name: "Lótus Negra: Reflexos", effect: "Vantagem em testes de Destreza para evitar aprisionamentos ou ferimentos" },
+    { id: "AssassinLotusDualWieldAC", name: "Lótus Negra: Defesa com Duas Armas", effect: "+1 na CA ao empunhar uma arma corpo a corpo em cada mão" },
+    { id: "AssassinLotusExtraHitDie", name: "Lótus Negra: Vitalidade", effect: "Ganhe um dado de pontos de vida adicional" },
+    { id: "AssassinLotusTripleDamage", name: "Lótus Negra: Dano Triplo", effect: "Você causa o triplo de dano com seu talento Assassino" },
+    { id: "AssassinLotusMoral", name: "Lótus Negra: Presença Aterradora", effect: "Inimigos que veem você fazem teste de moral CD 18 em vez de 15" },
+    { id: "AssassinLotusWaterWalking", name: "Lótus Negra: Caminhar sobre a Água", effect: "1/dia, ande sobre a água por 1d4 rodadas como se fosse uma superfície sólida" },
+    { id: "AssassinLotusSleep", name: "Lótus Negra: Sono", effect: "1/dia, uma criatura viva de NV 5 ou menor perto de você testa Constituição CD 15 ou adormece" },
+    { id: "AssassinLotusWallWalking", name: "Lótus Negra: Escalar Paredes", effect: "1/dia, ande em superfícies íngremes, como paredes, por 1d4 rodadas" },
+    { id: "AssassinLotusMeleeDamage", name: "Lótus Negra: Dano Corpo a Corpo", effect: "Cause +1 de dano com armas corpo a corpo" },
+    { id: "AssassinLotusUnseen", name: "Lótus Negra: Invisibilidade aos Sentidos", effect: "1/dia, uma criatura viva de NV 9 ou menor testa Sabedoria CD 15 ou não poderá vê-lo nem ouvi-lo por 1d4 rodadas" }
+  ];
+  function rollAssassinLotusResults(){
+    const rollOne = () => {
+      let roll = randInt(1, 12);
+      while (roll === 1) roll = randInt(1, 12);
+      const talent = ASSASSIN_BLACK_LOTUS_TALENTS[roll];
+      return { roll, id: talent.id, talentRolledName: talent.name, talentRolledDesc: talent.effect, displayDesc: talent.effect, bonusName: talent.id, bonusTo: talent.id };
+    };
+    const initialRoll = randInt(1, 12);
+    if (initialRoll === 1) return [rollOne(), rollOne()];
+    const talent = ASSASSIN_BLACK_LOTUS_TALENTS[initialRoll];
+    return [{ roll: initialRoll, id: talent.id, talentRolledName: talent.name, talentRolledDesc: talent.effect, displayDesc: talent.effect, bonusName: talent.id, bonusTo: talent.id }];
+  }
+
   const CLASS_LEVEL_TALENTS = {
+    "Assassino": {
+      foundryName: "Assassino",
+      title: "Talentos de Ras-Godai",
+      entries: [
+        { min: 2, max: 2, id: "AssassinPoisonTraining", name: "Treinamento com Venenos", desc: "Você é treinado no uso de venenos", foundryDesc: "Trained in the use of poisons", bonusName: "AssassinPoisonTraining" },
+        { min: 3, max: 6, id: "AssassinBlackLotusRoll", choice: "assassinBlackLotus", desc: "Role um talento adicional da tabela Talentos da Lótus Negra", foundryDesc: "Roll an additional Black Lotus talent", bonusName: "" },
+        { min: 7, max: 9, id: "AssassinStatOrMelee", choice: "assassinStatOrMelee", desc: "+2 em Força ou Destreza, ou +1 em ataques corpo a corpo", foundryDesc: "+2 Strength or Dexterity, or +1 to melee attacks" },
+        { min: 10, max: 11, id: "AssassinSmokeStepExtraUse", name: "Uso Adicional de Passo de Fumaça", desc: "Ganhe um uso adicional do talento Passo de Fumaça", foundryDesc: "Gain one additional use of Smoke Step", bonusName: "AssassinSmokeStepExtraUse" },
+        { min: 12, max: 12, id: "AssassinChooseTalentOrStats", choice: "twelve", desc: "Escolha um talento ou distribua +2 pontos entre os seus atributos", foundryDesc: "Choose a talent or distribute +2 points among ability scores" }
+      ]
+    },
     "Mago": {
       foundryName: "Mago",
       title: "Talentos de Mago",
@@ -299,7 +373,7 @@
 
   function classLevelTalentConfig(cls){ return CLASS_LEVEL_TALENTS[cls] || null; }
   window.app.getFoundryClassName = cls => classLevelTalentConfig(cls)?.foundryName || window.CUSTOM_CLASS_DATA?.[cls]?.foundryName || cls || "";
-  function resultForEntry(entry, roll){ return { roll, id: entry.id, talentRolledName: entry.name || "", talentRolledDesc: entry.foundryDesc || entry.desc, displayDesc: entry.desc, bonusName: entry.bonusName || entry.id, bonusTo: entry.bonusTo || "", needsChoice: entry.choice || "", statOptions: entry.statOptions || null }; }
+  function resultForEntry(entry, roll){ return { roll, id: entry.id, talentRolledName: entry.name || "", talentRolledDesc: entry.foundryDesc || entry.desc, displayDesc: entry.desc, bonusName: entry.bonusName ?? entry.id, bonusTo: entry.bonusTo || "", needsChoice: entry.choice || "", statOptions: entry.statOptions || null }; }
   function makeTalentBonus(result, cls){
     if (!result || !(result.bonusName || result.id)) return [];
     const config = classLevelTalentConfig(cls);
@@ -367,6 +441,36 @@
           complete(chosen);
         });
         details.append(select);
+      } else if (entry.choice === "assassinStatOrMelee") {
+        const select = document.createElement("select");
+        select.append(new Option("Escolha o benefício", ""), new Option("+2 em Força", "STR"), new Option("+2 em Destreza", "DEX"), new Option("+1 em ataques corpo a corpo", "melee"));
+        select.addEventListener("change", () => {
+          if (!select.value) { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); return; }
+          if (select.value === "melee") {
+            chosen.id = "AssassinMeleeAttackBonus"; chosen.talentRolledName = "+1 para Ataques Corpo a Corpo";
+            chosen.talentRolledDesc = "+1 to melee attacks"; chosen.bonusName = "Plus1ToHit";
+            chosen.bonusTo = "Melee attacks"; chosen.displayDesc = "+1 em ataques corpo a corpo";
+          } else {
+            const code = select.value, stat = code === "STR" ? "Força" : "Destreza";
+            chosen.id = "StatBonus"; chosen.talentRolledName = "+2 de " + stat;
+            chosen.talentRolledDesc = "+2 " + (code === "STR" ? "Strength" : "Dexterity");
+            chosen.bonusName = "StatBonus"; chosen.bonusTo = code + ":+2"; chosen.displayDesc = "+2 em " + stat;
+          }
+          finish(chosen);
+        });
+        details.append(select);
+      } else if (entry.choice === "assassinBlackLotus") {
+        const button = document.createElement("button");
+        button.type = "button"; button.className = "ghost";
+        button.textContent = "Rolar Talento da Lótus Negra (1d12)";
+        button.addEventListener("click", () => {
+          const results = rollAssassinLotusResults(); chosen.blackLotusResults = results;
+          chosen.displayDesc = results.length === 2
+            ? "Lótus Negra (1: dois talentos): " + results.map(item => "d12 " + item.roll + " — " + item.displayDesc).join("; ")
+            : "Lótus Negra (d12 " + results[0].roll + "): " + results[0].displayDesc;
+          finish(chosen);
+        });
+        details.append(button);
       } else if (entry.choice === "rangerWeaponDamage") {
         const select = document.createElement("select");
         select.append(new Option("Escolha a arma", ""));
@@ -491,7 +595,7 @@
         result.displayDesc = `+2 em ${stat}`;
         finish(result);
       }, result.statOptions || ["STR","DEX","CHA"]));
-    } else if (["weaponMastery", "armorMastery", "magicItem", "mageStatOrCasting", "mageKnownSpell", "mageExtraSpell", "rangerWeaponDamage", "rangerAttackBonus", "rangerHerbalism"].includes(result.needsChoice)) {
+    } else if (["weaponMastery", "armorMastery", "magicItem", "mageStatOrCasting", "mageKnownSpell", "mageExtraSpell", "rangerWeaponDamage", "rangerAttackBonus", "rangerHerbalism", "assassinStatOrMelee", "assassinBlackLotus"].includes(result.needsChoice)) {
       showEntryChoice(config.entries.find(entry => entry.id === result.id), result, choiceArea);
     } else if (result.needsChoice === "rangerTwelve") {
       const select = document.createElement("select");
@@ -630,31 +734,22 @@
     target.hidden = !data;
     if (!data) return;
 
-    const title = document.createElement("h4");
-    title.textContent = data.title;
-    const table = document.createElement("table");
-    const thead = document.createElement("thead");
-    const headingRow = document.createElement("tr");
-    ["2d6", "Efeito"].forEach(label => {
-      const th = document.createElement("th");
-      th.scope = "col";
-      th.textContent = label;
-      headingRow.append(th);
+    const tables = [
+      { title: data.title, dice: "2d6", entries: data.entries },
+      ...(data.secondaryEntries ? [{ title: data.secondaryTitle, dice: data.secondaryDice || "d12", entries: data.secondaryEntries }] : [])
+    ];
+    tables.forEach(section => {
+      const title = document.createElement("h4"); title.textContent = section.title;
+      const table = document.createElement("table"), thead = document.createElement("thead"), headingRow = document.createElement("tr");
+      [section.dice, "Efeito"].forEach(label => { const th = document.createElement("th"); th.scope = "col"; th.textContent = label; headingRow.append(th); });
+      thead.append(headingRow);
+      const tbody = document.createElement("tbody");
+      section.entries.forEach(entry => {
+        const row = document.createElement("tr"), roll = document.createElement("th"), effect = document.createElement("td");
+        roll.scope = "row"; roll.textContent = entry.roll; effect.textContent = entry.effect; row.append(roll, effect); tbody.append(row);
+      });
+      table.append(thead, tbody); target.append(title, table);
     });
-    thead.append(headingRow);
-    const tbody = document.createElement("tbody");
-    data.entries.forEach(entry => {
-      const row = document.createElement("tr");
-      const roll = document.createElement("th");
-      roll.scope = "row";
-      roll.textContent = entry.roll;
-      const effect = document.createElement("td");
-      effect.textContent = entry.effect;
-      row.append(roll, effect);
-      tbody.append(row);
-    });
-    table.append(thead, tbody);
-    target.append(title, table);
   }
 
   function renderMageSpellTables(cls){
@@ -736,7 +831,8 @@
         [
           ["Armas", equipment.weapons],
           ["Armaduras", equipment.armor],
-          ["Pontos de Vida", equipment.hp]
+          ["Pontos de Vida", equipment.hp],
+          ...(equipment.languages ? [["Idiomas", equipment.languages]] : [])
         ].forEach(([label, value]) => {
           classInfoDescription.append(document.createElement("br"), document.createElement("br"));
           const strong = document.createElement("strong");
@@ -773,7 +869,7 @@
         classInfoAbility.replaceChildren();
         specialAbility.split(String.fromCharCode(10)).forEach((line, index) => {
           if (index) classInfoAbility.append(document.createElement("br"));
-          const heading = line.match(/^(Apunhalada Pelas Costas|Ladroagem|Aprendendo Magias|Conjuração|Desbravador|Herbalismo)[.](.*)$/);
+          const heading = line.match(/^(Assassino|Passo de Fumaça|Lótus Negra|Apunhalada Pelas Costas|Ladroagem|Aprendendo Magias|Conjuração|Desbravador|Herbalismo)[.](.*)$/);
           if (heading) {
             const strong = document.createElement("strong");
             strong.style.display = "inline";
@@ -932,7 +1028,9 @@
     });
     if (!results.length) return empty;
     const first = results[0];
-    return { level: 1, talents: results, bonuses: results.flatMap(item => makeTalentBonus(item, cls)), fields: {
+    const bonusResults = results.flatMap(item => item.id === "AssassinBlackLotusRoll" ? (item.blackLotusResults || []) : [item]);
+    const talentResults = results.flatMap(item => item.id === "AssassinBlackLotusRoll" ? (item.blackLotusResults || []) : [item]);
+    return { level: 1, talents: talentResults, bonuses: bonusResults.flatMap(item => makeTalentBonus(item, cls)), fields: {
       talentRolledDesc: first.talentRolledDesc || "",
       talentRolledName: first.talentRolledName || "",
       Rolled12TalentOrTwoStatPoints: first.rolled12TalentOrTwoStatPoints || "",
@@ -951,7 +1049,24 @@
     const roll = randInt(1, 6) + randInt(1, 6);
     const entry = config.entries.find(item => roll >= item.min && roll <= item.max);
     const randomChoice = (entry, chosen, rolled12 = false) => {
-      if (entry.choice === "rangerWeaponDamage") {
+      if (entry.choice === "assassinBlackLotus") {
+        chosen.blackLotusResults = rollAssassinLotusResults();
+        chosen.displayDesc = chosen.blackLotusResults.length === 2
+          ? "Lótus Negra (1: dois talentos): " + chosen.blackLotusResults.map(item => "d12 " + item.roll + " — " + item.displayDesc).join("; ")
+          : "Lótus Negra (d12 " + chosen.blackLotusResults[0].roll + "): " + chosen.blackLotusResults[0].displayDesc;
+      } else if (entry.choice === "assassinStatOrMelee") {
+        const choice = randInt(0, 2);
+        if (choice === 2) {
+          chosen.id = "AssassinMeleeAttackBonus"; chosen.talentRolledName = "+1 para Ataques Corpo a Corpo";
+          chosen.talentRolledDesc = "+1 to melee attacks"; chosen.bonusName = "Plus1ToHit";
+          chosen.bonusTo = "Melee attacks"; chosen.displayDesc = "+1 em ataques corpo a corpo";
+        } else {
+          const code = choice === 0 ? "STR" : "DEX", stat = code === "STR" ? "Força" : "Destreza";
+          chosen.id = "StatBonus"; chosen.talentRolledName = "+2 de " + stat;
+          chosen.talentRolledDesc = "+2 " + (code === "STR" ? "Strength" : "Dexterity");
+          chosen.bonusName = "StatBonus"; chosen.bonusTo = code + ":+2"; chosen.displayDesc = "+2 em " + stat;
+        }
+      } else if (entry.choice === "rangerWeaponDamage") {
         const weapon = FIGHTER_WEAPON_TYPES[randInt(0, FIGHTER_WEAPON_TYPES.length - 1)];
         chosen.talentRolledName = "Dado de Dano de Arma Aumentado";
         chosen.bonusName = "SetWeaponTypeDamage";
