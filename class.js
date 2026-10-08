@@ -296,7 +296,7 @@
 
   const CLASS_LEVEL_TALENTS = {
     "Assassino": {
-      foundryName: "Ras-Godai",
+      foundryName: "Assassino",
       title: "Talentos de Ras-Godai",
       entries: [
         { min: 2, max: 2, id: "AssassinPoisonTraining", name: "Treinamento com Venenos", desc: "Você é treinado no uso de venenos", foundryDesc: "Trained in the use of poisons", bonusName: "AssassinPoisonTraining" },
