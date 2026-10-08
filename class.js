@@ -267,8 +267,24 @@
     "Ladrão": THIEF_SPECIAL_ABILITY
   };
 
+  const ASSASSIN_BONUS_ALIASES = {
+  "AssassinPoisonTraining": "UsePoisons",
+  "AssassinSmokeStepExtraUse": "ImpSmokeStep",
+  "AssassinLotusParalysis": "ParalyseOnWeaponHit",
+  "AssassinLotusDexterityAdvantage": "ADVonDEXToAvoidEntrapment",
+  "AssassinLotusDualWieldAC": "Plus1ACWhenDualWield",
+  "AssassinLotusExtraHitDie": "PlusOneHitDie",
+  "AssassinLotusTripleDamage": "TripleDamageAssassinate",
+  "AssassinLotusMoral": "Morale18",
+  "AssassinLotusWaterWalking": "WalkOnWater",
+  "AssassinLotusSleep": "MakeAsleep",
+  "AssassinLotusWallWalking": "WalkOnWalls",
+  "AssassinLotusMeleeDamage": "Plus1ToMeleeDamage",
+  "AssassinLotusUnseen": "Invisible"
+};
   const ASSASSIN_BLACK_LOTUS_TALENTS = [
-    null,
+    null, // d12 index 0 is unused.
+    null, // d12 result 1 rolls two additional talents.
     { id: "AssassinLotusParalysis", name: "Paralisar um Alvo", effect: "1/dia, ao causar dano com uma arma, paralise um alvo de NV 9 ou menor por 1d4 rodadas" },
     { id: "AssassinLotusDexterityAdvantage", name: "Evitar Aprisionamento/Ferimentos", effect: "Vantagem em testes de Destreza para evitar aprisionamentos ou ferimentos" },
     { id: "AssassinLotusDualWieldAC", name: "+1 CA com Duas Armas", effect: "+1 na CA ao empunhar uma arma corpo a corpo em cada mão" },
@@ -286,12 +302,12 @@
       let roll = randInt(1, 12);
       while (roll === 1) roll = randInt(1, 12);
       const talent = ASSASSIN_BLACK_LOTUS_TALENTS[roll];
-      return { roll, id: talent.id, talentRolledName: talent.name, talentRolledDesc: talent.effect, displayDesc: talent.effect, bonusName: talent.id, bonusTo: talent.id };
+      return { roll, id: talent.id, talentRolledName: talent.name, talentRolledDesc: talent.effect, displayDesc: talent.effect, bonusName: ASSASSIN_BONUS_ALIASES[talent.id], bonusTo: ASSASSIN_BONUS_ALIASES[talent.id] };
     };
     const initialRoll = randInt(1, 12);
     if (initialRoll === 1) return [rollOne(), rollOne()];
     const talent = ASSASSIN_BLACK_LOTUS_TALENTS[initialRoll];
-    return [{ roll: initialRoll, id: talent.id, talentRolledName: talent.name, talentRolledDesc: talent.effect, displayDesc: talent.effect, bonusName: talent.id, bonusTo: talent.id }];
+    return [{ roll: initialRoll, id: talent.id, talentRolledName: talent.name, talentRolledDesc: talent.effect, displayDesc: talent.effect, bonusName: ASSASSIN_BONUS_ALIASES[talent.id], bonusTo: ASSASSIN_BONUS_ALIASES[talent.id] }];
   }
 
   const CLASS_LEVEL_TALENTS = {
@@ -299,10 +315,10 @@
       foundryName: "Assassino",
       title: "Talentos de Ras-Godai",
       entries: [
-        { min: 2, max: 2, id: "AssassinPoisonTraining", name: "Treinamento em Venenos", desc: "Você é treinado no uso de venenos", foundryDesc: "Trained in the use of poisons", bonusName: "AssassinPoisonTraining" },
+        { min: 2, max: 2, id: "AssassinPoisonTraining", name: "Treinamento em Venenos", desc: "Você é treinado no uso de venenos", foundryDesc: "Trained in the use of poisons", bonusName: "UsePoisons" },
         { min: 3, max: 6, id: "AssassinBlackLotusRoll", name: "Talento da Lótus Negra Adicional", choice: "assassinBlackLotus", desc: "Role um talento adicional da tabela Talentos da Lótus Negra", foundryDesc: "Roll an additional Black Lotus talent", bonusName: "" },
         { min: 7, max: 9, id: "AssassinStatOrMelee", choice: "assassinStatOrMelee", desc: "+2 em Força ou Destreza, ou +1 em ataques corpo a corpo", foundryDesc: "+2 Strength or Dexterity, or +1 to melee attacks" },
-        { min: 10, max: 11, id: "AssassinSmokeStepExtraUse", name: "Uso Adicional de Passo de Fumaça", desc: "Ganhe um uso adicional do talento Passo de Fumaça", foundryDesc: "Gain one additional use of Smoke Step", bonusName: "AssassinSmokeStepExtraUse" },
+        { min: 10, max: 11, id: "AssassinSmokeStepExtraUse", name: "Uso Adicional de Passo de Fumaça", desc: "Ganhe um uso adicional do talento Passo de Fumaça", foundryDesc: "Gain one additional use of Smoke Step", bonusName: "ImpSmokeStep" },
         { min: 12, max: 12, id: "AssassinChooseTalentOrStats", choice: "twelve", desc: "Escolha um talento ou distribua +2 pontos entre os seus atributos", foundryDesc: "Choose a talent or distribute +2 points among ability scores" }
       ]
     },
@@ -404,6 +420,8 @@
     return {
       ...item,
       talentRolledName,
+      bonusName: ASSASSIN_BONUS_ALIASES[item.bonusName] || ASSASSIN_BONUS_ALIASES[item.id] || item.bonusName,
+      bonusTo: ASSASSIN_BONUS_ALIASES[item.bonusTo] || item.bonusTo,
       blackLotusResults: Array.isArray(item.blackLotusResults) ? item.blackLotusResults.map(normalizedTalentRecord) : item.blackLotusResults
     };
   }
@@ -1349,4 +1367,5 @@
     });
   }
 })();
+
 
