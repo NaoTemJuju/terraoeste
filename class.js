@@ -250,7 +250,7 @@
         { min: 2, max: 2, id: "IncreasedWeaponDamageDie", name: "Dado de Dano de Arma Aumentado", choice: "rangerWeaponDamage", desc: "Dado de Dano de Arma Aumentado", foundryDesc: "Increased Weapon Damage Die", bonusName: "Increased Weapon Damage Die" },
         { min: 3, max: 6, id: "RangerAttackBonus", choice: "rangerAttackBonus", desc: "Escolha +1 para ataques corpo a corpo e dano ou ataques à distância e dano", foundryDesc: "Choose +1 to melee attacks and damage or ranged attacks and damage" },
         { min: 7, max: 9, id: "StatBonus", choice: "stat", statOptions: ["STR", "DEX", "INT"], desc: "+2 em Força, Destreza ou Inteligência", foundryDesc: "+2 Strength, Dexterity, or Intelligence", bonusName: "StatBonus" },
-        { min: 10, max: 11, id: "HerbalismCheckAdvantage", name: "Vantagem em Teste de Herbalismo", choice: "rangerHerbalism", desc: "Vantagem em Teste de Herbalismo", foundryDesc: "Herbalism Check Advantage", bonusName: "ADVToElixir" },
+        { min: 10, max: 11, id: "HerbalismCheckAdvantage", name: "Vantagem em Teste de Herbalismo", choice: "rangerHerbalism", desc: "Vantagem em Teste de Herbalismo", foundryDesc: "Herbalism Check Advantage", bonusName: "ReduceHerbalismDC" },
         { min: 12, max: 12, id: "RangerChooseTalentOrStats", choice: "rangerTwelve", desc: "Escolha um talento da tabela ou distribua +2 pontos entre os atributos", foundryDesc: "Choose a talent from the table or distribute +2 points among ability scores" }
       ]
     },
@@ -410,7 +410,7 @@
           const remedy = RANGER_REMEDIES.find(item => item.value === select.value);
           if (!remedy) { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); return; }
           chosen.talentRolledName = "Vantagem em Teste de Herbalismo";
-          chosen.bonusName = "ADVToElixir";
+          chosen.bonusName = "ReduceHerbalismDC";
           chosen.bonusTo = remedy.value;
           chosen.displayDesc = `Vantagem em Herbalismo para preparar: ${remedy.label.replace(/ \(CD \d+\)$/, "")}`;
           complete(chosen);
@@ -967,7 +967,7 @@
       } else if (entry.choice === "rangerHerbalism") {
         const remedy = RANGER_REMEDIES[randInt(0, RANGER_REMEDIES.length - 1)];
         chosen.talentRolledName = "Vantagem em Teste de Herbalismo";
-        chosen.bonusName = "ADVToElixir";
+        chosen.bonusName = "ReduceHerbalismDC";
         chosen.bonusTo = remedy.value;
         chosen.displayDesc = `Vantagem em Herbalismo para preparar: ${remedy.label.replace(/ \(CD \d+\)$/, "")}`;
       } else if (entry.choice === "stat") {
