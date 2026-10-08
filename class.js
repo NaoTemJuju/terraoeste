@@ -386,8 +386,8 @@
           const melee = attackType === "melee";
           chosen.id = melee ? "RangerMeleeAttackDamage" : "RangerRangedAttackDamage";
           chosen.talentRolledName = melee ? "+1 para Ataques Corpo a Corpo e Dano" : "+1 para Ataques à Distância e Dano";
-          chosen.bonusName = chosen.talentRolledName;
-          chosen.bonusTo = chosen.talentRolledName;
+          chosen.bonusName = "Plus1ToHitAndDamage";
+          chosen.bonusTo = melee ? "Melee attacks" : "Ranged attacks";
           chosen.displayDesc = melee ? "+1 para ataques corpo a corpo e dano" : "+1 para ataques à distância e dano";
           complete(chosen);
         };
@@ -961,8 +961,8 @@
         const melee = entry.rangerAttackType ? entry.rangerAttackType === "melee" : randInt(0, 1) === 0;
         chosen.id = melee ? "RangerMeleeAttackDamage" : "RangerRangedAttackDamage";
         chosen.talentRolledName = melee ? "+1 para Ataques Corpo a Corpo e Dano" : "+1 para Ataques à Distância e Dano";
-        chosen.bonusName = chosen.talentRolledName;
-        chosen.bonusTo = chosen.talentRolledName;
+        chosen.bonusName = "Plus1ToHitAndDamage";
+        chosen.bonusTo = melee ? "Melee attacks" : "Ranged attacks";
         chosen.displayDesc = melee ? "+1 para ataques corpo a corpo e dano" : "+1 para ataques à distância e dano";
       } else if (entry.choice === "rangerHerbalism") {
         const remedy = RANGER_REMEDIES[randInt(0, RANGER_REMEDIES.length - 1)];
