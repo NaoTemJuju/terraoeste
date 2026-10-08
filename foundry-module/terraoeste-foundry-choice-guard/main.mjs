@@ -3,6 +3,33 @@ const WEAPON_MASTERY_BONUS = "Plus1AttackAndDamagePlusHalfLevel";
 const WEAPON_DAMAGE_DIE_BONUS = "SetWeaponTypeDamage";
 const ARMOR_MASTERY_BONUS = "ArmorMastery";
 
+const ASSASSIN_BONUS_ALIASES = {
+  "AssassinPoisonTraining": "UsePoisons",
+  "AssassinSmokeStepExtraUse": "ImpSmokeStep",
+  "AssassinLotusParalysis": "ParalyseOnWeaponHit",
+  "AssassinLotusDexterityAdvantage": "ADVonDEXToAvoidEntrapment",
+  "AssassinLotusDualWieldAC": "Plus1ACWhenDualWield",
+  "AssassinLotusExtraHitDie": "PlusOneHitDie",
+  "AssassinLotusTripleDamage": "TripleDamageAssassinate",
+  "AssassinLotusMoral": "Morale18",
+  "AssassinLotusWaterWalking": "WalkOnWater",
+  "AssassinLotusSleep": "MakeAsleep",
+  "AssassinLotusWallWalking": "WalkOnWalls",
+  "AssassinLotusMeleeDamage": "Plus1ToMeleeDamage",
+  "AssassinLotusUnseen": "Invisible"
+};
+
+// Shadowdarkling resolves talents by bonus identifiers, independently of Babele names.
+function normalizeAssassinBonus(bonus) {
+  const canonical = ASSASSIN_BONUS_ALIASES[bonus?.bonusName];
+  if (!canonical) return bonus;
+  return {
+    ...bonus,
+    bonusName: canonical,
+    bonusTo: bonus.bonusTo === bonus.bonusName ? canonical : bonus.bonusTo,
+  };
+}
+
 function key(value) {
   return String(value ?? "").trim().toLocaleLowerCase("en");
 }
@@ -409,6 +436,117 @@ async function applySpellcastingAdvantageChoice(importer, json) {
   return true;
 }
 
+function herbalismRemedyName(value) {
+  const raw = String(value ?? "").split(/:\s*/).pop().trim().replace(/\s*\([^)]*\)\s*$/, "");
+  const normalized = normalizedEffectLabel(raw);
+  const aliases = {
+    "salve": ["salve"],
+    "stimulant": ["stimulant", "estimulante"],
+    "foebane": ["foebane"],
+    "restorative": ["restorative", "restaurador", "restauradora"],
+    "curative": ["curative", "curativo", "curativa"],
+  };
+  for (const [canonical, names] of Object.entries(aliases)) {
+    if (names.includes(normalized)) return canonical;
+  }
+  return normalized;
+}
+
+async function resolveHerbalismRemedy(value) {
+  const canonical = herbalismRemedyName(value);
+  const abilities = await globalThis.shadowdark?.compendiums?.classAbilities?.();
+  const aliases = {
+    salve: ["salve"],
+    stimulant: ["stimulant", "estimulante"],
+    foebane: ["foebane"],
+    restorative: ["restorative", "restaurador", "restauradora"],
+    curative: ["curative", "curativo", "curativa"],
+  };
+  const names = aliases[canonical] ?? [canonical];
+  const item = (abilities ?? []).find(ability => {
+    const candidates = [ability.name, ability.flags?.babele?.originalName]
+      .map(normalizedEffectLabel);
+    return candidates.some(name => names.includes(name));
+  });
+  if (item) return {name: item.name, slug: slug(item.name)};
+
+  const fallbackNames = {
+    salve: "Salve",
+    stimulant: "Estimulante",
+    foebane: "Foebane",
+    restorative: "Restaurador",
+    curative: "Curativo",
+  };
+  const name = fallbackNames[canonical] ?? String(value ?? "").trim();
+  return {name, slug: slug(name)};
+}
+
+async function applyHerbalismAdvantageChoice(importer, json) {
+  const bonuses = (Array.isArray(json?.bonuses) ? json.bonuses : []).filter(item =>
+    ["Herbalism Check Advantage", "HerbalismCheckAdvantage"].includes(item?.bonusName) &&
+    typeof item.bonusTo === "string" && item.bonusTo.trim()
+  );
+  const uniqueSelections = bonuses.filter((selection, index, all) =>
+    all.findIndex(item => herbalismRemedyName(item.bonusTo) === herbalismRemedyName(selection.bonusTo)) === index
+  );
+  if (!uniqueSelections.length) return false;
+
+  const talentUuid = importer.itemMapping?.bonus?.["Herbalism Check Advantage"] ??
+    importer.itemMapping?.bonus?.HerbalismCheckAdvantage ??
+    "Compendium.shadowdark.talents.Item.p4Zh8LNyBp8UwhRD";
+  const sourceTalent = await fromUuid(talentUuid);
+  if (!sourceTalent) return false;
+
+  const mappedId = String(talentUuid).split(".").pop();
+  const currentCopies = (importer.talents ?? []).filter(item =>
+    item._id === mappedId || [
+      "herbalism check advantage",
+      "vantagem em teste de herbalismo",
+      "vantagem em herbalismo",
+    ].includes(normalizedEffectLabel(item.flags?.babele?.originalName ?? item.name))
+  );
+  const displayedBaseName = currentCopies[0]?.name || sourceTalent.name;
+  const talents = [];
+
+  for (const bonus of uniqueSelections) {
+    const remedy = await resolveHerbalismRemedy(bonus.bonusTo);
+    const talent = JSON.parse(JSON.stringify(currentCopies[0] || sourceTalent.toObject()));
+    talent._id = globalThis.foundry?.utils?.randomID?.() || `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
+    talent.effects ??= [];
+    talent.effects = talent.effects.filter(effect =>
+      !effect.changes?.some(change => String(change.key ?? "").startsWith("system.roll.ability.advantage."))
+    );
+    talent.effects.push({
+      _id: globalThis.foundry?.utils?.randomID?.() || `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`,
+      name: "Herbalism Check Advantage",
+      img: talent.img,
+      changes: [{
+        key: `system.roll.ability.advantage.${remedy.slug}`,
+        value: 1,
+        mode: CONST.ACTIVE_EFFECT_MODES.ADD,
+      }],
+      disabled: false,
+      transfer: true,
+    });
+    talent.name = `${displayedBaseName} (${remedy.name})`;
+    if (bonus.gainedAtLevel && talent.system?.talentClass === "level") {
+      talent.system.level = bonus.gainedAtLevel;
+    }
+    talents.push(talent);
+  }
+
+  if (!talents.length) return false;
+  importer.talents = (importer.talents ?? []).filter(item => !currentCopies.includes(item));
+  importer.talents.push(...talents);
+  importer.errors = (importer.errors ?? []).filter(error => !(
+    error.type === "Talent" && [
+      "herbalism check advantage",
+      "vantagem em teste de herbalismo",
+      "vantagem em herbalismo",
+    ].includes(normalizedEffectLabel(error.name))
+  ));
+  return true;
+}
 function isClassTalentTable(document) {
   const names = [
     document?.name,
@@ -445,9 +583,189 @@ function installLocalizedClassTalentTables() {
   compendiums.__terraOesteLocalizedClassTalentTables = true;
 }
 
+function normalizedEffectLabel(value) {
+  return String(value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toLocaleLowerCase("pt-BR")
+    .replace(/\s+/g, " ");
+}
+
+function canonicalReplacementEffectName(effectName, itemName) {
+  const labels = [effectName, itemName].map(normalizedEffectLabel);
+  const matches = (...aliases) => labels.some(label => aliases.includes(label));
+
+  if (matches(
+    "increased weapon damage die",
+    "d12 weapon damage die",
+    "dado de dano de arma aumentado",
+    "dado de dano de arma com d12"
+  )) return "Increased Weapon Damage Die";
+
+  if (matches("weapon mastery", "maestria em armas", "maestria de armas")) {
+    return "Weapon Mastery";
+  }
+  if (matches("armor mastery", "maestria em armaduras", "maestria de armadura")) {
+    return "Armor Mastery";
+  }
+  if (matches(
+    "spellcasting advantage on spell",
+    "vantagem em conjuracao",
+    "vantagem em conjuracao para uma magia"
+  )) return "Spellcasting Advantage on Spell";
+  if (matches(
+    "herbalism check advantage",
+    "vantagem em teste de herbalismo",
+    "vantagem em herbalismo"
+  )) return "Herbalism Check Advantage";
+
+  return null;
+}
+
+async function askHerbalismRemedy(itemName) {
+  const allAbilities = await globalThis.shadowdark?.compendiums?.classAbilities?.();
+  const allowedNames = new Set([
+    "salve", "stimulant", "foebane", "restorative", "curative",
+    "estimulante", "restaurador", "restauradora", "curativo", "curativa"
+  ]);
+  const remedies = (allAbilities ?? []).filter(item => {
+    const originalName = item.flags?.babele?.originalName;
+    const names = [item.name, originalName].map(normalizedEffectLabel);
+    return names.some(name => allowedNames.has(name));
+  });
+  const options = await globalThis.shadowdark?.utils?.getSlugifiedItemList?.(remedies);
+  if (!options || !Object.keys(options).length) {
+    ui.notifications.error("Não foi possível carregar a lista de remédios do Herbalismo.");
+    return false;
+  }
+
+  const type = "herbalism";
+  const parameter = {
+    name: itemName,
+    type,
+    options,
+    label: String(game.i18n.lang ?? "").toLowerCase().startsWith("pt")
+      ? "Escolha o remédio"
+      : "Choose Remedy",
+    uuid: foundry.utils.randomID(),
+  };
+  const content = await foundry.applications.handlebars.renderTemplate(
+    "systems/shadowdark/templates/dialog/effect-list-choice.hbs",
+    {effectParameters: [parameter]}
+  );
+  return Dialog.wait({
+    title: game.i18n.localize("SHADOWDARK.dialog.effect.choices.title"),
+    content,
+    classes: ["shadowdark-dialog"],
+    buttons: {
+      submit: {
+        label: game.i18n.localize("SHADOWDARK.dialog.submit"),
+        callback: html => {
+          const selector = `#${type}-selection-${parameter.uuid}`;
+          const formValue = html[0].querySelector(selector)?.value ?? "";
+          let selectedSlug = false;
+          for (const [slugValue, displayValue] of Object.entries(options)) {
+            if (formValue === displayValue) {
+              selectedSlug = slugValue;
+              break;
+            }
+          }
+          return {[type]: [selectedSlug, formValue]};
+        },
+      },
+    },
+    close: () => false,
+  }).then(result => result?.[type] ?? false);
+}
+
+function isHerbalismAdvantageTalent(item, itemObject = null) {
+  const source = itemObject ?? item?.toObject?.() ?? item;
+  if (source?.type !== "Talent") return false;
+  const names = [
+    source.name,
+    source.flags?.babele?.originalName,
+    item?.name,
+    item?.flags?.babele?.originalName,
+  ].map(normalizedEffectLabel);
+  return names.some(name => [
+    "herbalism check advantage",
+    "vantagem em teste de herbalismo",
+    "vantagem em herbalismo",
+  ].includes(name));
+}
+
+function installLocalizedReplacementEffectChoices() {
+  const effects = globalThis.shadowdark?.effects;
+  if (!effects?.handlePredefinedEffect) {
+    console.warn(`${MODULE_ID}: seletor de efeitos do Shadowdark não encontrado.`);
+    return;
+  }
+  if (effects.__terraOesteLocalizedReplacementEffectChoices) return;
+
+  const original = effects.handlePredefinedEffect;
+  effects.handlePredefinedEffect = async function(effectName, value, itemName = null) {
+    const canonicalName = canonicalReplacementEffectName(effectName, itemName);
+    if (canonicalName === "Herbalism Check Advantage") {
+      const selected = await askHerbalismRemedy(itemName);
+      return selected || [value];
+    }
+    if (!canonicalName) {
+      return original.call(this, effectName, value, itemName);
+    }
+    return original.call(this, canonicalName, value, itemName);
+  };
+  effects.__terraOesteLocalizedReplacementEffectChoices = true;
+}
+
+function installHerbalismTalentSelection() {
+  const effects = globalThis.shadowdark?.effects;
+  if (!effects?.createItemWithEffect) {
+    console.warn(`${MODULE_ID}: criação de talentos do Shadowdark não encontrada.`);
+    return;
+  }
+  if (effects.__terraOesteHerbalismTalentSelection) return;
+
+  const original = effects.createItemWithEffect;
+  effects.createItemWithEffect = async function(item) {
+    const itemObject = item?.toObject?.();
+    if (!isHerbalismAdvantageTalent(item, itemObject)) {
+      return original.call(this, item);
+    }
+
+    itemObject.effects ??= [];
+    const alreadyHasSelector = itemObject.effects.some(effect =>
+      effect.changes?.some(change => String(change.key ?? "").includes("REPLACEME"))
+    );
+    if (!alreadyHasSelector) {
+      itemObject.effects.push({
+        _id: foundry.utils.randomID(),
+        name: "Herbalism Check Advantage",
+        img: itemObject.img,
+        changes: [{
+          key: "system.roll.ability.advantage.REPLACEME",
+          value: 1,
+          mode: CONST.ACTIVE_EFFECT_MODES.ADD,
+        }],
+        disabled: false,
+        origin: item.uuid,
+        transfer: true,
+      });
+    }
+
+    const itemWithEffect = {
+      uuid: item.uuid,
+      toObject: () => foundry.utils.deepClone(itemObject),
+    };
+    return original.call(this, itemWithEffect);
+  };
+  effects.__terraOesteHerbalismTalentSelection = true;
+}
 Hooks.once("ready", () => {
   if (game.system.id !== "shadowdark") return;
   installLocalizedClassTalentTables();
+  installLocalizedReplacementEffectChoices();
+  installHerbalismTalentSelection();
 
   const Importer = globalThis.shadowdark?.apps?.ShadowdarklingImporterSD;
   if (!Importer?.prototype?._importActor) {
@@ -456,6 +774,12 @@ Hooks.once("ready", () => {
   }
   const prototype = Importer.prototype;
   if (prototype.__terraOesteChoiceGuard) return;
+  const originalFindTalent = prototype._findTalent;
+  if (originalFindTalent) {
+    prototype._findTalent = function(bonus) {
+      return originalFindTalent.call(this, normalizeAssassinBonus(bonus));
+    };
+  }
   const originalImport = prototype._importActor;
   prototype._importActor = async function(json) {
     const result = await originalImport.call(this, json);
@@ -477,6 +801,7 @@ Hooks.once("ready", () => {
     }
     try {
       changed = (await applySpellcastingAdvantageChoice(this, json)) || changed;
+      changed = (await applyHerbalismAdvantageChoice(this, json)) || changed;
     } catch (error) {
       console.error(`${MODULE_ID}: não foi possível aplicar a magia escolhida na Vantagem em Conjuração.`, error);
     }
@@ -497,3 +822,4 @@ Hooks.once("ready", () => {
   };
   prototype.__terraOesteChoiceGuard = true;
 });
+

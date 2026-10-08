@@ -267,31 +267,47 @@
     "Ladrão": THIEF_SPECIAL_ABILITY
   };
 
+  const ASSASSIN_BONUS_ALIASES = {
+  "AssassinPoisonTraining": "UsePoisons",
+  "AssassinSmokeStepExtraUse": "ImpSmokeStep",
+  "AssassinLotusParalysis": "ParalyseOnWeaponHit",
+  "AssassinLotusDexterityAdvantage": "ADVonDEXToAvoidEntrapment",
+  "AssassinLotusDualWieldAC": "Plus1ACWhenDualWield",
+  "AssassinLotusExtraHitDie": "PlusOneHitDie",
+  "AssassinLotusTripleDamage": "TripleDamageAssassinate",
+  "AssassinLotusMoral": "Morale18",
+  "AssassinLotusWaterWalking": "WalkOnWater",
+  "AssassinLotusSleep": "MakeAsleep",
+  "AssassinLotusWallWalking": "WalkOnWalls",
+  "AssassinLotusMeleeDamage": "Plus1ToMeleeDamage",
+  "AssassinLotusUnseen": "Invisible"
+};
   const ASSASSIN_BLACK_LOTUS_TALENTS = [
-    null,
-    { id: "AssassinLotusParalysis", name: "Lótus Negra: Paralisia", effect: "1/dia, ao causar dano com uma arma, paralise um alvo de NV 9 ou menor por 1d4 rodadas" },
-    { id: "AssassinLotusDexterityAdvantage", name: "Lótus Negra: Reflexos", effect: "Vantagem em testes de Destreza para evitar aprisionamentos ou ferimentos" },
-    { id: "AssassinLotusDualWieldAC", name: "Lótus Negra: Defesa com Duas Armas", effect: "+1 na CA ao empunhar uma arma corpo a corpo em cada mão" },
-    { id: "AssassinLotusExtraHitDie", name: "Lótus Negra: Vitalidade", effect: "Ganhe um dado de pontos de vida adicional" },
-    { id: "AssassinLotusTripleDamage", name: "Lótus Negra: Dano Triplo", effect: "Você causa o triplo de dano com seu talento Assassino" },
-    { id: "AssassinLotusMoral", name: "Lótus Negra: Presença Aterradora", effect: "Inimigos que veem você fazem teste de moral CD 18 em vez de 15" },
-    { id: "AssassinLotusWaterWalking", name: "Lótus Negra: Caminhar sobre a Água", effect: "1/dia, ande sobre a água por 1d4 rodadas como se fosse uma superfície sólida" },
-    { id: "AssassinLotusSleep", name: "Lótus Negra: Sono", effect: "1/dia, uma criatura viva de NV 5 ou menor perto de você testa Constituição CD 15 ou adormece" },
-    { id: "AssassinLotusWallWalking", name: "Lótus Negra: Escalar Paredes", effect: "1/dia, ande em superfícies íngremes, como paredes, por 1d4 rodadas" },
-    { id: "AssassinLotusMeleeDamage", name: "Lótus Negra: Dano Corpo a Corpo", effect: "Cause +1 de dano com armas corpo a corpo" },
-    { id: "AssassinLotusUnseen", name: "Lótus Negra: Invisibilidade aos Sentidos", effect: "1/dia, uma criatura viva de NV 9 ou menor testa Sabedoria CD 15 ou não poderá vê-lo nem ouvi-lo por 1d4 rodadas" }
+    null, // d12 index 0 is unused.
+    null, // d12 result 1 rolls two additional talents.
+    { id: "AssassinLotusParalysis", name: "Paralisar um Alvo", effect: "1/dia, ao causar dano com uma arma, paralise um alvo de NV 9 ou menor por 1d4 rodadas" },
+    { id: "AssassinLotusDexterityAdvantage", name: "Evitar Aprisionamento/Ferimentos", effect: "Vantagem em testes de Destreza para evitar aprisionamentos ou ferimentos" },
+    { id: "AssassinLotusDualWieldAC", name: "+1 CA com Duas Armas", effect: "+1 na CA ao empunhar uma arma corpo a corpo em cada mão" },
+    { id: "AssassinLotusExtraHitDie", name: "PV Adicional", effect: "Ganhe um dado de pontos de vida adicional" },
+    { id: "AssassinLotusTripleDamage", name: "Dano Triplo de Assassino", effect: "Você causa o triplo de dano com seu talento Assassino" },
+    { id: "AssassinLotusMoral", name: "Testes de Moral com CD 18", effect: "Inimigos que veem você fazem teste de moral CD 18 em vez de 15" },
+    { id: "AssassinLotusWaterWalking", name: "Andar sobre a Água", effect: "1/dia, ande sobre a água por 1d4 rodadas como se fosse uma superfície sólida" },
+    { id: "AssassinLotusSleep", name: "Adormecer Criatura", effect: "1/dia, uma criatura viva de NV 5 ou menor perto de você testa Constituição CD 15 ou adormece" },
+    { id: "AssassinLotusWallWalking", name: "Andar em Superfícies Íngremes", effect: "1/dia, ande em superfícies íngremes, como paredes, por 1d4 rodadas" },
+    { id: "AssassinLotusMeleeDamage", name: "+1 para Dano Corpo a Corpo", effect: "Cause +1 de dano com armas corpo a corpo" },
+    { id: "AssassinLotusUnseen", name: "Esconder-se de Criatura", effect: "1/dia, uma criatura viva de NV 9 ou menor testa Sabedoria CD 15 ou não poderá vê-lo nem ouvi-lo por 1d4 rodadas" }
   ];
   function rollAssassinLotusResults(){
     const rollOne = () => {
       let roll = randInt(1, 12);
       while (roll === 1) roll = randInt(1, 12);
       const talent = ASSASSIN_BLACK_LOTUS_TALENTS[roll];
-      return { roll, id: talent.id, talentRolledName: talent.name, talentRolledDesc: talent.effect, displayDesc: talent.effect, bonusName: talent.id, bonusTo: talent.id };
+      return { roll, id: talent.id, talentRolledName: talent.name, talentRolledDesc: talent.effect, displayDesc: talent.effect, bonusName: ASSASSIN_BONUS_ALIASES[talent.id], bonusTo: ASSASSIN_BONUS_ALIASES[talent.id] };
     };
     const initialRoll = randInt(1, 12);
     if (initialRoll === 1) return [rollOne(), rollOne()];
     const talent = ASSASSIN_BLACK_LOTUS_TALENTS[initialRoll];
-    return [{ roll: initialRoll, id: talent.id, talentRolledName: talent.name, talentRolledDesc: talent.effect, displayDesc: talent.effect, bonusName: talent.id, bonusTo: talent.id }];
+    return [{ roll: initialRoll, id: talent.id, talentRolledName: talent.name, talentRolledDesc: talent.effect, displayDesc: talent.effect, bonusName: ASSASSIN_BONUS_ALIASES[talent.id], bonusTo: ASSASSIN_BONUS_ALIASES[talent.id] }];
   }
 
   const CLASS_LEVEL_TALENTS = {
@@ -299,10 +315,10 @@
       foundryName: "Assassino",
       title: "Talentos de Ras-Godai",
       entries: [
-        { min: 2, max: 2, id: "AssassinPoisonTraining", name: "Treinamento com Venenos", desc: "Você é treinado no uso de venenos", foundryDesc: "Trained in the use of poisons", bonusName: "AssassinPoisonTraining" },
-        { min: 3, max: 6, id: "AssassinBlackLotusRoll", choice: "assassinBlackLotus", desc: "Role um talento adicional da tabela Talentos da Lótus Negra", foundryDesc: "Roll an additional Black Lotus talent", bonusName: "" },
+        { min: 2, max: 2, id: "AssassinPoisonTraining", name: "Treinamento em Venenos", desc: "Você é treinado no uso de venenos", foundryDesc: "Trained in the use of poisons", bonusName: "UsePoisons" },
+        { min: 3, max: 6, id: "AssassinBlackLotusRoll", name: "Talento da Lótus Negra Adicional", choice: "assassinBlackLotus", desc: "Role um talento adicional da tabela Talentos da Lótus Negra", foundryDesc: "Roll an additional Black Lotus talent", bonusName: "" },
         { min: 7, max: 9, id: "AssassinStatOrMelee", choice: "assassinStatOrMelee", desc: "+2 em Força ou Destreza, ou +1 em ataques corpo a corpo", foundryDesc: "+2 Strength or Dexterity, or +1 to melee attacks" },
-        { min: 10, max: 11, id: "AssassinSmokeStepExtraUse", name: "Uso Adicional de Passo de Fumaça", desc: "Ganhe um uso adicional do talento Passo de Fumaça", foundryDesc: "Gain one additional use of Smoke Step", bonusName: "AssassinSmokeStepExtraUse" },
+        { min: 10, max: 11, id: "AssassinSmokeStepExtraUse", name: "Uso Adicional de Passo de Fumaça", desc: "Ganhe um uso adicional do talento Passo de Fumaça", foundryDesc: "Gain one additional use of Smoke Step", bonusName: "ImpSmokeStep" },
         { min: 12, max: 12, id: "AssassinChooseTalentOrStats", choice: "twelve", desc: "Escolha um talento ou distribua +2 pontos entre os seus atributos", foundryDesc: "Choose a talent or distribute +2 points among ability scores" }
       ]
     },
@@ -310,10 +326,10 @@
       foundryName: "Mago",
       title: "Talentos de Mago",
       entries: [
-        { min: 2, max: 2, id: "MakeRandomMagicItem", name: "MakeRandomMagicItem", choice: "magicItem", desc: "Crie 1 item mágico aleatório de qualquer tipo, à sua escolha", foundryDesc: "Create one random magic item of any type, your choice", bonusName: "MakeRandomMagicItem" },
+        { min: 2, max: 2, id: "MakeRandomMagicItem", name: "Criar um Item Mágico Aleatório", choice: "magicItem", desc: "Crie 1 item mágico aleatório de qualquer tipo, à sua escolha", foundryDesc: "Create one random magic item of any type, your choice", bonusName: "MakeRandomMagicItem" },
         { min: 3, max: 7, id: "Plus2INTOrPlus1Casting", choice: "mageStatOrCasting", desc: "+2 em Inteligência ou +1 em testes de conjuração de magias de mago", foundryDesc: "+2 Intelligence or +1 to casting checks for mage spells" },
-        { min: 8, max: 9, id: "AdvOnCastOneSpell", name: "AdvOnCastOneSpell", choice: "mageKnownSpell", desc: "Ganhe Vantagem na conjuração de uma magia que você conhece", foundryDesc: "Gain Advantage casting one spell you know", bonusName: "AdvOnCastOneSpell" },
-        { min: 10, max: 11, id: "PickExtraSpell", name: "PickExtraSpell", choice: "mageExtraSpell", desc: "Aprenda outra magia de mago de qualquer grau que você conheça", foundryDesc: "Learn one additional mage spell of any tier you know", bonusName: "PickExtraSpell" },
+        { min: 8, max: 9, id: "AdvOnCastOneSpell", name: "Vantagem em Conjuração", choice: "mageKnownSpell", desc: "Ganhe Vantagem na conjuração de uma magia que você conhece", foundryDesc: "Gain Advantage casting one spell you know", bonusName: "AdvOnCastOneSpell" },
+        { min: 10, max: 11, id: "PickExtraSpell", name: "Aprender uma Magia de Mago", choice: "mageExtraSpell", desc: "Aprenda outra magia de mago de qualquer grau que você conheça", foundryDesc: "Learn one additional mage spell of any tier you know", bonusName: "PickExtraSpell" },
         { min: 12, max: 12, id: "ChooseTalentOrStats", choice: "twelve", desc: "Escolha um talento ou distribua +2 pontos entre os seus atributos" }
       ]
     },
@@ -332,10 +348,10 @@
       foundryName: "Guerreiro",
       title: "Talentos de Guerreiro",
       entries: [
-        { min: 2, max: 2, id: "WeaponMastery", name: "WeaponMastery", choice: "weaponMastery", desc: "Ganhe Maestria em Armas em um tipo de arma adicional", foundryDesc: "Gain Weapon Mastery with one additional weapon", bonusName: "Plus1AttackAndDamagePlusHalfLevel" },
+        { min: 2, max: 2, id: "WeaponMastery", name: "Maestria em Armas", choice: "weaponMastery", desc: "Ganhe Maestria em Armas em um tipo de arma adicional", foundryDesc: "Gain Weapon Mastery with one additional weapon", bonusName: "Plus1AttackAndDamagePlusHalfLevel" },
         { min: 3, max: 6, id: "Plus1ToHit", name: "+1 para Ataques Corpo a Corpo ou à Distância", desc: "+1 em ataques corpo a corpo e à distância", foundryDesc: "+1 to melee and ranged attacks", bonusTo: "Melee and ranged attacks", bonusName: "Plus1ToHit" },
         { min: 7, max: 9, id: "StatBonus", choice: "stat", statOptions: ["STR", "DEX", "CON"], desc: "+2 em Força, Destreza ou Constituição", foundryDesc: "+2 Strength, Dexterity, or Constitution", bonusName: "StatBonus" },
-        { min: 10, max: 11, id: "ArmorMastery", name: "ArmorMastery", choice: "armorMastery", desc: "Escolha um tipo de armadura e receba +1 na CA ao usá-la", foundryDesc: "Choose one kind of armor. You get +1 AC from that armor", bonusName: "ArmorMastery" },
+        { min: 10, max: 11, id: "ArmorMastery", name: "Maestria em Armaduras", choice: "armorMastery", desc: "Escolha um tipo de armadura e receba +1 na CA ao usá-la", foundryDesc: "Choose one kind of armor. You get +1 AC from that armor", bonusName: "ArmorMastery" },
         { min: 12, max: 12, id: "ChooseTalentOrStats", choice: "twelve", desc: "Escolha um talento ou distribua +2 pontos entre os seus atributos" }
       ]
     },
@@ -344,7 +360,7 @@
       title: "Talentos de Ladrão",
       entries: [
         { min: 2, max: 2, id: "InitiativeAdvantage", name: "Vantagem na Iniciativa", desc: "Vantagem nas rolagens de iniciativa (role novamente se repetir)", foundryDesc: "Advantage on initiative rolls (reroll if tied)", bonusTo: "Initiative", bonusName: "AdvOnInitiative" },
-        { min: 3, max: 5, id: "BackstabIncrease", name: "BackstabIncrease", desc: "Sua Apunhalada pelas Costas causa +1 dado de dano", foundryDesc: "Your Backstab deals +1 dice of damage", bonusTo: "Backstab", bonusName: "BackstabIncrease" },
+        { min: 3, max: 5, id: "BackstabIncrease", name: "Apunhalada pelas Costas: +1 Dado de Dano", desc: "Sua Apunhalada pelas Costas causa +1 dado de dano", foundryDesc: "Your Backstab deals +1 dice of damage", bonusTo: "Backstab", bonusName: "BackstabIncrease" },
         { min: 6, max: 9, id: "StatBonus", choice: "stat", desc: "+2 em Força, Destreza ou Carisma", foundryDesc: "+2 Strength, Dexterity, or Charisma", bonusName: "StatBonus" },
         { min: 10, max: 11, id: "Plus1ToHit", name: "+1 para Ataques Corpo a Corpo ou à Distância", desc: "+1 em ataques corpo a corpo e à distância", foundryDesc: "+1 to melee and ranged attacks", bonusTo: "Melee and ranged attacks", bonusName: "Plus1ToHit" },
         { min: 12, max: 12, id: "ChooseTalentOrStats", choice: "twelve", desc: "Escolha um talento ou distribua +2 pontos entre os seus atributos" }
@@ -370,6 +386,45 @@
     "Apunhalada pelas Costas: +1 Dado de Dano": "Sua Apunhalada pelas Costas causa +1 dado de dano"
   };
   const STAT_LABELS = Object.keys(STAT_CODES);
+
+  const CLASS_TALENT_NAME_ALIASES = {
+    "make random magic item": "Criar um Item Mágico Aleatório",
+    "advoncastonespell": "Vantagem em Conjuração",
+    "pickextraspell": "Aprender uma Magia de Mago",
+    "plus1tocastingspells": "+1 em Testes de Conjuração de Magia",
+    "weaponmastery": "Maestria em Armas",
+    "armormastery": "Maestria em Armaduras",
+    "backstabincrease": "Apunhalada pelas Costas: +1 Dado de Dano",
+    "assassinpoisontraining": "Treinamento em Venenos",
+    "treinamento com venenos": "Treinamento em Venenos",
+    "lotus negra: paralisia": "Paralisar um Alvo",
+    "lotus negra: reflexos": "Evitar Aprisionamento/Ferimentos",
+    "lotus negra: defesa com duas armas": "+1 CA com Duas Armas",
+    "lotus negra: vitalidade": "PV Adicional",
+    "lotus negra: dano triplo": "Dano Triplo de Assassino",
+    "lotus negra: presenca aterradora": "Testes de Moral com CD 18",
+    "lotus negra: caminhar sobre a agua": "Andar sobre a Água",
+    "lotus negra: sono": "Adormecer Criatura",
+    "lotus negra: escalar paredes": "Andar em Superfícies Íngremes",
+    "lotus negra: dano corpo a corpo": "+1 para Dano Corpo a Corpo",
+    "lotus negra: invisibilidade aos sentidos": "Esconder-se de Criatura"
+  };
+  function normalizedTalentRecord(item){
+    if (!item || typeof item !== "object") return item;
+    const name = String(item.talentRolledName || "");
+    const nameKey = name.normalize("NFD").replace(/\p{M}/gu, "").toLocaleLowerCase("pt-BR").trim();
+    const alias = CLASS_TALENT_NAME_ALIASES[nameKey];
+    const talentRolledName = item.id === "TwoStatPoints" ? "Distribuir entre Atributos"
+      : item.id === "AssassinBlackLotusRoll" ? "Talento da Lótus Negra Adicional"
+      : alias || name;
+    return {
+      ...item,
+      talentRolledName,
+      bonusName: ASSASSIN_BONUS_ALIASES[item.bonusName] || ASSASSIN_BONUS_ALIASES[item.id] || item.bonusName,
+      bonusTo: ASSASSIN_BONUS_ALIASES[item.bonusTo] || item.bonusTo,
+      blackLotusResults: Array.isArray(item.blackLotusResults) ? item.blackLotusResults.map(normalizedTalentRecord) : item.blackLotusResults
+    };
+  }
 
   function classLevelTalentConfig(cls){ return CLASS_LEVEL_TALENTS[cls] || null; }
   window.app.getFoundryClassName = cls => classLevelTalentConfig(cls)?.foundryName || window.CUSTOM_CLASS_DATA?.[cls]?.foundryName || cls || "";
@@ -436,7 +491,7 @@
         select.addEventListener("change", () => {
           if (!select.value) { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); return; }
           chosen.bonusTo = select.value;
-          chosen.talentRolledName = entry.name || (weapon ? "WeaponMastery" : "ArmorMastery");
+          chosen.talentRolledName = entry.name || (weapon ? "Maestria em Armas" : "Maestria em Armaduras");
           chosen.displayDesc = weapon ? `Maestria em Armas adicional: ${(FIGHTER_WEAPON_TYPES.find(item => item.value === select.value) || {}).label}` : `+1 na CA usando ${(FIGHTER_ARMOR_TYPES.find(item => item.value === select.value) || {}).label}`;
           complete(chosen);
         });
@@ -527,7 +582,7 @@
         select.addEventListener("change", () => {
           if (!select.value) { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); return; }
           const category = MAGE_ITEM_TYPES.find(item => item.value === select.value);
-          chosen.talentRolledName = "MakeRandomMagicItem";
+          chosen.talentRolledName = "Criar um Item Mágico Aleatório";
           chosen.bonusName = "MakeRandomMagicItem";
           chosen.bonusTo = select.value;
           chosen.displayDesc = `Crie 1 item mágico aleatório: ${category.label}`;
@@ -548,7 +603,7 @@
             complete(chosen);
           } else if (select.value === "casting") {
             chosen.id = "Plus1ToCastingSpells";
-            chosen.talentRolledName = "Plus1ToCastingSpells";
+            chosen.talentRolledName = "+1 em Testes de Conjuração de Magia";
             chosen.bonusName = "Plus1ToCastingSpells";
             chosen.bonusTo = "Casting spells";
             chosen.talentRolledDesc = "+1 to casting checks for mage spells";
@@ -617,7 +672,7 @@
             if (selected.length !== 2 || !selected.every(Boolean)) { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); return; }
             const counts = selected.reduce((acc, code) => ({...acc,[code]:(acc[code]||0)+1}), {});
             const labels = selected.map(code => STAT_LABELS.find(stat => STAT_CODES[stat] === code));
-            finish({ roll: result.roll, id: "TwoStatPoints", talentRolledName: "", talentRolledDesc: "+2 to ability scores", bonusName: "StatBonus", bonusTo: Object.entries(counts).map(([code,n]) => `${code}:+${n}`).join(", "), rolled12Mode: "twoStatPoints", displayDesc: `+2 pontos nos atributos: ${labels.join(" e ")}`, rolled12TalentOrTwoStatPoints: "TwoStatPoints" });
+            finish({ roll: result.roll, id: "TwoStatPoints", talentRolledName: "Distribuir entre Atributos", talentRolledDesc: "+2 to ability scores", bonusName: "StatBonus", bonusTo: Object.entries(counts).map(([code,n]) => `${code}:+${n}`).join(", "), rolled12Mode: "twoStatPoints", displayDesc: `+2 pontos nos atributos: ${labels.join(" e ")}`, rolled12TalentOrTwoStatPoints: "TwoStatPoints" });
           };
           details.append(makeStatSelect("Primeiro ponto", code => { selected[0]=code; updateStats(); }, null, 1));
           details.append(makeStatSelect("Segundo ponto", code => { selected[1]=code; updateStats(); }, null, 1));
@@ -666,7 +721,7 @@
             const counts = selected.reduce((acc, code) => ({...acc,[code]:(acc[code]||0)+1}), {});
             const labels = selected.map(code => STAT_LABELS.find(stat => STAT_CODES[stat] === code));
             finish({
-              roll: result.roll, id: "TwoStatPoints", talentRolledName: "", talentRolledDesc: "+2 to ability scores",
+              roll: result.roll, id: "TwoStatPoints", talentRolledName: "Distribuir entre Atributos", talentRolledDesc: "+2 to ability scores",
               bonusName: "StatBonus", bonusTo: Object.entries(counts).map(([code,n]) => `${code}:+${n}`).join(", "),
               rolled12Mode: "twoStatPoints", displayDesc: `+2 pontos nos atributos: ${labels.join(" e ")}`,
               rolled12TalentOrTwoStatPoints: "TwoStatPoints"
@@ -1022,7 +1077,7 @@
   window.app.getClassLevelTalent = (cls, result) => {
     const empty = { level: 1, bonuses: [], talents: [], fields: { talentRolledDesc: "", talentRolledName: "", Rolled12TalentOrTwoStatPoints: "", Rolled12ChosenTalentDesc: "", Rolled12ChosenTalentName: "" } };
     if (!classLevelTalentConfig(cls) || !result) return empty;
-    const results = (Array.isArray(result) ? result : [result]).filter(Boolean).map(item => {
+    const results = (Array.isArray(result) ? result : [result]).filter(Boolean).map(normalizedTalentRecord).map(item => {
       const isInitiativeAdvantage = item.id === "InitiativeAdvantage" || item.bonusName === "InitiativeAdvantage" || item.bonusName === "AdvOnInitiative" || item.talentRolledName === "Vantagem na Iniciativa" || item.talentRolledName === "Initiative Advantage";
       return isInitiativeAdvantage ? { ...item, bonusName: "AdvOnInitiative" } : item;
     });
@@ -1106,7 +1161,7 @@
         chosen.displayDesc = `+1 na CA usando ${armor.label}`;
       } else if (entry.choice === "magicItem") {
         const item = MAGE_ITEM_TYPES[randInt(0, MAGE_ITEM_TYPES.length - 1)];
-        chosen.talentRolledName = "MakeRandomMagicItem";
+        chosen.talentRolledName = "Criar um Item Mágico Aleatório";
         chosen.bonusName = "MakeRandomMagicItem";
         chosen.bonusTo = item.value;
         chosen.displayDesc = `Crie 1 item mágico aleatório: ${item.label}`;
@@ -1120,7 +1175,7 @@
           chosen.displayDesc = "+2 em Inteligência";
         } else {
           chosen.id = "Plus1ToCastingSpells";
-          chosen.talentRolledName = "Plus1ToCastingSpells";
+          chosen.talentRolledName = "+1 em Testes de Conjuração de Magia";
           chosen.bonusName = "Plus1ToCastingSpells";
           chosen.bonusTo = "Casting spells";
           chosen.talentRolledDesc = "+1 to casting checks for mage spells";
@@ -1159,7 +1214,7 @@
         const second = ["STR", "DEX", "CON", "INT", "WIS", "CHA"][randInt(0, 5)];
         const counts = [first, second].reduce((acc, code) => ({ ...acc, [code]: (acc[code] || 0) + 1 }), {});
         const labels = [first, second].map(code => STAT_LABELS.find(stat => STAT_CODES[stat] === code));
-        return { roll, id: "TwoStatPoints", talentRolledName: "", talentRolledDesc: "+2 to ability scores", bonusName: "StatBonus", bonusTo: Object.entries(counts).map(([code, amount]) => `${code}:+${amount}`).join(", "), rolled12Mode: "twoStatPoints", rolled12TalentOrTwoStatPoints: "TwoStatPoints", displayDesc: `+2 pontos nos atributos: ${labels.join(" e ")}` };
+        return { roll, id: "TwoStatPoints", talentRolledName: "Distribuir entre Atributos", talentRolledDesc: "+2 to ability scores", bonusName: "StatBonus", bonusTo: Object.entries(counts).map(([code, amount]) => `${code}:+${amount}`).join(", "), rolled12Mode: "twoStatPoints", rolled12TalentOrTwoStatPoints: "TwoStatPoints", displayDesc: `+2 pontos nos atributos: ${labels.join(" e ")}` };
       }
       result = randomChoice(selected, resultForEntry(selected, roll), true);
       result.rolled12Mode = "talent";
@@ -1176,7 +1231,7 @@
         const second = stats[randInt(0, stats.length - 1)];
         const counts = [first, second].reduce((acc, code) => ({ ...acc, [code]: (acc[code] || 0) + 1 }), {});
         const labels = [first, second].map(code => STAT_LABELS.find(stat => STAT_CODES[stat] === code));
-        return { roll, id: "TwoStatPoints", talentRolledName: "", talentRolledDesc: "+2 to ability scores", bonusName: "StatBonus", bonusTo: Object.entries(counts).map(([code, amount]) => `${code}:+${amount}`).join(", "), rolled12Mode: "twoStatPoints", rolled12TalentOrTwoStatPoints: "TwoStatPoints", displayDesc: `+2 pontos nos atributos: ${labels.join(" e ")}` };
+        return { roll, id: "TwoStatPoints", talentRolledName: "Distribuir entre Atributos", talentRolledDesc: "+2 to ability scores", bonusName: "StatBonus", bonusTo: Object.entries(counts).map(([code, amount]) => `${code}:+${amount}`).join(", "), rolled12Mode: "twoStatPoints", rolled12TalentOrTwoStatPoints: "TwoStatPoints", displayDesc: `+2 pontos nos atributos: ${labels.join(" e ")}` };
       }
       const choices = config.entries.filter(item => item.choice !== "twelve");
       const chosenEntry = choices[randInt(0, choices.length - 1)];
@@ -1312,4 +1367,5 @@
     });
   }
 })();
+
 
