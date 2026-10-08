@@ -142,7 +142,7 @@
     "13 — Mata-inimigo: você tem Vantagem em ataques e dano contra um tipo de criatura escolhido por 1d6 rodadas.",
     "14 — Restaurador: encerra um veneno ou uma doença.",
     "15 — Curativo: equivale a uma Poção de Cura."
-  ].join("\\n");
+  ].join("\n");
   const CLASS_DESCRIPTIONS = {
     "Malandro": THIEF_DESCRIPTION,
     "Ladrão": THIEF_DESCRIPTION,
