@@ -59,7 +59,14 @@
     { label: "Queda Suave", value: "Feather Fall", duration: "Instantâneo", range: "Você" },
     { label: "Sono", value: "Sleep", duration: "Instantâneo", range: "Perto" }
   ];
-    const MAGE_ITEM_TYPES = [
+    const RANGER_REMEDIES = [
+    { label: "Salve (CD 11)", value: "Salve" },
+    { label: "Estimulante (CD 12)", value: "Stimulant" },
+    { label: "Foebane (CD 13)", value: "Foebane" },
+    { label: "Restaurador (CD 14)", value: "Restorative" },
+    { label: "Curativo (CD 15)", value: "Curative" }
+  ];
+  const MAGE_ITEM_TYPES = [
     { label: "Armadura mágica", value: "Armor" },
     { label: "Arma mágica", value: "Weapon" },
     { label: "Poção", value: "Potion" },
@@ -392,11 +399,19 @@
           details.append(select);
         }
       } else if (entry.choice === "rangerHerbalism") {
-        chosen.talentRolledName = "Vantagem em Teste de Herbalismo";
-        chosen.bonusName = "Herbalism Check Advantage";
-        chosen.bonusTo = "Herbalism";
-        chosen.displayDesc = "Vantagem em Teste de Herbalismo";
-        complete(chosen);
+        const select = document.createElement("select");
+        select.append(new Option("Escolha o remédio", ""));
+        RANGER_REMEDIES.forEach(remedy => select.append(new Option(remedy.label, remedy.value)));
+        select.addEventListener("change", () => {
+          const remedy = RANGER_REMEDIES.find(item => item.value === select.value);
+          if (!remedy) { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); return; }
+          chosen.talentRolledName = "Vantagem em Teste de Herbalismo";
+          chosen.bonusName = "Herbalism Check Advantage";
+          chosen.bonusTo = remedy.value;
+          chosen.displayDesc = `Vantagem em Herbalismo para preparar: ${remedy.label.replace(/ \(CD \d+\)$/, "")}`;
+          complete(chosen);
+        });
+        details.append(select);
       } else if (entry.choice === "magicItem") {
         const select = document.createElement("select");
         select.append(new Option("Selecione uma categoria de item mágico", ""));
@@ -931,10 +946,11 @@
         chosen.bonusTo = chosen.talentRolledName;
         chosen.displayDesc = melee ? "+1 para ataques corpo a corpo e dano" : "+1 para ataques à distância e dano";
       } else if (entry.choice === "rangerHerbalism") {
+        const remedy = RANGER_REMEDIES[randInt(0, RANGER_REMEDIES.length - 1)];
         chosen.talentRolledName = "Vantagem em Teste de Herbalismo";
         chosen.bonusName = "Herbalism Check Advantage";
-        chosen.bonusTo = "Herbalism";
-        chosen.displayDesc = "Vantagem em Teste de Herbalismo";
+        chosen.bonusTo = remedy.value;
+        chosen.displayDesc = `Vantagem em Herbalismo para preparar: ${remedy.label.replace(/ \(CD \d+\)$/, "")}`;
       } else if (entry.choice === "stat") {
         const options = entry.statOptions || ["STR", "DEX", "CHA"];
         const code = options[randInt(0, options.length - 1)];
