@@ -738,7 +738,7 @@
           ["Armaduras", equipment.armor],
           ["Pontos de Vida", equipment.hp]
         ].forEach(([label, value]) => {
-          classInfoDescription.append(document.createElement("br"));
+          classInfoDescription.append(document.createElement("br"), document.createElement("br"));
           const strong = document.createElement("strong");
           strong.style.display = "inline";
           strong.textContent = `${label}:`;
