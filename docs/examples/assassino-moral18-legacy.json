@@ -1,0 +1,122 @@
+{
+  "name": "Teste Assassino identificador antigo",
+  "stats": {
+    "STR": 7,
+    "DEX": 13,
+    "CON": 14,
+    "INT": 7,
+    "WIS": 13,
+    "CHA": 11
+  },
+  "rolledStats": {
+    "STR": 7,
+    "DEX": 13,
+    "CON": 14,
+    "INT": 7,
+    "WIS": 13,
+    "CHA": 11
+  },
+  "ancestry": "Humano",
+  "class": "Assassino",
+  "level": 1,
+  "levels": [
+    {
+      "level": 1,
+      "talentRolledDesc": "+1 to melee attacks",
+      "talentRolledName": "+1 para Ataques Corpo a Corpo",
+      "Rolled12TalentOrTwoStatPoints": "",
+      "Rolled12ChosenTalentDesc": "",
+      "Rolled12ChosenTalentName": "",
+      "HitPointRoll": 0,
+      "stoutHitPointRoll": 0
+    }
+  ],
+  "terraOesteClassTalents": [
+    {
+      "roll": 8,
+      "id": "AssassinMeleeAttackBonus",
+      "talentRolledName": "+1 para Ataques Corpo a Corpo",
+      "talentRolledDesc": "+1 to melee attacks",
+      "displayDesc": "+1 em ataques corpo a corpo",
+      "bonusName": "Plus1ToHit",
+      "bonusTo": "Melee attacks",
+      "needsChoice": "assassinStatOrMelee",
+      "statOptions": null
+    },
+    {
+      "roll": 7,
+      "id": "AssassinLotusMoral",
+      "talentRolledName": "Lótus Negra: Presença Aterradora",
+      "talentRolledDesc": "Inimigos que veem você fazem teste de moral CD 18 em vez de 15",
+      "displayDesc": "Inimigos que veem você fazem teste de moral CD 18 em vez de 15",
+      "bonusName": "AssassinLotusMoral",
+      "bonusTo": "AssassinLotusMoral"
+    }
+  ],
+  "terraOesteClassOptions": null,
+  "XP": 0,
+  "ambitionTalentLevel": {
+    "level": 1,
+    "talentRolledDesc": "",
+    "talentRolledName": "",
+    "Rolled12TalentOrTwoStatPoints": "",
+    "Rolled12ChosenTalentDesc": "",
+    "Rolled12ChosenTalentName": "",
+    "HitPointRoll": 0,
+    "stoutHitPointRoll": 0
+  },
+  "title": "Aventureiro",
+  "alignment": "Lawful",
+  "background": "",
+  "deity": "",
+  "maxHitPoints": 5,
+  "armorClass": 10,
+  "gearSlotsTotal": 10,
+  "gearSlotsUsed": 0,
+  "bonuses": [
+    {
+      "sourceType": "Class",
+      "sourceName": "Assassino",
+      "sourceCategory": "Talent",
+      "name": "+1 para Ataques Corpo a Corpo",
+      "bonusName": "Plus1ToHit",
+      "bonusTo": "Melee attacks",
+      "gainedAtLevel": 1
+    },
+    {
+      "sourceType": "Class",
+      "sourceName": "Assassino",
+      "sourceCategory": "Talent",
+      "name": "Lótus Negra: Presença Aterradora",
+      "bonusName": "AssassinLotusMoral",
+      "bonusTo": "AssassinLotusMoral",
+      "gainedAtLevel": 1
+    }
+  ],
+  "terraOesteChoices": [],
+  "goldRolled": 45,
+  "gold": 45,
+  "silver": 0,
+  "copper": 0,
+  "gear": [],
+  "treasures": [],
+  "magicItems": [],
+  "attacks": [],
+  "ledger": [
+    {
+      "goldChange": 45,
+      "silverChange": 0,
+      "copperChange": 0,
+      "desc": "Ouro inicial",
+      "notes": ""
+    }
+  ],
+  "spellsKnown": "None",
+  "languages": "Comum, Diabólico, Anânico",
+  "creationMethod": "Exported by Bot",
+  "coreRulesOnly": true,
+  "activeSources": [
+    "SD"
+  ],
+  "edits": []
+}

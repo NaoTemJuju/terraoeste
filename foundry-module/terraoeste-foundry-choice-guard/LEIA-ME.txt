@@ -1,33 +1,40 @@
 TerraOeste: escolhas de talentos no Foundry
+Versão documentada: 0.8.8
 
-Instalação/atualização:
-1. Feche o Foundry.
-2. Copie a pasta terraoeste-foundry-choice-guard para Data/modules do Foundry,
-   substituindo os arquivos da versão anterior.
-3. Abra o Foundry e confirme que o módulo está ativo no mundo Shadowdark.
-4. Exporte um JSON novo do TerraOeste e reimporte o personagem.
+A documentação completa de instalação e diagnóstico está no README.md desta pasta.
+No GitHub: https://github.com/NaoTemJuju/terraoeste/tree/main/foundry-module/terraoeste-foundry-choice-guard
 
-O módulo mantém as escolhas de talentos declaradas em terraOesteChoices e agora
-também trata Weapon Mastery: remove as cópias genéricas recebidas da classe e do
-bônus, cria uma cópia do talento original do compêndio, atualiza as chaves dos
-efeitos para a arma selecionada e mostra o nome da arma na ficha.
+Instalação/atualização manual:
+1. Localize a pasta de dados realmente usada pelo Foundry.
+2. Guarde uma cópia da versão instalada do módulo.
+3. Feche o Foundry para instalação inicial ou atualização completa do pacote.
+4. Copie a pasta terraoeste-foundry-choice-guard para Data/modules.
+5. Confira que module.json e main.mjs estão diretamente nessa pasta.
+6. Abra o Foundry, habilite o módulo no mundo Shadowdark e recarregue os clientes.
 
-O JSON TerraOeste pode trazer a seleção em terraOesteClassOptions e também no
-bonus Plus1AttackAndDamagePlusHalfLevel (bonusTo com o nome original da arma).
-O módulo usa o item original do compêndio, preservando os efeitos e a origem do
-talento do Shadowdark.
+Atualizar o GitHub não substitui automaticamente o módulo no PC.
+O manifesto atual não tem URLs manifest/download para atualização automática.
+Atualizar só o JSON de personagem não exige reiniciar o Foundry.
+Atualizar main.mjs exige recarregar o cliente; mudanças de manifesto/descoberta
+podem exigir reiniciar o processo do Foundry.
 
-O módulo também adapta a Vantagem em Conjuração para a magia escolhida, substituindo a chave REPLACEME pelo slug PT-BR correspondente (ex.: `system.roll.spellcasting.advantage.armadura-arcana`). O JSON do site exporta magias conhecidas como bônus `Spell:` para o importador criar os itens de magia no personagem.
+O módulo preserva escolhas declaradas em terraOesteChoices e aplica opções de
+Maestria em Armas, Maestria em Armaduras, dano d12 de arma, vantagem em uma
+magia e vantagem em Herbalismo para um remédio escolhido. Ele também adapta
+seletores e descoberta de tabelas traduzidos pelo Babele.
 
-O módulo não altera os arquivos do sistema Shadowdark.
+A versão 0.8.8 aceita os 13 identificadores antigos do Assassino. Exemplo:
+AssassinLotusMoral é normalizado para Morale18, a chave oficial do importador.
+O importador resolve bonusName/bonusTo; mudar apenas o nome visual não basta.
 
-Compatibilidade com Babele em português:
-O módulo também inclui tabelas RollTable cujo nome foi traduzido para “Talentos de Classe: …”. Isso corrige o seletor “Tabela de Talentos da Classe” nas fichas de classe quando o Foundry está em português. Não é necessário renomear tabelas nem alterar arquivos do sistema Shadowdark.
-A versão 0.4.0 padroniza o nome exibido da arma escolhida. Para Longsword, a ficha usa “Espada Longa”, com a mesma capitalização do item do compêndio traduzido, para o Foundry reconhecer a arma corretamente.
-A versão 0.5.0 também cria as chaves dos efeitos de Maestria usando o nome da arma em português. Exemplo: Espada Longa gera `system.roll.melee.bonus.espada-longa` e `system.roll.melee.damage.espada-longa`, como no efeito original do Shadowdark localizado.
+O módulo usa cópias dos itens originais de compêndio e não altera diretamente
+os arquivos do sistema Shadowdark. REPLACEME no modelo de compêndio pode ser
+normal; na cópia adquirida com escolha confirmada, confira se foi resolvido.
 
-A versão 0.8.0 corrige a importação das magias conhecidas de Mago e a escolha de magia na Vantagem em Conjuração.
+Contrato e exemplos: ../../docs/foundry-integration.md
+Diagnóstico e limitações: ../../docs/troubleshooting.md
+Roteiro de prevenção: ../../docs/regression-checklist.md
 
-A versão 0.8.1 reconhece o identificador canônico `Mage Armor` e mantém o slug localizado `armadura-arcana` na escolha de Vantagem em Conjuração.
-
-A versão 0.8.2 adapta a chave `REPLACEME` da Vantagem em Conjuração na cópia do talento importado, aceitando os caminhos de efeito usados pelo Foundry.
+As verificações da versão 0.8.8 incluíram testes de resolução com mocks de
+documentos; não representam validação visual de todos os idiomas e efeitos.
+Consulte as limitações documentadas antes de ampliar o suporte.
