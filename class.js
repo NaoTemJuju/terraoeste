@@ -738,11 +738,11 @@
           ["Armaduras", equipment.armor],
           ["Pontos de Vida", equipment.hp]
         ].forEach(([label, value]) => {
-          const line = document.createElement("div");
+          classInfoDescription.append(document.createElement("br"));
           const strong = document.createElement("strong");
+          strong.style.display = "inline";
           strong.textContent = `${label}:`;
-          line.append(strong, document.createTextNode(` ${value}.`));
-          classInfoDescription.append(line);
+          classInfoDescription.append(strong, document.createTextNode(` ${value}.`));
         });
       }
     }
