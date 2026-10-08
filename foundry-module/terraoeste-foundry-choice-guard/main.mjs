@@ -145,7 +145,7 @@ function setWeaponDamageDieEffect(item, weaponName) {
       ? effect.changes
       : Array.isArray(effect.system?.changes) ? effect.system.changes : [];
     for (const change of changes) {
-      const match = String(change.key ?? "").match(/^system\\.roll\\.attack\\.upgrade-damage-die\\.REPLACEME$/i);
+      const match = String(change.key ?? "").match(/^system\.roll\.attack\.upgrade-damage-die\.REPLACEME$/i);
       if (!match) continue;
       change.key = `system.roll.attack.upgrade-damage-die.${weaponSlug}`;
       replaced += 1;
