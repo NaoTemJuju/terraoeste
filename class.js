@@ -137,10 +137,6 @@
     "• Tarefas delicadas como roubar bolsos e abrir fechaduras."
   ].join("\n");
   const RANGER_SPECIAL_ABILITY = [
-    "Armas: adaga, arco longo, espada longa, arco curto, espada curta, lança e cajado.",
-    "Armaduras: armadura de couro e cota de malha.",
-    "Pontos de Vida: 1d8 por nível.",
-    "",
     "Desbravador. Você tem Vantagem em testes relacionados a navegação, rastreamento, sobrevivência na natureza, furtividade e animais selvagens.",
     "",
     "Herbalismo. Faça um teste de Inteligência para preparar um remédio à sua escolha. Se falhar, não poderá preparar esse remédio novamente até descansar com sucesso. Remédios não usados expiram em 3 rodadas.",
@@ -158,6 +154,13 @@
     "Mago": "Adeptos tatuados com runas, sábios usando óculos, e bruxas conjuradoras de chamas que ousam manipular as terríveis forças da magia.",
     "Patrulheiro": "Rastreadores habilidosos, andarilhos furtivos e guerreiros incomparáveis que chamam as terras selvagens de lar.",
     "Sacerdote": "Templários cruzados, xamãs proféticos, ou fanáticos com olhos enlouquecidos que empunham o poder de seus deuses para expurgar os impuros."
+  };
+  const CLASS_EQUIPMENT_INFO = {
+    "Patrulheiro": { weapons: "Adaga, arco longo, espada longa, arco curto, espada curta, lança e cajado", armor: "Armadura de couro e cota de malha", hp: "1d8 por nível" },
+    "Guerreiro": { weapons: "Todas as armas", armor: "Todas as armaduras", hp: "1d8 por nível" },
+    "Malandro": { weapons: "Adaga, besta, clava, espada curta e arco curto", armor: "Armadura de couro e cota de malha de mithral", hp: "1d4 por nível" },
+    "Ladrão": { weapons: "Adaga, besta, clava, espada curta e arco curto", armor: "Armadura de couro e cota de malha de mithral", hp: "1d4 por nível" },
+    "Mago": { weapons: "Adaga e cajado", armor: "Nenhuma", hp: "1d4 por nível" }
   };
 
   const CLASS_TALENT_TABLES = {
@@ -726,7 +729,22 @@
     renderClassLevelTalent(cls);
     if (classInfoTitle && cls) classInfoTitle.textContent = `Informações: ${cls}`;
     if (classInfoDescription) {
-      classInfoDescription.textContent = cls ? (window.CUSTOM_CLASS_DATA?.[cls]?.description || CLASS_DESCRIPTIONS[cls] || "Ainda não há uma descrição correspondente no compêndio consultado.") : "A descrição da classe aparecerá aqui.";
+      const description = cls ? (window.CUSTOM_CLASS_DATA?.[cls]?.description || CLASS_DESCRIPTIONS[cls] || "Ainda não há uma descrição correspondente no compêndio consultado.") : "A descrição da classe aparecerá aqui.";
+      classInfoDescription.replaceChildren(document.createTextNode(description));
+      const equipment = CLASS_EQUIPMENT_INFO[cls];
+      if (equipment) {
+        [
+          ["Armas", equipment.weapons],
+          ["Armaduras", equipment.armor],
+          ["Pontos de Vida", equipment.hp]
+        ].forEach(([label, value]) => {
+          const line = document.createElement("div");
+          const strong = document.createElement("strong");
+          strong.textContent = `${label}:`;
+          line.append(strong, document.createTextNode(` ${value}.`));
+          classInfoDescription.append(line);
+        });
+      }
     }
     const talents = talentOptions(cls);
     if (classInfoAbility) classInfoAbility.textContent = talents.length
