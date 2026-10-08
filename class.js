@@ -129,13 +129,27 @@
     "• Encontrar e desarmar armadilhas.",
     "• Tarefas delicadas como roubar bolsos e abrir fechaduras."
   ].join("\n");
+  const RANGER_SPECIAL_ABILITY = [
+    "Armas: adaga, arco longo, espada longa, arco curto, espada curta, lança e cajado.",
+    "Armaduras: armadura de couro e cota de malha.",
+    "Pontos de Vida: 1d8 por nível.",
+    "",
+    "Desbravador. Você tem Vantagem em testes relacionados a navegação, rastreamento, sobrevivência na natureza, furtividade e animais selvagens.",
+    "",
+    "Herbalismo. Faça um teste de Inteligência para preparar um remédio à sua escolha. Se falhar, não poderá preparar esse remédio novamente até descansar com sucesso. Remédios não usados expiram em 3 rodadas.",
+    "11 — Salve: cura 1 PV.",
+    "12 — Estimulante: você não pode ser surpreendido por 10 rodadas.",
+    "13 — Mata-inimigo: você tem Vantagem em ataques e dano contra um tipo de criatura escolhido por 1d6 rodadas.",
+    "14 — Restaurador: encerra um veneno ou uma doença.",
+    "15 — Curativo: equivale a uma Poção de Cura."
+  ].join("\\n");
   const CLASS_DESCRIPTIONS = {
     "Malandro": THIEF_DESCRIPTION,
     "Ladrão": THIEF_DESCRIPTION,
     "Bardo": "Bardos são viajantes bem-vindos e conselheiros sábios; sua tarefa é proteger e compartilhar o conhecimento que é repassado através das eras.",
     "Guerreiro": "Gladiadores ensanguentados usando armaduras amassadas, duelistas acrobáticos com suas espadas de arremesso, ou arqueiros élficos de visão aguçada que forjam suas lendas com aço e coragem.",
     "Mago": "Adeptos tatuados com runas, sábios usando óculos, e bruxas conjuradoras de chamas que ousam manipular as terríveis forças da magia.",
-    "Patrulheiro": "Rastreadores habilidosos, andarilhos furtivos e guerreiros incomparáveis que têm as terras selvagens como lar.",
+    "Patrulheiro": "Rastreadores habilidosos, andarilhos furtivos e guerreiros incomparáveis que chamam as terras selvagens de lar.",
     "Sacerdote": "Templários cruzados, xamãs proféticos, ou fanáticos com olhos enlouquecidos que empunham o poder de seus deuses para expurgar os impuros."
   };
 
@@ -201,7 +215,7 @@
     "Conjuração. Você pode conjurar as magias de mago que você conhece. Você conhece três magias de grau 1, à sua escolha, da lista de magias de mago. A cada nível que você ganhar, escolha novas magias de mago para aprender, de acordo com a tabela de Magias de Mago Conhecidas. Para conjurar magias de mago, veja Conjuração, na pág. 44."
   ].join("\n");
   const CLASS_SPECIAL_ABILITIES = {
-    "Mago": MAGE_SPECIAL_ABILITY,
+    "Mago": MAGE_SPECIAL_ABILITY,\n    "Patrulheiro": RANGER_SPECIAL_ABILITY,
     "Malandro": THIEF_SPECIAL_ABILITY,
     "Ladrão": THIEF_SPECIAL_ABILITY
   };
@@ -378,21 +392,11 @@
           details.append(select);
         }
       } else if (entry.choice === "rangerHerbalism") {
-        const label = document.createElement("label");
-        label.textContent = "Erva escolhida";
-        const input = document.createElement("input");
-        input.type = "text";
-        input.placeholder = "Digite o nome da erva";
-        input.addEventListener("change", () => {
-          if (!input.value.trim()) { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); return; }
-          chosen.talentRolledName = "Vantagem em Teste de Herbalismo";
-          chosen.bonusName = "Herbalism Check Advantage";
-          chosen.bonusTo = input.value.trim();
-          chosen.displayDesc = `Vantagem em Herbalismo: ${input.value.trim()}`;
-          complete(chosen);
-        });
-        label.append(input);
-        details.append(label);
+        chosen.talentRolledName = "Vantagem em Teste de Herbalismo";
+        chosen.bonusName = "Herbalism Check Advantage";
+        chosen.bonusTo = "Herbalism";
+        chosen.displayDesc = "Vantagem em Teste de Herbalismo";
+        complete(chosen);
       } else if (entry.choice === "magicItem") {
         const select = document.createElement("select");
         select.append(new Option("Selecione uma categoria de item mágico", ""));
@@ -735,7 +739,7 @@
         classInfoAbility.replaceChildren();
         specialAbility.split(String.fromCharCode(10)).forEach((line, index) => {
           if (index) classInfoAbility.append(document.createElement("br"));
-          const heading = line.match(/^(Apunhalada Pelas Costas|Ladroagem|Aprendendo Magias|Conjuração)[.](.*)$/);
+          const heading = line.match(/^(Apunhalada Pelas Costas|Ladroagem|Aprendendo Magias|Conjuração|Desbravador|Herbalismo)[.](.*)$/);
           if (heading) {
             const strong = document.createElement("strong");
             strong.style.display = "inline";
@@ -929,7 +933,7 @@
       } else if (entry.choice === "rangerHerbalism") {
         chosen.talentRolledName = "Vantagem em Teste de Herbalismo";
         chosen.bonusName = "Herbalism Check Advantage";
-        chosen.bonusTo = "herb";
+        chosen.bonusTo = "Herbalism";
         chosen.displayDesc = "Vantagem em Teste de Herbalismo";
       } else if (entry.choice === "stat") {
         const options = entry.statOptions || ["STR", "DEX", "CHA"];
