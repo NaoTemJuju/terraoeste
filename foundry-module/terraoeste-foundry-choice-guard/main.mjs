@@ -1,5 +1,6 @@
 const MODULE_ID = "terraoeste-foundry-choice-guard";
 const WEAPON_MASTERY_BONUS = "Plus1AttackAndDamagePlusHalfLevel";
+const WEAPON_DAMAGE_DIE_BONUS = "SetWeaponTypeDamage";
 const ARMOR_MASTERY_BONUS = "ArmorMastery";
 
 function key(value) {
@@ -135,6 +136,24 @@ function setWeaponMasteryEffect(item, weaponName, attackType) {
   return replaced > 0;
 }
 
+function setWeaponDamageDieEffect(item, weaponName) {
+  // D12 Weapon Damage Die uses the weapon's localized slug in the Shadowdark system.
+  const weaponSlug = slug(weaponDisplayName(weaponName));
+  let replaced = 0;
+  for (const effect of item.effects ?? []) {
+    const changes = Array.isArray(effect.changes)
+      ? effect.changes
+      : Array.isArray(effect.system?.changes) ? effect.system.changes : [];
+    for (const change of changes) {
+      const match = String(change.key ?? "").match(/^system\\.roll\\.attack\\.upgrade-damage-die\\.REPLACEME$/i);
+      if (!match) continue;
+      change.key = `system.roll.attack.upgrade-damage-die.${weaponSlug}`;
+      replaced += 1;
+    }
+  }
+  return replaced > 0;
+}
+
 function armorDisplayName(armorName) {
   const names = {
     "leather armor": "Armadura de Couro",
@@ -242,6 +261,54 @@ async function applyWeaponMasteryChoice(importer, json) {
     const attackType = await weaponAttackType(weapon);
     if (!setWeaponMasteryEffect(talent, weapon, attackType)) {
       console.warn(`${MODULE_ID}: não foi possível adaptar Maestria em Armas para ${weapon}.`);
+      continue;
+    }
+
+    talent.name = `${displayedBaseName} (${weaponDisplayName(weapon)})`;
+    if (bonus?.gainedAtLevel && talent.system?.talentClass === "level") {
+      talent.system.level = bonus.gainedAtLevel;
+    }
+    talents.push(talent);
+  }
+
+  if (!talents.length) return false;
+  importer.talents = (importer.talents ?? []).filter(item => !currentCopies.includes(item));
+  importer.talents.push(...talents);
+  return true;
+}
+
+async function applyWeaponDamageDieChoice(importer, json) {
+  const bonuses = (Array.isArray(json?.bonuses) ? json.bonuses : []).filter(item =>
+    item?.bonusName === WEAPON_DAMAGE_DIE_BONUS && typeof item.bonusTo === "string" && item.bonusTo.trim()
+  );
+  const selections = bonuses.map(bonus => ({ bonus, weapon: bonus.bonusTo.trim() }));
+  const uniqueSelections = selections.filter((selection, index, all) =>
+    all.findIndex(item => key(item.weapon) === key(selection.weapon)) === index
+  );
+  if (!uniqueSelections.length) return false;
+
+  const talentUuid = importer.itemMapping?.bonus?.[WEAPON_DAMAGE_DIE_BONUS];
+  if (!talentUuid) return false;
+  const sourceTalent = await fromUuid(talentUuid);
+  if (!sourceTalent) return false;
+
+  const mappedId = String(talentUuid).split(".").pop();
+  const currentCopies = (importer.talents ?? []).filter(item =>
+    item._id === mappedId || [
+      "d12 weapon damage die",
+      "increased weapon damage die",
+      "dado de dano de arma aumentado",
+      "dado de dano de arma com d12"
+    ].includes(key(item.flags?.babele?.originalName ?? item.name))
+  );
+  const displayedBaseName = currentCopies[0]?.name || sourceTalent.name;
+  const talents = [];
+
+  for (const { bonus, weapon } of uniqueSelections) {
+    const talent = sourceTalent.toObject();
+    talent._id = globalThis.foundry?.utils?.randomID?.() || `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
+    if (!setWeaponDamageDieEffect(talent, weapon)) {
+      console.warn(`${MODULE_ID}: não foi possível adaptar Dado de Dano de Arma Aumentado para ${weapon}.`);
       continue;
     }
 
@@ -397,6 +464,11 @@ Hooks.once("ready", () => {
       changed = await applyWeaponMasteryChoice(this, json);
     } catch (error) {
       console.error(`${MODULE_ID}: não foi possível aplicar a arma escolhida na Maestria em Armas.`, error);
+    }
+    try {
+      changed = (await applyWeaponDamageDieChoice(this, json)) || changed;
+    } catch (error) {
+      console.error(`${MODULE_ID}: não foi possível aplicar a arma escolhida no Dado de Dano de Arma Aumentado.`, error);
     }
     try {
       changed = (await applyArmorMasteryChoice(this, json)) || changed;
