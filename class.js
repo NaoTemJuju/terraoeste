@@ -222,7 +222,8 @@
     "Conjuração. Você pode conjurar as magias de mago que você conhece. Você conhece três magias de grau 1, à sua escolha, da lista de magias de mago. A cada nível que você ganhar, escolha novas magias de mago para aprender, de acordo com a tabela de Magias de Mago Conhecidas. Para conjurar magias de mago, veja Conjuração, na pág. 44."
   ].join("\n");
   const CLASS_SPECIAL_ABILITIES = {
-    "Mago": MAGE_SPECIAL_ABILITY,\n    "Patrulheiro": RANGER_SPECIAL_ABILITY,
+    "Mago": MAGE_SPECIAL_ABILITY,
+    "Patrulheiro": RANGER_SPECIAL_ABILITY,
     "Malandro": THIEF_SPECIAL_ABILITY,
     "Ladrão": THIEF_SPECIAL_ABILITY
   };
