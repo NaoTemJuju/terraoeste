@@ -270,3 +270,14 @@ Formato de referência:
 ```
 
 Confira também margens CSS. Não insira um salto de linha entre `Armas:` e o primeiro nome da lista. Um `\n` em uma string HTML não garante espaço vertical visível.
+
+
+## 11. Bárbaro
+
+O gerador já tinha Bárbaro em `CLASS_DICE` com d8 de PV; a inclusão em `class.js` acrescenta descrição, equipamento, habilidades e a tabela 2d6 enviada pelo usuário. A habilidade Fúria fica descrita com duração, redução de dano, Vantagem, imunidades, moral, obrigação de atacar e teste de Constituição ao fim. A descrição de Devastar preserva a condição de CA do alvo.
+
+Na tabela de talentos, o resultado 7–9 pede uma escolha explícita entre +2 FOR, +2 CON e +1 em ataques corpo a corpo. A escolha manual e o sorteio automático usam `StatBonus` com `STR:+2`/`CON:+2` ou `Plus1ToHit` com `Melee attacks`, identificadores já usados pelo projeto e cobertos pelo mapa oficial consultado. O resultado 3–6 usa `Plus1ToMeleeDamage`, chave já utilizada para o talento de dano da Lótus Negra.
+
+Os resultados de crítico corpo a corpo em 19 (e a ampliação por resultados 2 repetidos) e de usos adicionais de Fúria são registrados como talentos descritivos, com `exportAsBonus: false`. Não se inventa `bonusName` nem `bonusTo` para eles. A redução de dano, Vantagem, imunidades, moral, obrigação de atacar, perda/recuperação de Constituição, faixa crítica e quantidade diária de Fúria **não são automatizadas pelo Foundry nesta implementação**: o mapa e o importador consultados não confirmaram efeitos compatíveis. O mestre acompanha essas regras manualmente.
+
+A opção 12 reutiliza o seletor comum de “talento ou +2 atributos”. A seleção manual e o sorteio aleatório da faixa 7–9 devem resultar no mesmo benefício exportável. A lógica foi revisada no código, mas a interface real do Foundry, o ganho natural em nível e o importador ainda precisam de validação na instalação alvo.
