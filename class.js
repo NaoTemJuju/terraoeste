@@ -1116,6 +1116,11 @@
       spellListTable.table.querySelectorAll("tbody tr").forEach((row, index) => {
         const spell = spellList[index];
         const nameCell = row.querySelector("th");
+        const name = document.createElement("span");
+        name.className = "witch-spell-name";
+        const label = document.createElement("span");
+        label.className = "witch-spell-name__label";
+        label.textContent = spell.label;
         const info = document.createElement("details");
         info.className = "witch-spell-info";
         const trigger = document.createElement("summary");
@@ -1126,7 +1131,8 @@
         description.className = "witch-spell-info__content";
         description.textContent = spell.description;
         info.append(trigger, description);
-        nameCell.append(info);
+        name.append(label, info);
+        nameCell.replaceChildren(name);
       });
     }
     mageSpellTables.append(spellListTable.title, spellListTable.table);
