@@ -59,6 +59,50 @@
     { label: "Queda Suave", value: "Feather Fall", duration: "Instantâneo", range: "Você" },
     { label: "Sono", value: "Sleep", duration: "Instantâneo", range: "Perto" }
   ];
+  // Lista conferida no compêndio de magias de Bruxo da instalação Shadowdark.
+  // `value` conserva o nome original para a resolução pelo importador.
+  const WITCH_SPELLS = [
+    { label: "Caldeirão", value: "Cauldron", duration: "", range: "" },
+    { label: "Carvalho, Freixo e Espinheiro", value: "Oak, Ash, Thorn", duration: "", range: "" },
+    { label: "Dança das Sombras", value: "Shadowdance", duration: "", range: "" },
+    { label: "Encantar Pessoa", value: "Charm Person", duration: "", range: "" },
+    { label: "Fantoche", value: "Puppet", duration: "", range: "" },
+    { label: "Hipnotizar", value: "Hypnotize", duration: "", range: "" },
+    { label: "Homem-Salgueiro", value: "Willowman", duration: "", range: "" },
+    { label: "Luz de Bruxa", value: "Witchlight", duration: "", range: "" },
+    { label: "Mau Olhado", value: "Eyebite", duration: "", range: "" },
+    { label: "Névoa", value: "Fog", duration: "", range: "" }
+  ];
+  const classSpells = cls => cls === "Bruxo" ? WITCH_SPELLS : cls === "Mago" ? MAGE_SPELLS : [];
+  const spellListKey = cls => cls === "Bruxo" ? "witchSpells" : "mageSpells";
+  const witchKnownSpellRows = [
+    ["1","3","–","–","–","–"], ["2","4","–","–","–","–"],
+    ["3","4","1","–","–","–"], ["4","4","2","–","–","–"],
+    ["5","4","2","1","–","–"], ["6","4","3","2","–","–"],
+    ["7","4","3","2","1","–"], ["8","4","4","2","2","–"],
+    ["9","4","4","3","2","1"], ["10","4","4","4","2","2"]
+  ];
+  window.app.getClassSpellExportData = (cls, choices = {}, talents = []) => {
+    if (!["Mago", "Bruxo"].includes(cls)) return { spellsKnown: "None", bonuses: [] };
+    const spells = classSpells(cls);
+    const key = spellListKey(cls);
+    const selected = Array.isArray(choices?.[key]) ? choices[key] : [];
+    const extra = (Array.isArray(talents) ? talents : [])
+      .filter(talent => talent?.bonusName === "PickExtraSpell" && talent.bonusTo)
+      .map(talent => String(talent.bonusTo).trim());
+    const normalize = value => String(value || "").trim().toLowerCase() === "arcane armor" ? "Mage Armor" : String(value || "").trim();
+    const known = [...new Set([...selected, ...extra].map(normalize))]
+      .filter(value => spells.some(spell => spell.value.toLowerCase() === value.toLowerCase()));
+    const labels = known.map(value => spells.find(spell => spell.value.toLowerCase() === value.toLowerCase()).label);
+    return {
+      spellsKnown: labels.join(", ") || "None",
+      bonuses: labels.map((label, index) => ({
+        sourceType: "Class", sourceName: cls, sourceCategory: "Ability",
+        name: `Spell: ${cls}, Tier 1, Spell ${index + 1}`, bonusName: label,
+        bonusTo: `Tier:1, Spell:${index + 1}`, gainedAtLevel: 1
+      }))
+    };
+  };
     const RANGER_REMEDIES = [
     { label: "Salve (CD 11)", value: "Salve" },
     { label: "Estimulante (CD 12)", value: "Stimulant" },
@@ -120,6 +164,12 @@
       while (mageSpells.length < 3) mageSpells.push(pool.splice(randInt(0, pool.length - 1), 1)[0].value);
       return { mageSpells };
     }
+    if (cls === "Bruxo") {
+      const pool = [...WITCH_SPELLS];
+      const witchSpells = [];
+      while (witchSpells.length < 3) witchSpells.push(pool.splice(randInt(0, pool.length - 1), 1)[0].value);
+      return { witchSpells };
+    }
     return null;
   };
 
@@ -170,6 +220,7 @@
     "Malandro": THIEF_DESCRIPTION,
     "Ladrão": THIEF_DESCRIPTION,
     "Bardo": "Bardos são viajantes bem-vindos e conselheiros sábios; sua tarefa é proteger e compartilhar o conhecimento transmitido através dos tempos.",
+    "Bruxo": "Manipuladores dos segredos ocultos e da magia ancestral, tecendo feitiços com elementos misteriosos e pactos sombrios. Guiados por intuições profundas, portadores de maldições.",
     "Guerreiro": "Gladiadores ensanguentados usando armaduras amassadas, duelistas acrobáticos com suas espadas de arremesso, ou arqueiros élficos de visão aguçada que forjam suas lendas com aço e coragem.",
     "Mago": "Adeptos tatuados com runas, sábios usando óculos, e bruxas conjuradoras de chamas que ousam manipular as terríveis forças da magia.",
     "Patrulheiro": "Rastreadores habilidosos, andarilhos furtivos e guerreiros incomparáveis que chamam as terras selvagens de lar.",
@@ -183,7 +234,8 @@
     "Guerreiro": { weapons: "Todas as armas", armor: "Todas as armaduras", hp: "1d8 por nível" },
     "Malandro": { weapons: "Adaga, besta, clava, espada curta e arco curto", armor: "Armadura de couro e cota de malha de mithral", hp: "1d4 por nível" },
     "Ladrão": { weapons: "Adaga, besta, clava, espada curta e arco curto", armor: "Armadura de couro e cota de malha de mithral", hp: "1d4 por nível" },
-    "Mago": { weapons: "Adaga e cajado", armor: "Nenhuma", hp: "1d4 por nível" }
+    "Mago": { weapons: "Adaga e cajado", armor: "Nenhuma", hp: "1d4 por nível" },
+    "Bruxo": { weapons: "Adaga e cajado", armor: "Armadura de couro", hp: "1d4 por nível", languages: "Diabólico, Primordial ou Silvestre" }
   };
 
   const CLASS_TALENT_TABLES = {
@@ -221,6 +273,17 @@
         { roll: "8–9", effect: "Ganhe Vantagem na conjuração de uma magia que você conhece" },
         { roll: "10–11", effect: "Aprenda outra magia de mago de qualquer grau que você conheça" },
         { roll: "12", effect: "Escolha um talento ou distribua +2 pontos entre os seus atributos" }
+      ]
+    },
+    "Bruxo": {
+      title: "Talentos de Bruxo",
+      effectHeader: "Efeito (2 duplicado = +1 uso por dia)",
+      entries: [
+        { roll: "2", effect: "1/dia, teleporte-se para o local do seu familiar como um movimento" },
+        { roll: "3–7", effect: "+2 para Carisma ou +1 para testes de conjuração" },
+        { roll: "8–9", effect: "Ganhe Vantagem para conjurar uma magia que você conhece" },
+        { roll: "10–11", effect: "Aprenda uma magia adicional de um nível que você conheça" },
+        { roll: "12", effect: "Escolha um talento ou distribua +2 pontos entre seus atributos" }
       ]
     },
     "Bárbaro": {
@@ -295,9 +358,15 @@
     "",
     "Conjuração. Você pode conjurar as magias de mago que você conhece. Você conhece três magias de grau 1, à sua escolha, da lista de magias de mago. A cada nível que você ganhar, escolha novas magias de mago para aprender, de acordo com a tabela de Magias de Mago Conhecidas. Para conjurar magias de mago, veja Conjuração, na pág. 44."
   ].join("\n");
+  const WITCH_SPECIAL_ABILITY = [
+    "Familiar. Você tem um pequeno animal, como um corvo, rato ou sapo, que o serve lealmente. Ele pode falar Comum. Seu familiar pode ser a fonte das magias que você conjura; trate-o como se fosse você para determinar o alcance das magias. Se seu familiar morrer, você pode restaurá-lo à vida sacrificando permanentemente 1d4 pontos de vida.",
+    "",
+    "Conjuração. Você pode conjurar as magias de Bruxo que conhece. Você conhece três magias de nível 1, à sua escolha, da lista de magias de Bruxo. A cada nível que ganhar, escolha novas magias de Bruxo para aprender, de acordo com a tabela de Magias de Bruxo Conhecidas. Você usa Carisma como atributo de conjuração; a CD é 10 + o nível da magia. Se falhar em um teste de conjuração, não poderá conjurar aquela magia novamente até completar um descanso. Se tirar 1 natural em um teste de conjuração, role também na tabela de Desastre Diabólico correspondente ao nível da magia."
+  ].join("\n");
   const CLASS_SPECIAL_ABILITIES = {
     "Assassino": ASSASSIN_SPECIAL_ABILITY,
     "Mago": MAGE_SPECIAL_ABILITY,
+    "Bruxo": WITCH_SPECIAL_ABILITY,
     "Bardo": BARD_SPECIAL_ABILITY,
     "Bárbaro": [
       "Instinto Primitivo. Você tem Vantagem em testes para evitar armadilhas e outros perigos que possa ver ou ouvir.",
@@ -382,6 +451,17 @@
         { min: 8, max: 9, id: "AdvOnCastOneSpell", name: "Vantagem em Conjuração", choice: "mageKnownSpell", desc: "Ganhe Vantagem na conjuração de uma magia que você conhece", foundryDesc: "Gain Advantage casting one spell you know", bonusName: "AdvOnCastOneSpell" },
         { min: 10, max: 11, id: "PickExtraSpell", name: "Aprender uma Magia de Mago", choice: "mageExtraSpell", desc: "Aprenda outra magia de mago de qualquer grau que você conheça", foundryDesc: "Learn one additional mage spell of any tier you know", bonusName: "PickExtraSpell" },
         { min: 12, max: 12, id: "ChooseTalentOrStats", choice: "twelve", desc: "Escolha um talento ou distribua +2 pontos entre os seus atributos" }
+      ]
+    },
+    "Bruxo": {
+      foundryName: "Bruxo",
+      title: "Talentos de Bruxo",
+      entries: [
+        { min: 2, max: 2, id: "TeleportToFamiliar", name: "Teleporte até o Familiar", desc: "1/dia, teleporte-se para o local do seu familiar como um movimento; resultados 2 adicionais concedem +1 uso diário", foundryDesc: "Once per day, teleport to your familiar's location as a move; each additional result of 2 grants one extra daily use", bonusName: "TeleportToFamiliar", bonusTo: "TeleportToFamiliar" },
+        { min: 3, max: 7, id: "WitchStatOrCasting", choice: "witchStatOrCasting", desc: "+2 para Carisma ou +1 para testes de conjuração", foundryDesc: "+2 Charisma or +1 to casting checks" },
+        { min: 8, max: 9, id: "AdvOnCastOneSpell", name: "Vantagem em Conjuração", choice: "witchKnownSpell", desc: "Ganhe Vantagem para conjurar uma magia que você conhece", foundryDesc: "Gain Advantage casting one spell you know", bonusName: "AdvOnCastOneSpell" },
+        { min: 10, max: 11, id: "PickExtraSpell", name: "Aprender uma Magia de Bruxo", choice: "witchExtraSpell", desc: "Aprenda uma magia adicional de um nível que você conheça", foundryDesc: "Learn one additional witch spell of a tier you know", bonusName: "PickExtraSpell" },
+        { min: 12, max: 12, id: "WitchChooseTalentOrStats", choice: "twelve", desc: "Escolha um talento ou distribua +2 pontos entre seus atributos", foundryDesc: "Choose a talent or distribute +2 points among ability scores" }
       ]
     },
     "Bardo": {
@@ -755,20 +835,43 @@
           }
         });
         details.append(select);
-      } else if (entry.choice === "mageKnownSpell" || entry.choice === "mageExtraSpell") {
-        const known = state.classFeatures?.mageSpells || [];
-        const options = entry.choice === "mageKnownSpell"
-          ? MAGE_SPELLS.filter(spell => known.includes(spell.value))
-          : MAGE_SPELLS.filter(spell => !known.includes(spell.value));
+      } else if (entry.choice === "witchStatOrCasting") {
         const select = document.createElement("select");
-        select.append(new Option(entry.choice === "mageKnownSpell" ? "Escolha uma magia conhecida" : "Escolha a magia adicional", ""));
+        select.append(new Option("Escolha o benefício", ""), new Option("+2 em Carisma", "cha"), new Option("+1 em testes de conjuração", "casting"));
+        select.addEventListener("change", () => {
+          if (select.value === "cha") {
+            chosen.id = "StatBonus"; chosen.talentRolledName = "+2 de Carisma";
+            chosen.bonusName = "StatBonus"; chosen.bonusTo = "CHA:+2";
+            chosen.talentRolledDesc = "+2 Charisma"; chosen.displayDesc = "+2 para Carisma";
+            complete(chosen);
+          } else if (select.value === "casting") {
+            chosen.id = "Plus1ToCastingSpells"; chosen.talentRolledName = "+1 em Testes de Conjuração de Magia";
+            chosen.bonusName = "Plus1ToCastingSpells"; chosen.bonusTo = "Casting spells";
+            chosen.talentRolledDesc = "+1 to casting checks"; chosen.displayDesc = "+1 para testes de conjuração";
+            complete(chosen);
+          } else { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); }
+        });
+        details.append(select);
+      } else if (["mageKnownSpell", "mageExtraSpell", "witchKnownSpell", "witchExtraSpell"].includes(entry.choice)) {
+        const spellChoices = classSpells(pending.cls);
+        const listKey = spellListKey(pending.cls);
+        const previousExtras = (pending.classLevelTalents || [])
+          .filter((talent, index) => index !== rollIndex && talent?.bonusName === "PickExtraSpell")
+          .map(talent => talent.bonusTo);
+        const known = [...(state.classFeatures?.[listKey] || []), ...previousExtras];
+        const choosesKnown = entry.choice === "mageKnownSpell" || entry.choice === "witchKnownSpell";
+        const options = choosesKnown
+          ? spellChoices.filter(spell => known.includes(spell.value))
+          : spellChoices.filter(spell => !known.includes(spell.value));
+        const select = document.createElement("select");
+        select.append(new Option(choosesKnown ? "Escolha uma magia conhecida" : "Escolha a magia adicional", ""));
         options.forEach(spell => select.append(new Option(spell.label, spell.value)));
         select.addEventListener("change", () => {
           if (!select.value) { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); return; }
-          const spell = MAGE_SPELLS.find(item => item.value === select.value);
-          chosen.bonusTo = spell.value;
+          const spell = spellChoices.find(item => item.value === select.value);
+          chosen.bonusTo = entry.choice.startsWith("witch") && choosesKnown ? spell.label : spell.value;
           chosen.talentRolledName = entry.name;
-          chosen.displayDesc = entry.choice === "mageKnownSpell"
+          chosen.displayDesc = choosesKnown
             ? `Vantagem ao conjurar: ${spell.label}`
             : `Magia adicional aprendida: ${spell.label}`;
           complete(chosen);
@@ -790,7 +893,7 @@
         result.displayDesc = `+2 em ${stat}`;
         finish(result);
       }, result.statOptions || ["STR","DEX","CHA"]));
-    } else if (["weaponMastery", "armorMastery", "magicItem", "mageStatOrCasting", "mageKnownSpell", "mageExtraSpell", "rangerWeaponDamage", "rangerAttackBonus", "rangerHerbalism", "assassinStatOrMelee", "assassinBlackLotus", "barbarianStatOrMelee", "bardAttackOrFascinate", "distributeStats"].includes(result.needsChoice)) {
+    } else if (["weaponMastery", "armorMastery", "magicItem", "mageStatOrCasting", "mageKnownSpell", "mageExtraSpell", "witchStatOrCasting", "witchKnownSpell", "witchExtraSpell", "rangerWeaponDamage", "rangerAttackBonus", "rangerHerbalism", "assassinStatOrMelee", "assassinBlackLotus", "barbarianStatOrMelee", "bardAttackOrFascinate", "distributeStats"].includes(result.needsChoice)) {
       showEntryChoice(config.entries.find(entry => entry.id === result.id), result, choiceArea);
     } else if (result.needsChoice === "rangerTwelve") {
       const select = document.createElement("select");
@@ -951,8 +1054,8 @@
   function renderMageSpellTables(cls){
     if (!mageSpellTables) return;
     mageSpellTables.replaceChildren();
-    mageSpellTables.hidden = cls !== "Mago";
-    if (cls !== "Mago") return;
+    mageSpellTables.hidden = !["Mago", "Bruxo"].includes(cls);
+    if (!["Mago", "Bruxo"].includes(cls)) return;
     const makeTable = (titleText, headers, rows, captionText = "") => {
       const title = document.createElement("h4");
       title.textContent = titleText;
@@ -979,7 +1082,8 @@
       table.append(thead,tbody);
       return { title, table };
     };
-    const knownSpellTable = makeTable("Magias de Mago Conhecidas", ["Nível","1","2","3","4","5"], [
+    const isWitch = cls === "Bruxo";
+    const knownSpellRows = isWitch ? witchKnownSpellRows : [
       ["1","3","–","–","–","–"],
       ["2","4","–","–","–","–"],
       ["3","4","1","–","–","–"],
@@ -990,19 +1094,23 @@
       ["8","4","4","2","2","–"],
       ["9","4","4","3","2","1"],
       ["10","4","4","4","2","2"]
-    ], "Magias Conhecidas por Grau de Magia");
+    ];
+    const knownSpellTable = makeTable(isWitch ? "Magias de Bruxo Conhecidas" : "Magias de Mago Conhecidas", ["Nível","1","2","3","4","5"], knownSpellRows, "Magias Conhecidas por Nível de Magia");
     const info = document.createElement("details");
     info.className = "mage-known-spells-info";
     info.style.margin = "8px 0";
     const trigger = document.createElement("summary");
     trigger.className = "mage-known-spells-info__trigger";
     trigger.textContent = "i";
-    trigger.title = "Ver tabela completa de magias de mago conhecidas";
+    trigger.title = `Ver tabela completa de magias de ${cls.toLocaleLowerCase("pt-BR")} conhecidas`;
     trigger.setAttribute("aria-label", trigger.title);
     trigger.style.cssText = "display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border:1px solid currentColor;border-radius:50%;font-size:14px;font-weight:700;line-height:1;cursor:pointer;list-style:none;";
     info.append(trigger, knownSpellTable.title, knownSpellTable.table);
     mageSpellTables.append(info);
-    const spellListTable = makeTable("Magias de 1º círculo", ["Magia","Duração","Alcance"], MAGE_SPELLS.map(spell => [spell.label,spell.duration,spell.range]));
+    const spellList = classSpells(cls);
+    const spellListTable = isWitch
+      ? makeTable("Magias de 1º nível de Bruxo", ["Magia"], spellList.map(spell => [spell.label]))
+      : makeTable("Magias de 1º círculo", ["Magia","Duração","Alcance"], spellList.map(spell => [spell.label,spell.duration,spell.range]));
     mageSpellTables.append(spellListTable.title, spellListTable.table);
   }
 
@@ -1065,7 +1173,7 @@
         classInfoAbility.replaceChildren();
         specialAbility.split(String.fromCharCode(10)).forEach((line, index) => {
           if (index) classInfoAbility.append(document.createElement("br"));
-          const heading = line.match(/^(Assassino|Passo de Fumaça|Lótus Negra|Apunhalada Pelas Costas|Ladroagem|Aprendendo Magias|Conjuração|Desbravador|Herbalismo|Instinto Primitivo|Devastar|Fúria)[.](.*)$/);
+          const heading = line.match(/^(Assassino|Passo de Fumaça|Lótus Negra|Apunhalada Pelas Costas|Ladroagem|Aprendendo Magias|Conjuração|Familiar|Desbravador|Herbalismo|Instinto Primitivo|Devastar|Fúria)[.](.*)$/);
           if (heading) {
             const strong = document.createElement("strong");
             strong.style.display = "inline";
@@ -1082,7 +1190,9 @@
     if (classFeatureChoices) {
       classFeatureChoices.replaceChildren();
       const isMage = cls === "Mago";
-      classFeatureChoices.hidden = !featureConfig && !isMage;
+      const isWitch = cls === "Bruxo";
+      const isSpellcaster = isMage || isWitch;
+      classFeatureChoices.hidden = !featureConfig && !isSpellcaster;
       if (featureConfig) {
         const makeFeatureSelect = (title, description, options, value, onChange) => {
           const wrap = document.createElement("label");
@@ -1105,16 +1215,18 @@
             { label: "Força", value: "Strength" }, { label: "Destreza", value: "Dexterity" }
           ], pending.classFeatureChoices.grit, value => { pending.classFeatureChoices.grit = value; })
         );
-      } else if (isMage) {
+      } else if (isSpellcaster) {
+        const spells = classSpells(cls);
+        const listKey = spellListKey(cls);
         pending.classFeatureChoices = pending.classFeatureChoices || {};
-        const selectedSpells = Array.isArray(pending.classFeatureChoices.mageSpells) ? pending.classFeatureChoices.mageSpells : [];
-        pending.classFeatureChoices.mageSpells = selectedSpells.slice(0, 3);
+        const selectedSpells = Array.isArray(pending.classFeatureChoices[listKey]) ? pending.classFeatureChoices[listKey] : [];
+        pending.classFeatureChoices[listKey] = selectedSpells.slice(0, 3);
         const heading = document.createElement("strong");
-        heading.textContent = "Magias conhecidas de 1º círculo (escolha 3)";
+        heading.textContent = `Magias conhecidas de 1º ${isWitch ? "nível" : "círculo"} (escolha 3)`;
         classFeatureChoices.append(heading);
         const selects = [];
         const refreshSpellOptions = () => {
-          const selected = pending.classFeatureChoices.mageSpells.filter(Boolean);
+          const selected = pending.classFeatureChoices[listKey].filter(Boolean);
           selects.forEach((select, index) => {
             [...select.options].forEach(option => {
               option.disabled = !!option.value && option.value !== select.value && selected.includes(option.value);
@@ -1130,10 +1242,10 @@
           label.textContent = `Magia ${index + 1}`;
           const select = document.createElement("select");
           select.append(new Option("Escolha uma magia", ""));
-          MAGE_SPELLS.forEach(spell => select.append(new Option(spell.label, spell.value)));
-          select.value = pending.classFeatureChoices.mageSpells[index] || "";
+          spells.forEach(spell => select.append(new Option(spell.label, spell.value)));
+          select.value = pending.classFeatureChoices[listKey][index] || "";
           select.addEventListener("change", () => {
-            pending.classFeatureChoices.mageSpells[index] = select.value;
+            pending.classFeatureChoices[listKey][index] = select.value;
             refreshSpellOptions();
             updateConfirmButton();
           });
@@ -1176,9 +1288,10 @@
     const missingTalentChoice = hasClassTalentChoice(pending.cls) && !talentOptions(pending.cls).some(t => t.id === pending.classTalent);
     const featureChoices = pending.classFeatureChoices || {};
     const missingCoreFeatureChoice = pending.cls === "Guerreiro" && (!featureChoices.weaponMastery || !featureChoices.grit);
-    const mageSpells = Array.isArray(featureChoices.mageSpells) ? featureChoices.mageSpells.filter(Boolean) : [];
-    const missingMageSpells = pending.cls === "Mago" && (mageSpells.length !== 3 || new Set(mageSpells).size !== 3);
-    btnConfirmClass.disabled = !pending.cls || missingTalentChoice || missingCoreFeatureChoice || missingMageSpells;
+    const isSpellcaster = ["Mago", "Bruxo"].includes(pending.cls);
+    const knownSpells = Array.isArray(featureChoices[spellListKey(pending.cls)]) ? featureChoices[spellListKey(pending.cls)].filter(Boolean) : [];
+    const missingKnownSpells = isSpellcaster && (knownSpells.length !== 3 || new Set(knownSpells).size !== 3);
+    btnConfirmClass.disabled = !pending.cls || missingTalentChoice || missingCoreFeatureChoice || missingKnownSpells;
   }
 
   function goToClassLevelTalent(){
@@ -1360,32 +1473,38 @@
         chosen.bonusName = "MakeRandomMagicItem";
         chosen.bonusTo = item.value;
         chosen.displayDesc = `Crie 1 item mágico aleatório: ${item.label}`;
-      } else if (entry.choice === "mageStatOrCasting") {
+      } else if (entry.choice === "mageStatOrCasting" || entry.choice === "witchStatOrCasting") {
+        const isWitch = entry.choice === "witchStatOrCasting";
         if (randInt(0, 1) === 0) {
           chosen.id = "StatBonus";
-          chosen.talentRolledName = "+2 de Inteligência";
+          chosen.talentRolledName = isWitch ? "+2 de Carisma" : "+2 de Inteligência";
           chosen.bonusName = "StatBonus";
-          chosen.bonusTo = "INT:+2";
-          chosen.talentRolledDesc = "+2 Intelligence";
-          chosen.displayDesc = "+2 em Inteligência";
+          chosen.bonusTo = isWitch ? "CHA:+2" : "INT:+2";
+          chosen.talentRolledDesc = isWitch ? "+2 Charisma" : "+2 Intelligence";
+          chosen.displayDesc = isWitch ? "+2 para Carisma" : "+2 em Inteligência";
         } else {
           chosen.id = "Plus1ToCastingSpells";
           chosen.talentRolledName = "+1 em Testes de Conjuração de Magia";
           chosen.bonusName = "Plus1ToCastingSpells";
           chosen.bonusTo = "Casting spells";
-          chosen.talentRolledDesc = "+1 to casting checks for mage spells";
-          chosen.displayDesc = "+1 em testes de conjuração de magias de mago";
+          chosen.talentRolledDesc = isWitch ? "+1 to casting checks" : "+1 to casting checks for mage spells";
+          chosen.displayDesc = isWitch ? "+1 para testes de conjuração" : "+1 em testes de conjuração de magias de mago";
         }
-      } else if (entry.choice === "mageKnownSpell" || entry.choice === "mageExtraSpell") {
-        const known = state.classFeatures?.mageSpells || [];
-        const options = entry.choice === "mageKnownSpell"
-          ? MAGE_SPELLS.filter(spell => known.includes(spell.value))
-          : MAGE_SPELLS.filter(spell => !known.includes(spell.value));
+      } else if (["mageKnownSpell", "mageExtraSpell", "witchKnownSpell", "witchExtraSpell"].includes(entry.choice)) {
+        const spellChoices = classSpells(cls);
+        const previousExtras = (Array.isArray(previousResults) ? previousResults : [])
+          .filter(talent => talent?.bonusName === "PickExtraSpell")
+          .map(talent => talent.bonusTo);
+        const known = [...(state.classFeatures?.[spellListKey(cls)] || []), ...previousExtras];
+        const choosesKnown = entry.choice === "mageKnownSpell" || entry.choice === "witchKnownSpell";
+        const options = choosesKnown
+          ? spellChoices.filter(spell => known.includes(spell.value))
+          : spellChoices.filter(spell => !known.includes(spell.value));
         const spell = options[randInt(0, options.length - 1)];
         if (spell) {
-          chosen.bonusTo = spell.value;
+          chosen.bonusTo = entry.choice === "witchKnownSpell" ? spell.label : spell.value;
           chosen.talentRolledName = entry.name;
-          chosen.displayDesc = entry.choice === "mageKnownSpell"
+          chosen.displayDesc = choosesKnown
             ? `Vantagem ao conjurar: ${spell.label}`
             : `Magia adicional aprendida: ${spell.label}`;
         }
@@ -1562,5 +1681,6 @@
     });
   }
 })();
+
 
 
