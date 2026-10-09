@@ -385,8 +385,8 @@
       ]
     },
     "Bardo": {
-      // O importador do Shadowdark converte o identificador "Bard" em "Bard (Legacy)".
-      foundryName: "Bard",
+      // Exporta o nome localizado usado pelo compêndio/instalação em português.
+      foundryName: "Bardo",
       title: "Talentos de Bardo",
       entries: [
         { min: 2, max: 2, id: "BardDowntimeAdvantage", name: "Vantagem em Testes de Tempo Livre", desc: "Você tem Vantagem em testes de tempo livre, exceto farra. Role novamente se este resultado 2 já tiver sido obtido", foundryDesc: "Advantage on downtime checks, excluding carousing; reroll duplicate results of 2", exportAsBonus: false },

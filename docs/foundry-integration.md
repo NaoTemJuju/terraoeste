@@ -138,7 +138,7 @@ O PR #3 também padronizou nomes visíveis de Mago, Guerreiro e Ladrão. Esses n
 
 ## Bardo no gerador
 
-O Shadowdark 4.0.6 já traz a classe antiga como **Bard (Legacy)**. O importador converte a classe exportada como `Bard` para esse nome; portanto, o site usa `foundryName: "Bard"` e não precisa criar outra classe no módulo TerraOeste.
+O site exporta a classe localizada como `Bardo`, conforme o nome usado pelo compêndio do Foundry na instalação em português. Evite converter esse valor para `Bard` ou `Bard (Legacy)`, pois esses identificadores não são reconhecidos pela instalação reportada pelo usuário.
 
 O site apresenta Línguas, Artes Bárdicas, Fascinar, Inspirar e Mago Diletante, além do equipamento informado. A tabela 2d6 tem rerrolagem de resultado 2 repetido. No talento 3–6, o bônus de ataques usa a combinação mapeada `Plus1ToHit_Melee and ranged attacks`. As opções narrativas de Fascinar, tempo livre e Farra ficam registradas em `terraOesteClassTalents`, sem `bonusName` inventado: o mapa local não oferece chaves confirmadas para esses três efeitos, então o JSON não deve produzir um talento “não encontrado” por identificador fabricado. O talento 7–9 usa os bônus oficiais `StatBonus` por atributo.
 
