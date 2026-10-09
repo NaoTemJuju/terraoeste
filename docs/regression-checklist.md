@@ -28,7 +28,7 @@ Confira ambas as funções de exportação em `final.js`, além de `normalizedTa
 
 ## Bardo
 
-- [ ] Classe exportada como `Bard` e reconhecida pelo importador como `Bard (Legacy)`.
+- [ ] Classe exportada como `Bardo` e reconhecida pelo compêndio localizado do Foundry.
 - [ ] Descrição, armas, armadura, PV d6, quatro línguas comuns adicionais e uma rara aparecem na ficha do site.
 - [ ] Artes Bárdicas, Fascinar, Inspirar e Mago Diletante aparecem completos na descrição da classe.
 - [ ] A tabela 2d6 exibe os cinco resultados e informa que um 2 repetido deve ser rolado novamente.
@@ -37,7 +37,7 @@ Confira ambas as funções de exportação em `final.js`, além de `normalizedTa
 - [ ] 7–9 → distribuição dos +2 entre atributos é mantida na ficha e no JSON.
 - [ ] 10–11 e 2 permanecem registrados na ficha sem criar bônus com IDs inventados.
 - [ ] 12 permite escolher talento da tabela ou distribuir +2 entre atributos.
-- [ ] Importar JSON de Bardo no Shadowdark 4.0.6 local; validar o nome Bardo (Legado) e a resolução dos bônus de atributo/ataque.
+- [ ] Importar JSON de Bardo no Shadowdark 4.0.6 local; validar o nome `Bardo` e a resolução dos bônus de atributo/ataque.
 
 ## Antecedentes TerraOeste
 
