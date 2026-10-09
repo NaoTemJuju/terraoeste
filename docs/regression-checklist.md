@@ -39,6 +39,19 @@ Confira ambas as funções de exportação em `final.js`, além de `normalizedTa
 - [ ] 12 permite escolher talento da tabela ou distribuir +2 entre atributos.
 - [ ] Importar JSON de Bardo no Shadowdark 4.0.6 local; validar o nome `Bardo` e a resolução dos bônus de atributo/ataque.
 
+## Bruxo
+
+- [ ] Site mostra descrição, armas adaga/cajado, armadura de couro, PV d4 e escolha de idioma entre Diabólico, Primordial e Silvestre.
+- [ ] Familiar e Conjuração exibem texto completo; a ficha mostra a progressão de magias conhecidas por nível enviada pelo usuário.
+- [ ] Escolha manual e aleatória produzem três magias distintas dentre as dez magias de Bruxo verificadas no compêndio instalado.
+- [ ] O talento 3–7 oferece +2 Carisma ou +1 em testes de conjuração e exporta `StatBonus` ou `Plus1ToCastingSpells`.
+- [ ] O talento 8–9 permite escolher apenas uma magia conhecida e exporta `AdvOnCastOneSpell` com o rótulo da magia PT-BR como `bonusTo`.
+- [ ] O talento 10–11 permite escolher uma magia ainda não conhecida; essa escolha entra em `spellsKnown` e gera seu bônus de magia no JSON.
+- [ ] O talento 2 não é rerrolado quando repetido; duplicatas permanecem registradas e representam usos diários adicionais.
+- [ ] Resultado 12 permite escolher outro talento da tabela ou distribuir +2 entre atributos.
+- [ ] Exportação recém-gerada e reconstruída conserva `witchSpells` e talentos escolhidos, usando `class: "Bruxo"`.
+- [ ] Importar JSON no Foundry local com a classe renomeada para `Bruxo`; validar classe, magias conhecidas e talento escolhido.
+
 ## Antecedentes TerraOeste
 
 - [ ] Build cria pack `backgrounds` do tipo Item e aceita documentos `Background`.
@@ -65,6 +78,7 @@ Confira ambas as funções de exportação em `final.js`, além de `normalizedTa
 | Maestria em Armaduras | +1 CA apenas com a armadura escolhida |
 | Vantagem em Conjuração | Vantagem na magia escolhida; outra magia não a recebe |
 | Magias conhecidas do Mago | Itens de magia realmente criados, além de textos na ficha |
+| Magias conhecidas do Bruxo | Itens de magia realmente criados e nomes localizados correspondentes à instalação |
 | Herbalismo: Curative/Curativa | Efeito aponta ao slug da habilidade real Curativa |
 | Herbalismo: Stimulant/Estimulante | Efeito aponta a Estimulante; Curativa permanece sem bônus adicional |
 | Herbalismo: Salve/Foebane traduzidos | Seleção funciona com os nomes originais preservados; registrar comportamento sem esses metadados |
@@ -167,3 +181,4 @@ Este roteiro não garante ausência de falhas futuras. Ele registra os pontos qu
 - [ ] Resultado 12 no Foundry: escolher talento OU arrastar dois +1 da tabela de distribuição (podem ser iguais).
 - [ ] Exportar fontes, editar, reimportar e compilar preserva IDs e descrições.
 - [ ] Fonte TerraOeste aparece e pode ser selecionada quando filtros de fontes estão ativos.
+
