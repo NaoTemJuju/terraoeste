@@ -101,12 +101,13 @@ section{
 .witch-spell-list th,.witch-spell-list td{padding:8px 10px;vertical-align:middle}
 .witch-spell-list td:nth-child(2),.witch-spell-list td:nth-child(3){white-space:nowrap}
 .witch-spell-name{display:flex;align-items:center;gap:8px;min-width:0}
-.witch-spell-name__label{min-width:0}
+.witch-spell-name__label{min-width:0;cursor:help;text-decoration:underline;text-decoration-style:dotted;text-decoration-color:rgba(59,44,26,.45);text-underline-offset:3px}
 .witch-spell-info{display:inline-block;position:relative;flex:0 0 auto;margin-left:0;vertical-align:middle;font-family:var(--font-ui)}
 .witch-spell-info>summary{display:inline-flex;align-items:center;justify-content:center;width:21px;height:21px;border:1px solid var(--accent);border-radius:50%;background:rgba(197,154,74,.12);color:var(--ink);font-size:13px;font-weight:700;line-height:1;cursor:pointer;list-style:none}
 .witch-spell-info>summary::-webkit-details-marker{display:none}
 .witch-spell-info__content{display:none;position:absolute;top:calc(100% + 7px);left:0;z-index:20;width:min(330px,calc(100vw - 64px));padding:12px 14px;border:1px solid var(--border);border-radius:9px;background:var(--paper);box-shadow:var(--shadow-lift);color:var(--ink);font-size:14px;font-weight:400;line-height:1.45;text-align:left;white-space:normal}
 .witch-spell-info[open] .witch-spell-info__content{display:block}
+.witch-spell-name:hover .witch-spell-info__content,.witch-spell-name:focus-within .witch-spell-info__content{display:block}
 @media(max-width:640px){
   .witch-spell-list th,.witch-spell-list td{padding:7px 6px;font-size:14px}
   .witch-spell-list th:first-child,.witch-spell-list td:first-child{width:44%}
