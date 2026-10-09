@@ -44,7 +44,7 @@ Confira ambas as funções de exportação em `final.js`, além de `normalizedTa
 - [ ] Site mostra descrição, armas adaga/cajado, armadura de couro, PV d4 e escolha de idioma entre Diabólico, Primordial e Silvestre.
 - [ ] Familiar e Conjuração exibem texto completo; a ficha mostra a progressão de magias conhecidas por nível enviada pelo usuário.
 - [ ] Escolha manual e aleatória produzem três magias distintas dentre as dez magias de Bruxo verificadas no compêndio instalado.
-- [ ] Cada uma das dez magias mostra duração e alcance corretos; passar o mouse sobre o nome ou focá-lo pelo teclado revela a descrição localizada.
+- [ ] Cada uma das dez magias mostra duração e alcance corretos; passar o mouse sobre o nome ou focá-lo pelo teclado revela a descrição localizada; clique/toque alterna a descrição em telas sem hover.
 - [ ] O talento 3–7 oferece +2 Carisma ou +1 em testes de conjuração e exporta `StatBonus` ou `Plus1ToCastingSpells`.
 - [ ] O talento 8–9 permite escolher apenas uma magia conhecida e exporta `AdvOnCastOneSpell` com o rótulo da magia PT-BR como `bonusTo`.
 - [ ] O talento 10–11 permite escolher uma magia ainda não conhecida; essa escolha entra em `spellsKnown` e gera seu bônus de magia no JSON.
@@ -52,6 +52,13 @@ Confira ambas as funções de exportação em `final.js`, além de `normalizedTa
 - [ ] Resultado 12 permite escolher outro talento da tabela ou distribuir +2 entre atributos.
 - [ ] Exportação recém-gerada e reconstruída conserva `witchSpells` e talentos escolhidos, usando `class: "Bruxo"`.
 - [ ] Importar JSON no Foundry local com a classe renomeada para `Bruxo`; validar classe, magias conhecidas e talento escolhido.
+
+## Mago
+
+- [ ] As 12 magias de 1º círculo exibem nome simples, duração e alcance sem mudança no layout.
+- [ ] Passar o mouse sobre cada nome revela a descrição correta; foco pelo teclado e clique/toque também mostram/alternam a descrição.
+- [ ] Os nomes continuam com aparência de texto, sem botão, ícone `(i)` ou sublinhado; descrições não exibem marcação HTML nem UUIDs do compêndio.
+- [ ] A exibição de descrições não altera seleção/exportação de magias nem a progressão de magias conhecidas do Mago.
 
 ## Antecedentes TerraOeste
 
