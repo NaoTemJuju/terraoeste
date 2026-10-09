@@ -142,6 +142,14 @@ O site exporta a classe localizada como `Bardo`, conforme o nome usado pelo comp
 
 O site apresenta Línguas, Artes Bárdicas, Fascinar, Inspirar e Mago Diletante, além do equipamento informado. A tabela 2d6 tem rerrolagem de resultado 2 repetido. No talento 3–6, o bônus de ataques usa a combinação mapeada `Plus1ToHit_Melee and ranged attacks`. As opções narrativas de Fascinar, tempo livre e Farra ficam registradas em `terraOesteClassTalents`, sem `bonusName` inventado: o mapa local não oferece chaves confirmadas para esses três efeitos, então o JSON não deve produzir um talento “não encontrado” por identificador fabricado. O talento 7–9 usa os bônus oficiais `StatBonus` por atributo.
 
+## Bruxo no gerador
+
+O usuário confirmou que renomeou no Foundry a classe correspondente para `Bruxo`; preserve esse nome em `class` e `sourceName` do JSON. As regras e a progressão fornecidas correspondem ao documento Witch do Shadowdark, com o nome localizado alterado na instalação do usuário. Não crie uma segunda classe no módulo TerraOeste nem traduza o nome exportado para `Bruxa` sem nova confirmação.
+
+O site mantém as escolhas iniciais de três magias de 1º nível em `terraOesteClassOptions.witchSpells`, incluindo o fluxo aleatório. A lista de opções deve ser obtida da lista de Witch do compêndio instalado e os valores internos preservam os nomes originais: `Cauldron`, `Oak, Ash, Thorn`, `Shadowdance`, `Charm Person`, `Puppet`, `Hypnotize`, `Willowman`, `Witchlight`, `Eyebite` e `Fog`. Os rótulos exibidos são `Caldeirão`, `Carvalho, Freixo e Espinheiro`, `Dança das Sombras`, `Encantar Pessoa`, `Fantoche`, `Hipnotizar`, `Homem-Salgueiro`, `Luz de Bruxa`, `Mau Olhado` e `Névoa`. `final.js` deriva `spellsKnown` e os bônus de magia das escolhas e dos talentos, tanto no personagem recém-gerado quanto no reconstruído.
+
+Os talentos 2d6 reutilizam identificadores confirmados no mapa instalado: `TeleportToFamiliar`, `StatBonus`, `Plus1ToCastingSpells`, `AdvOnCastOneSpell` e `PickExtraSpell`. Para `AdvOnCastOneSpell`, `bonusTo` deve ser o rótulo PT-BR escolhido, pois o módulo de escolhas converte o nome à chave de efeito individual da magia. Resultado 2 duplicado não é rerrolado; cada resultado concede um uso diário adicional conforme a tabela. A progressão de magias conhecidas por nível é apresentada no site conforme a tabela enviada.
+
 ## Antecedentes TerraOeste
 
 O módulo de conteúdo 0.2.0 adiciona um compêndio de documentos nativos do tipo `Background` com os 102 antecedentes do documento fornecido, seis para cada uma das 17 classes. `registry.items.Background` associa os nomes exatos aos UUIDs do compêndio `terraoeste-class-content.backgrounds`. O wrapper do importador consulta esse registro antes da busca normal por nome, permitindo importar, por exemplo, **Matador de Rua**, sem editar o compêndio original do Shadowdark.
@@ -295,3 +303,4 @@ O módulo independente `terraoeste-class-content` fornece documentos nativos par
 A opção 12 reutiliza o seletor comum de “talento ou +2 atributos”. A seleção manual e o sorteio aleatório da faixa 7–9 devem resultar no mesmo benefício exportável. A lógica foi revisada no código, mas a interface real do Foundry, o ganho natural em nível e o importador ainda precisam de validação na instalação alvo.
 
 O módulo preserva aliases antigos e recupera talentos descritivos de JSONs anteriores por contagem de ocorrências, sem acrescentar linhas de nível nem duplicar bônus já exportados. As fontes dos compêndios são JSONs editáveis versionados. Ver [documentação do módulo de conteúdo](../foundry-module/terraoeste-class-content/README.md) para expansão, build, instalação e limites de automação.
+
