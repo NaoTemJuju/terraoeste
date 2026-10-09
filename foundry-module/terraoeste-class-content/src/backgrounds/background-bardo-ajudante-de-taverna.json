@@ -1,0 +1,29 @@
+{
+  "_id": "TO00000000000113",
+  "name": "Ajudante de Taverna",
+  "type": "Background",
+  "img": "icons/svg/book.svg",
+  "flags": {
+    "terraoeste-class-content": {
+      "contentId": "background-bardo-ajudante-de-taverna",
+      "class": "Bardo"
+    }
+  },
+  "folder": null,
+  "sort": 113000,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "13.350",
+    "systemId": "shadowdark",
+    "systemVersion": "4.0.6"
+  },
+  "system": {
+    "description": "<p>Você trabalhava em uma taberna, em palco e mesas.</p>",
+    "source": {
+      "title": "terraoeste"
+    },
+    "properties": []
+  }
+}

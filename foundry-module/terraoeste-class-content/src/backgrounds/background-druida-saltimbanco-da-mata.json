@@ -1,0 +1,29 @@
+{
+  "_id": "TO00000000000140",
+  "name": "Saltimbanco da Mata",
+  "type": "Background",
+  "img": "icons/svg/book.svg",
+  "flags": {
+    "terraoeste-class-content": {
+      "contentId": "background-druida-saltimbanco-da-mata",
+      "class": "Druida"
+    }
+  },
+  "folder": null,
+  "sort": 140000,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "13.350",
+    "systemId": "shadowdark",
+    "systemVersion": "4.0.6"
+  },
+  "system": {
+    "description": "<p>Você exibia dons selvagens para encantar plateias.</p>",
+    "source": {
+      "title": "terraoeste"
+    },
+    "properties": []
+  }
+}

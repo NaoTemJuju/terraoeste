@@ -147,7 +147,7 @@ function enqueue(actor) {
 async function exportSources() {
   if (!game.user.isGM) throw new Error("Somente o mestre pode exportar os compêndios.");
   const sources = {};
-  for (const name of ["classes", "talents", "class-abilities", "rollable-tables", "gear"]) {
+  for (const name of ["classes", "talents", "class-abilities", "rollable-tables", "gear", "backgrounds"]) {
     const pack = game.packs.get(`${MODULE_ID}.${name}`);
     if (!pack) throw new Error(`Compêndio ausente: ${name}`);
     sources[name] = (await pack.getDocuments()).map(document => document.toObject());

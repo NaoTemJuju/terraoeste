@@ -4,13 +4,14 @@ Módulo independente de conteúdo para Shadowdark 4.0.6 e Foundry 13+. Usa a org
 
 ## Conteúdo inicial
 
-Cinco compêndios nativos: **Classes**, **Talentos**, **Habilidades**, **Tabelas** e **Equipamento**. O primeiro conjunto inclui Bárbaro, Instinto Primitivo, Devastar, Fúria, seis opções de talentos da classe, seis aumentos de atributo +1 para distribuir os dois pontos do resultado 12 e Machado de Batalha.
+Seis compêndios nativos: **Classes**, **Talentos**, **Habilidades**, **Tabelas**, **Equipamento** e **Antecedentes**. O conjunto inclui Bárbaro, Instinto Primitivo, Devastar, Fúria, seis opções de talentos da classe, seis aumentos de atributo +1 para distribuir os dois pontos do resultado 12, Machado de Batalha e 102 antecedentes editáveis agrupados por classe nos metadados do módulo.
 
 O módulo não cria classes a partir de texto arbitrário do personagem. Novas classes entram por documentos revisáveis e um registro explícito de identificadores; isso evita efeitos inventados e talentos silenciosamente ausentes.
 
 | Regra | Implementação |
 | --- | --- |
 | PV d8; armas e armadura | Documento Class com referências ao equipamento do Shadowdark |
+| Antecedentes de TerraOeste | Documentos `Background` no compêndio TerraOeste — Antecedentes, resolvidos por nome exato no JSON |
 | Crítico corpo a corpo ampliado | ADD -1 em `system.roll.melee.critical-success` por aquisição; 19, depois 18 etc. |
 | +1 dano / ataque corpo a corpo | Efeitos nativos em `system.roll.melee.damage.all` / `system.roll.melee.bonus.all` |
 | +2 FOR / CON | Efeitos nativos nos atributos base, sem somar novamente ao JSON |
@@ -34,7 +35,7 @@ O módulo de escolhas `terraoeste-foundry-choice-guard` pode continuar ativo. Am
 
 Ainda não existe URL de download automático publicada. O manifesto da pasta de fontes não instala sozinho: é necessário gerar/obter o ZIP com os bancos compilados.
 
-O ZIP compilado da versão 0.1.0 fica em `release/terraoeste-class-content-0.1.0.zip`. Após modificar fontes, reconstrua-o antes de publicar uma nova versão. O manifesto não depende da presença de Node/npm no PC do jogador.
+O ZIP compilado da versão atual fica em `release/terraoeste-class-content-0.2.0.zip`. Após modificar fontes, reconstrua-o antes de publicar uma nova versão. O manifesto não depende da presença de Node/npm no PC do jogador.
 
 ## Editar no Foundry
 
@@ -70,7 +71,7 @@ O objeto define o mapa completo de substituições. Inclua também talentos pers
 
 ## Adicionar uma classe
 
-1. Adicione JSONs completos em `src/classes`, `src/talents`, `src/class-abilities` e `src/rollable-tables`.
+1. Adicione JSONs completos na pasta do compêndio apropriado dentro de `src` (incluindo `src/backgrounds` para antecedentes).
 2. Preserve IDs de 16 caracteres alfanuméricos e `contentId` estáveis. Nunca reutilize um ID para outra regra.
 3. Classe: ligue talentos fixos, habilidades, equipamento e `classTalentTable` por UUID. Para descoberta nativa, use o prefixo **Class Talents:** no nome da tabela.
 4. Talentos: use as chaves de efeito consumidas pela versão instalada. Talentos com escolhas exigem implementação explícita; não deixe `REPLACEME` em um item adquirido.
@@ -89,7 +90,7 @@ Na pasta deste módulo:
 ```powershell
 npm ci
 npm run build
-Compress-Archive -LiteralPath "./dist/terraoeste-class-content" -DestinationPath "./dist/terraoeste-class-content-0.1.0.zip" -Force
+Compress-Archive -LiteralPath "./dist/terraoeste-class-content" -DestinationPath "./dist/terraoeste-class-content-0.2.0.zip" -Force
 ```
 
 O build valida IDs, referências internas e registro, rejeita placeholders, gera LevelDB somente nesta pasta e prepara `dist/terraoeste-class-content`. Não acessa bancos do Foundry. `src` e `registry.json` são as fontes versionadas; `packs` e `dist` são artefatos gerados.

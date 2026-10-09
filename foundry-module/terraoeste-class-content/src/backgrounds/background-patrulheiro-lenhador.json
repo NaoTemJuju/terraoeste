@@ -1,0 +1,29 @@
+{
+  "_id": "TO00000000000184",
+  "name": "Lenhador",
+  "type": "Background",
+  "img": "icons/svg/book.svg",
+  "flags": {
+    "terraoeste-class-content": {
+      "contentId": "background-patrulheiro-lenhador",
+      "class": "Patrulheiro"
+    }
+  },
+  "folder": null,
+  "sort": 184000,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "13.350",
+    "systemId": "shadowdark",
+    "systemVersion": "4.0.6"
+  },
+  "system": {
+    "description": "<p>Você sobrevivia coletando madeira na floresta selvagem.</p>",
+    "source": {
+      "title": "terraoeste"
+    },
+    "properties": []
+  }
+}

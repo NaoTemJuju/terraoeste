@@ -1,0 +1,29 @@
+{
+  "_id": "TO00000000000148",
+  "name": "Banido",
+  "type": "Background",
+  "img": "icons/svg/book.svg",
+  "flags": {
+    "terraoeste-class-content": {
+      "contentId": "background-feiticeiro-banido",
+      "class": "Feiticeiro"
+    }
+  },
+  "folder": null,
+  "sort": 148000,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "13.350",
+    "systemId": "shadowdark",
+    "systemVersion": "4.0.6"
+  },
+  "system": {
+    "description": "<p>Você foi expulso de seu plano original e forçado a viver como mortal.</p>",
+    "source": {
+      "title": "terraoeste"
+    },
+    "properties": []
+  }
+}

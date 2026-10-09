@@ -1,0 +1,29 @@
+{
+  "_id": "TO00000000000129",
+  "name": "Quebra-Cultos",
+  "type": "Background",
+  "img": "icons/svg/book.svg",
+  "flags": {
+    "terraoeste-class-content": {
+      "contentId": "background-cacador-quebra-cultos",
+      "class": "Caçador"
+    }
+  },
+  "folder": null,
+  "sort": 129000,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "13.350",
+    "systemId": "shadowdark",
+    "systemVersion": "4.0.6"
+  },
+  "system": {
+    "description": "<p>Você infiltrou seitas e frustrou rituais profanos.</p>",
+    "source": {
+      "title": "terraoeste"
+    },
+    "properties": []
+  }
+}

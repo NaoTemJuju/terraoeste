@@ -1,0 +1,29 @@
+{
+  "_id": "TO00000000000168",
+  "name": "Arrombador",
+  "type": "Background",
+  "img": "icons/svg/book.svg",
+  "flags": {
+    "terraoeste-class-content": {
+      "contentId": "background-malandro-arrombador",
+      "class": "Malandro"
+    }
+  },
+  "folder": null,
+  "sort": 168000,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "13.350",
+    "systemId": "shadowdark",
+    "systemVersion": "4.0.6"
+  },
+  "system": {
+    "description": "<p>Você abria fechaduras e invadia casas sob o véu da noite.</p>",
+    "source": {
+      "title": "terraoeste"
+    },
+    "properties": []
+  }
+}

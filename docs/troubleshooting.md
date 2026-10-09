@@ -108,6 +108,14 @@ O talento específico estava presente, mas seu documento não tinha efeito que a
 
 O módulo resolve o nome efetivo do remédio e adiciona `system.roll.ability.advantage.<slug>`. Para Curativa, deve conferir a habilidade **Curativa**, e não somente um texto de descrição “Curativo”.
 
+## Antecedente não encontrado na importação
+
+Antecedentes de campanha como **Matador de Rua** não fazem parte do compêndio padrão instalado. Trocar o rótulo ou o campo de fonte não cria um documento de tipo `Background`.
+
+O módulo de conteúdo 0.2.0 inclui os 102 nomes e suas descrições do arquivo enviado pelo usuário em seu pack **TerraOeste — Antecedentes**. O registro do módulo resolve nomes exatos antes da busca normal do importador. Atualize/ative esse módulo e confirme que o pack está carregado. Um item pode ainda ser reportado como ausente se o JSON usar nome diferente do registrado; preserve acentos, espaços e pontuação do nome do antecedente.
+
+As descrições são narrativas: não contêm bônus, perícias ou equipamentos que não foram especificados no documento. Foi corrigido o “ocê” evidente para “Você” em Saltimbanco da Mata e a separação perdida entre Patrulheiro e Peão na extração do documento. A lista não foi renderizada visualmente: o renderer de DOCX desta estação parou porque LibreOffice não está instalado.
+
 Confira:
 
 - Se o remédio escolhido chegou ao JSON em `bonusTo`.

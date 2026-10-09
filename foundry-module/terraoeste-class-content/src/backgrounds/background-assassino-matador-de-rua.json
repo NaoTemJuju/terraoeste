@@ -1,0 +1,29 @@
+{
+  "_id": "TO00000000000101",
+  "name": "Matador de Rua",
+  "type": "Background",
+  "img": "icons/svg/book.svg",
+  "flags": {
+    "terraoeste-class-content": {
+      "contentId": "background-assassino-matador-de-rua",
+      "class": "Assassino"
+    }
+  },
+  "folder": null,
+  "sort": 101000,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "13.350",
+    "systemId": "shadowdark",
+    "systemVersion": "4.0.6"
+  },
+  "system": {
+    "description": "<p>Você matou por vingança ou sobrevivência pelas vielas.</p>",
+    "source": {
+      "title": "terraoeste"
+    },
+    "properties": []
+  }
+}
