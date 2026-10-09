@@ -700,6 +700,7 @@
       };
       const languagesStr = Array.isArray(obj?.linguas) ? obj.linguas.join(", ") : "";
       const classLevelTalent = window.app.getClassLevelTalent?.(obj?.classe, obj?.terraOesteClassTalents || obj?.talentoClasseNivel1) || { level: 1, bonuses: [], fields: {} };
+      const classSpellExport = window.app.getClassSpellExportData?.(obj?.classe, obj?.opcoesClasse || obj?.terraOesteClassOptions, classLevelTalent.talents) || { spellsKnown: "None", bonuses: [] };
       const level = classLevelTalent.level;
       const gear = Array.isArray(obj?.itens) ? obj.itens : [];
       const shopLedger = Array.isArray(obj?.compras) ? obj.compras : [];
@@ -746,6 +747,7 @@
         bonuses: [
           ...(window.app.getRaceBonuses?.(obj?.raca, obj?.talentoRacial) || []),
           ...(window.app.getClassFeatureBonuses?.(obj?.classe, obj?.opcoesClasse || obj?.terraOesteClassOptions) || []),
+          ...classSpellExport.bonuses,
           ...(classLevelTalent.bonuses || [])
         ],
         terraOesteChoices: [
@@ -770,7 +772,7 @@
           },
           ...shopLedger
         ],
-        spellsKnown: "None",
+        spellsKnown: classSpellExport.spellsKnown,
         languages: languagesStr,
         creationMethod: "Exported by Bot",
         coreRulesOnly: true,
@@ -1059,4 +1061,5 @@
     set __loadedRawObj(val){ __loadedRawObj = val; }
   };
 })();
+
 
