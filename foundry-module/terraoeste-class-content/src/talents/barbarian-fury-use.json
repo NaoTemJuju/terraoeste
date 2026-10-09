@@ -1,0 +1,34 @@
+{
+  "_id": "TO00000000000009",
+  "name": "Uso Adicional de Fúria",
+  "type": "Talent",
+  "img": "icons/skills/melee/strike-axe-blood-red.webp",
+  "flags": {
+    "terraoeste-class-content": {
+      "contentId": "barbarian-fury-use",
+      "usageTarget": "barbarian-fury",
+      "usageBonus": 1
+    }
+  },
+  "folder": null,
+  "sort": 900000,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "13.350",
+    "systemId": "shadowdark",
+    "systemVersion": "4.0.6"
+  },
+  "system": {
+    "description": "<p>Ganhe um uso adicional de Fúria por dia. O módulo ajusta o contador da habilidade Fúria na ficha, preservando usos já gastos.</p>",
+    "source": {
+      "title": "terraoeste"
+    },
+    "properties": [],
+    "talentClass": "level",
+    "level": 0
+  },
+  "effects": []
+}
+

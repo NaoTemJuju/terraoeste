@@ -1,0 +1,54 @@
+{
+  "_id": "TO00000000000008",
+  "name": "+1 em Ataques Corpo a Corpo",
+  "type": "Talent",
+  "img": "icons/skills/melee/strike-axe-blood-red.webp",
+  "flags": {
+    "terraoeste-class-content": {
+      "contentId": "barbarian-melee-attack"
+    }
+  },
+  "folder": null,
+  "sort": 800000,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "13.350",
+    "systemId": "shadowdark",
+    "systemVersion": "4.0.6"
+  },
+  "system": {
+    "description": "<p>+1 em ataques corpo a corpo.</p>",
+    "source": {
+      "title": "terraoeste"
+    },
+    "properties": [],
+    "talentClass": "level",
+    "level": 0
+  },
+  "effects": [
+    {
+      "_id": "TE00000000000080",
+      "name": "+1 em Ataques Corpo a Corpo",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "disabled": false,
+      "transfer": true,
+      "changes": [
+        {
+          "key": "system.roll.melee.bonus.all",
+          "mode": 2,
+          "value": "1",
+          "priority": 20
+        }
+      ],
+      "duration": {},
+      "flags": {
+        "shadowdark": {
+          "situational": false
+        }
+      }
+    }
+  ]
+}
+

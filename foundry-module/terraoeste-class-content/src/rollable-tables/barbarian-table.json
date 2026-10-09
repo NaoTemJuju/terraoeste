@@ -1,0 +1,252 @@
+{
+  "_id": "TO00000000000017",
+  "name": "Class Talents: Bárbaro",
+  "img": "icons/svg/d20-grey.svg",
+  "flags": {
+    "terraoeste-class-content": {
+      "contentId": "barbarian-table"
+    }
+  },
+  "folder": null,
+  "sort": 1700000,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "13.350",
+    "systemId": "shadowdark",
+    "systemVersion": "4.0.6"
+  },
+  "description": "<p>2d6. Resultados 7–9: escolha uma opção. Resultado 12: escolha um talento ou distribua +2 pontos entre atributos. Resultado 2 repetido amplia o crítico em 1.</p>",
+  "formula": "2d6",
+  "replacement": true,
+  "displayRoll": true,
+  "results": [
+    {
+      "_id": "TR00000000000001",
+      "type": "document",
+      "name": "Crítico Corpo a Corpo Ampliado",
+      "description": "",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000004",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        2,
+        2
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000002",
+      "type": "document",
+      "name": "+1 de Dano Corpo a Corpo",
+      "description": "",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000005",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        3,
+        6
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000003",
+      "type": "text",
+      "name": "Escolha 1",
+      "description": "Escolha 1",
+      "documentUuid": null,
+      "img": "icons/svg/d20-grey.svg",
+      "range": [
+        7,
+        9
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000004",
+      "type": "document",
+      "name": "+2 em Força",
+      "description": "",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000006",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        7,
+        9
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000005",
+      "type": "document",
+      "name": "+2 em Constituição",
+      "description": "",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000007",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        7,
+        9
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000006",
+      "type": "document",
+      "name": "+1 em Ataques Corpo a Corpo",
+      "description": "",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000008",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        7,
+        9
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000007",
+      "type": "document",
+      "name": "Uso Adicional de Fúria",
+      "description": "",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000009",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        10,
+        11
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000008",
+      "type": "text",
+      "name": "Escolha 1 talento OU distribua +2 pontos entre atributos",
+      "description": "Escolha 1 talento OU distribua +2 pontos entre atributos",
+      "documentUuid": null,
+      "img": "icons/svg/d20-grey.svg",
+      "range": [
+        12,
+        12
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000009",
+      "type": "document",
+      "name": "Crítico Corpo a Corpo Ampliado",
+      "description": "",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000004",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        12,
+        12
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000010",
+      "type": "document",
+      "name": "+1 de Dano Corpo a Corpo",
+      "description": "",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000005",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        12,
+        12
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000011",
+      "type": "document",
+      "name": "+2 em Força",
+      "description": "",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000006",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        12,
+        12
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000012",
+      "type": "document",
+      "name": "+2 em Constituição",
+      "description": "",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000007",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        12,
+        12
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000013",
+      "type": "document",
+      "name": "+1 em Ataques Corpo a Corpo",
+      "description": "",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000008",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        12,
+        12
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000014",
+      "type": "document",
+      "name": "Uso Adicional de Fúria",
+      "description": "",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000009",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        12,
+        12
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000015",
+      "type": "document",
+      "name": "Distribuir entre Atributos (TerraOeste)",
+      "description": "",
+      "documentUuid": "Compendium.terraoeste-class-content.rollable-tables.RollTable.TO00000000000018",
+      "img": "icons/svg/d20-grey.svg",
+      "range": [
+        12,
+        12
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    }
+  ]
+}
+

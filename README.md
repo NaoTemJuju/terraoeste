@@ -8,9 +8,10 @@ Gerador de personagens de Shadowdark em português, com exportação de JSON par
 - [Diagnóstico e soluções dos problemas conhecidos](docs/troubleshooting.md): causas confirmadas, investigação e limitações atuais.
 - [Roteiro de prevenção e regressão](docs/regression-checklist.md): verificações antes de publicar uma correção.
 - [Instalação e atualização do módulo](foundry-module/terraoeste-foundry-choice-guard/README.md).
+- [Módulo de conteúdo: classes, talentos, habilidades e tabelas editáveis](foundry-module/terraoeste-class-content/README.md).
 - [Instruções para agentes e colaboradores](AGENTS.md).
 
-Esses documentos registram o estado verificado em 8 de outubro de 2026, após a versão **0.8.8** do módulo. Ao atualizar o Shadowdark ou o Babele, confira novamente os caminhos de efeitos, os UUIDs e as APIs descritas.
+Esses documentos registram o módulo de escolhas **0.8.8** e, em 9 de outubro de 2026, o módulo de conteúdo **0.1.0**, preparado contra o código local do Shadowdark 4.0.6. O novo conteúdo ainda requer validação na interface real. Ao atualizar o Shadowdark ou o Babele, confira novamente os caminhos de efeitos, os UUIDs e as APIs descritas.
 
 ## O que o projeto faz
 
@@ -32,6 +33,7 @@ O módulo `terraoeste-foundry-choice-guard` adapta a importação e os seletores
 | `functions/api/` | Cloudflare Pages Functions |
 | `config/availability.json` | Configuração de disponibilidade |
 | `foundry-module/terraoeste-foundry-choice-guard/` | Módulo de compatibilidade do Foundry |
+| `foundry-module/terraoeste-class-content/` | Conteúdo nativo próprio, registro de importação e build de compêndios |
 | `docs/` | Contratos, histórico de incidentes e verificações |
 
 **As tabelas do site estão dentro de `class.js`.** As RollTables e os itens usados no Foundry pertencem aos compêndios instalados no Foundry. Um ZIP de RollTables exportado pelo usuário serve como referência; ele não contém necessariamente todos os documentos de Talent ou seus efeitos.

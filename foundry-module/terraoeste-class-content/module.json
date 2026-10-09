@@ -1,0 +1,105 @@
+{
+  "id": "terraoeste-class-content",
+  "title": "TerraOeste: Classes e Talentos",
+  "description": "Conteúdo próprio editável para Shadowdark. Classe Bárbaro, talentos, Fúria e tabelas; integração com o importador TerraOeste.",
+  "version": "0.1.0",
+  "authors": [
+    {
+      "name": "TerraOeste"
+    }
+  ],
+  "compatibility": {
+    "minimum": "13",
+    "verified": "13"
+  },
+  "esmodules": [
+    "main.mjs"
+  ],
+  "relationships": {
+    "systems": [
+      {
+        "id": "shadowdark",
+        "type": "system",
+        "compatibility": {
+          "minimum": "4.0.6"
+        }
+      }
+    ]
+  },
+  "packs": [
+    {
+      "name": "gear",
+      "label": "TerraOeste — Equipamento",
+      "path": "packs/gear",
+      "type": "Item",
+      "system": "shadowdark",
+      "ownership": {"PLAYER": "OBSERVER", "ASSISTANT": "OWNER"}
+    },
+    {
+      "name": "classes",
+      "label": "TerraOeste — Classes",
+      "path": "packs/classes",
+      "type": "Item",
+      "system": "shadowdark",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "talents",
+      "label": "TerraOeste — Talentos",
+      "path": "packs/talents",
+      "type": "Item",
+      "system": "shadowdark",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "class-abilities",
+      "label": "TerraOeste — Habilidades",
+      "path": "packs/class-abilities",
+      "type": "Item",
+      "system": "shadowdark",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "rollable-tables",
+      "label": "TerraOeste — Tabelas",
+      "path": "packs/rollable-tables",
+      "type": "RollTable",
+      "system": "shadowdark",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    }
+  ],
+  "packFolders": [
+    {
+      "name": "TerraOeste",
+      "sorting": "a",
+      "color": "#6a3020",
+      "packs": [
+        "gear",
+        "classes",
+        "talents",
+        "class-abilities",
+        "rollable-tables"
+      ]
+    }
+  ],
+  "flags": {
+    "shadowdark": {
+      "sources": {
+        "terraoeste": "TerraOeste"
+      }
+    }
+  }
+}
+

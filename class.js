@@ -155,6 +155,7 @@
   ].join("\n");
   const CLASS_DESCRIPTIONS = {
     "Assassino": "Assassinos vestidos de preto, treinados desde a infância em um mosteiro oculto no deserto. Eles ganham poderes místicos de uma lendária flor de lótus negra, concedida por um demônio.",
+    "Bárbaro": "Guerreiros de fúria primeva que entram em um frenesi cego e sanguinário no calor da batalha, incapazes de distinguir amigo de inimigo.",
     "Malandro": THIEF_DESCRIPTION,
     "Ladrão": THIEF_DESCRIPTION,
     "Bardo": "Bardos são viajantes bem-vindos e conselheiros sábios; sua tarefa é proteger e compartilhar o conhecimento que é repassado através das eras.",
@@ -165,6 +166,7 @@
   };
   const CLASS_EQUIPMENT_INFO = {
     "Assassino": { weapons: "Adaga, boleadeira, chicote de lâminas, cimitarra, lança, shuriken e zarabatana", armor: "Armadura de couro", hp: "1d6 por nível", languages: "Diabólico" },
+    "Bárbaro": { weapons: "Adaga, arco longo, espada longa, espadão, lança, machado, machado de batalha e machadão", armor: "Armadura de couro e escudos", hp: "1d8 por nível" },
     "Patrulheiro": { weapons: "Adaga, arco longo, espada longa, arco curto, espada curta, lança e cajado", armor: "Armadura de couro e cota de malha", hp: "1d8 por nível" },
     "Guerreiro": { weapons: "Todas as armas", armor: "Todas as armaduras", hp: "1d8 por nível" },
     "Malandro": { weapons: "Adaga, besta, clava, espada curta e arco curto", armor: "Armadura de couro e cota de malha de mithral", hp: "1d4 por nível" },
@@ -206,6 +208,17 @@
         { roll: "3–7", effect: "+2 em Inteligência ou +1 em testes de conjuração de magias de mago" },
         { roll: "8–9", effect: "Ganhe Vantagem na conjuração de uma magia que você conhece" },
         { roll: "10–11", effect: "Aprenda outra magia de mago de qualquer grau que você conheça" },
+        { roll: "12", effect: "Escolha um talento ou distribua +2 pontos entre os seus atributos" }
+      ]
+    },
+    "Bárbaro": {
+      title: "Talentos de Bárbaro",
+      effectHeader: "Efeito (2 duplicado = aumenta o alcance de crítico em 1; ex.: 18–20)",
+      entries: [
+        { roll: "2", effect: "Você causa crítico em ataques corpo a corpo com resultado 19" },
+        { roll: "3–6", effect: "+1 de dano para ataques corpo a corpo" },
+        { roll: "7–9", effect: "+2 em Força ou Constituição, ou +1 em ataques corpo a corpo" },
+        { roll: "10–11", effect: "Ganhe um uso adicional da habilidade Fúria a cada dia" },
         { roll: "12", effect: "Escolha um talento ou distribua +2 pontos entre os seus atributos" }
       ]
     },
@@ -262,6 +275,20 @@
   const CLASS_SPECIAL_ABILITIES = {
     "Assassino": ASSASSIN_SPECIAL_ABILITY,
     "Mago": MAGE_SPECIAL_ABILITY,
+    "Bárbaro": [
+      "Instinto Primitivo. Você tem Vantagem em testes para evitar armadilhas e outros perigos que possa ver ou ouvir.",
+      "",
+      "Devastar. Durante a Fúria, ao finalizar um inimigo, use o dano excedente contra um alvo próximo, desde que a CA dele seja igual ou inferior.",
+      "",
+      "Fúria. Uma vez por dia, por 3 rodadas:",
+      "• Reduz todo o dano sofrido em 1d4.",
+      "• Você tem Vantagem em ataques corpo a corpo.",
+      "• Você fica imune a efeitos de medo e encantamento.",
+      "• Inimigos fazem testes de moral com Desvantagem.",
+      "• Você deve atacar um inimigo ou aliado no seu turno.",
+      "• Ao fim do efeito, faça um teste de Constituição CD 15 ou perca 1 ponto de Constituição.",
+      "Você recupera o ponto de Constituição perdido após uma noite de descanso."
+    ].join("\n"),
     "Patrulheiro": RANGER_SPECIAL_ABILITY,
     "Malandro": THIEF_SPECIAL_ABILITY,
     "Ladrão": THIEF_SPECIAL_ABILITY
@@ -342,6 +369,17 @@
         { min: 7, max: 9, id: "StatBonus", choice: "stat", statOptions: ["STR", "DEX", "INT"], desc: "+2 em Força, Destreza ou Inteligência", foundryDesc: "+2 Strength, Dexterity, or Intelligence", bonusName: "StatBonus" },
         { min: 10, max: 11, id: "HerbalismCheckAdvantage", name: "Vantagem em Teste de Herbalismo", choice: "rangerHerbalism", desc: "Vantagem em Teste de Herbalismo", foundryDesc: "Herbalism Check Advantage", bonusName: "ReduceHerbalismDC" },
         { min: 12, max: 12, id: "RangerChooseTalentOrStats", choice: "rangerTwelve", desc: "Escolha um talento da tabela ou distribua +2 pontos entre os atributos", foundryDesc: "Choose a talent from the table or distribute +2 points among ability scores" }
+      ]
+    },
+    "Bárbaro": {
+      foundryName: "Bárbaro",
+      title: "Talentos de Bárbaro",
+      entries: [
+        { min: 2, max: 2, id: "BarbarianCriticalRange", name: "Crítico corpo a corpo (19)", desc: "Você causa crítico em ataques corpo a corpo com resultado 19. Cada resultado 2 adicional amplia o alcance crítico em 1", foundryDesc: "Critical hit on melee attacks with a result of 19; each additional result of 2 expands the critical range by 1", bonusName: "TerraOeste.BarbarianCriticalRange", bonusTo: "TerraOeste.BarbarianCriticalRange" },
+        { min: 3, max: 6, id: "Plus1ToMeleeDamage", name: "+1 para Dano Corpo a Corpo", desc: "+1 de dano para ataques corpo a corpo", foundryDesc: "+1 to melee damage", bonusName: "Plus1ToMeleeDamage", bonusTo: "Plus1ToMeleeDamage" },
+        { min: 7, max: 9, id: "BarbarianStatOrMelee", choice: "barbarianStatOrMelee", desc: "+2 em Força ou Constituição, ou +1 em ataques corpo a corpo", foundryDesc: "+2 Strength or Constitution, or +1 to melee attacks" },
+        { min: 10, max: 11, id: "BarbarianExtraFuryUse", name: "Uso Adicional de Fúria", desc: "Ganhe um uso adicional da habilidade Fúria a cada dia", foundryDesc: "Gain one additional use of Fury per day", bonusName: "TerraOeste.BarbarianExtraFuryUse", bonusTo: "TerraOeste.BarbarianExtraFuryUse" },
+        { min: 12, max: 12, id: "BarbarianChooseTalentOrStats", choice: "twelve", desc: "Escolha um talento ou distribua +2 pontos entre os seus atributos", foundryDesc: "Choose a talent or distribute +2 points among ability scores" }
       ]
     },
     "Guerreiro": {
@@ -428,9 +466,9 @@
 
   function classLevelTalentConfig(cls){ return CLASS_LEVEL_TALENTS[cls] || null; }
   window.app.getFoundryClassName = cls => classLevelTalentConfig(cls)?.foundryName || window.CUSTOM_CLASS_DATA?.[cls]?.foundryName || cls || "";
-  function resultForEntry(entry, roll){ return { roll, id: entry.id, talentRolledName: entry.name || "", talentRolledDesc: entry.foundryDesc || entry.desc, displayDesc: entry.desc, bonusName: entry.bonusName ?? entry.id, bonusTo: entry.bonusTo || "", needsChoice: entry.choice || "", statOptions: entry.statOptions || null }; }
+  function resultForEntry(entry, roll){ return { roll, id: entry.id, talentRolledName: entry.name || "", talentRolledDesc: entry.foundryDesc || entry.desc, displayDesc: entry.desc, bonusName: entry.exportAsBonus === false ? "" : (entry.bonusName ?? entry.id), bonusTo: entry.bonusTo || "", needsChoice: entry.choice || "", statOptions: entry.statOptions || null, exportAsBonus: entry.exportAsBonus !== false }; }
   function makeTalentBonus(result, cls){
-    if (!result || !(result.bonusName || result.id)) return [];
+    if (!result || result.exportAsBonus === false || !(result.bonusName || result.id)) return [];
     const config = classLevelTalentConfig(cls);
     const effectName = result.bonusName || result.id;
     const bonusTo = result.bonusTo || result.talentRolledName || effectName;
@@ -493,6 +531,31 @@
           chosen.bonusTo = select.value;
           chosen.talentRolledName = entry.name || (weapon ? "Maestria em Armas" : "Maestria em Armaduras");
           chosen.displayDesc = weapon ? `Maestria em Armas adicional: ${(FIGHTER_WEAPON_TYPES.find(item => item.value === select.value) || {}).label}` : `+1 na CA usando ${(FIGHTER_ARMOR_TYPES.find(item => item.value === select.value) || {}).label}`;
+          complete(chosen);
+        });
+        details.append(select);
+      } else if (entry.choice === "barbarianStatOrMelee") {
+        const select = document.createElement("select");
+        select.append(new Option("Escolha o benefício", ""), new Option("+2 em Força", "STR"), new Option("+2 em Constituição", "CON"), new Option("+1 em ataques corpo a corpo", "melee"));
+        select.addEventListener("change", () => {
+          if (!select.value) { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); return; }
+          if (select.value === "melee") {
+            chosen.id = "BarbarianMeleeAttackBonus";
+            chosen.talentRolledName = "+1 para Ataques Corpo a Corpo";
+            chosen.talentRolledDesc = "+1 to melee attacks";
+            chosen.bonusName = "Plus1ToHit";
+            chosen.bonusTo = "Melee attacks";
+            chosen.displayDesc = "+1 em ataques corpo a corpo";
+          } else {
+            const code = select.value;
+            const stat = code === "STR" ? "Força" : "Constituição";
+            chosen.id = "StatBonus";
+            chosen.talentRolledName = "+2 de " + stat;
+            chosen.talentRolledDesc = "+2 " + (code === "STR" ? "Strength" : "Constitution");
+            chosen.bonusName = "StatBonus";
+            chosen.bonusTo = code + ":+2";
+            chosen.displayDesc = "+2 em " + stat;
+          }
           complete(chosen);
         });
         details.append(select);
@@ -650,7 +713,7 @@
         result.displayDesc = `+2 em ${stat}`;
         finish(result);
       }, result.statOptions || ["STR","DEX","CHA"]));
-    } else if (["weaponMastery", "armorMastery", "magicItem", "mageStatOrCasting", "mageKnownSpell", "mageExtraSpell", "rangerWeaponDamage", "rangerAttackBonus", "rangerHerbalism", "assassinStatOrMelee", "assassinBlackLotus"].includes(result.needsChoice)) {
+    } else if (["weaponMastery", "armorMastery", "magicItem", "mageStatOrCasting", "mageKnownSpell", "mageExtraSpell", "rangerWeaponDamage", "rangerAttackBonus", "rangerHerbalism", "assassinStatOrMelee", "assassinBlackLotus", "barbarianStatOrMelee"].includes(result.needsChoice)) {
       showEntryChoice(config.entries.find(entry => entry.id === result.id), result, choiceArea);
     } else if (result.needsChoice === "rangerTwelve") {
       const select = document.createElement("select");
@@ -790,13 +853,13 @@
     if (!data) return;
 
     const tables = [
-      { title: data.title, dice: "2d6", entries: data.entries },
+      { title: data.title, dice: "2d6", effectHeader: data.effectHeader, entries: data.entries },
       ...(data.secondaryEntries ? [{ title: data.secondaryTitle, dice: data.secondaryDice || "d12", entries: data.secondaryEntries }] : [])
     ];
     tables.forEach(section => {
       const title = document.createElement("h4"); title.textContent = section.title;
       const table = document.createElement("table"), thead = document.createElement("thead"), headingRow = document.createElement("tr");
-      [section.dice, "Efeito"].forEach(label => { const th = document.createElement("th"); th.scope = "col"; th.textContent = label; headingRow.append(th); });
+      [section.dice, section.effectHeader || "Efeito"].forEach(label => { const th = document.createElement("th"); th.scope = "col"; th.textContent = label; headingRow.append(th); });
       thead.append(headingRow);
       const tbody = document.createElement("tbody");
       section.entries.forEach(entry => {
@@ -924,7 +987,7 @@
         classInfoAbility.replaceChildren();
         specialAbility.split(String.fromCharCode(10)).forEach((line, index) => {
           if (index) classInfoAbility.append(document.createElement("br"));
-          const heading = line.match(/^(Assassino|Passo de Fumaça|Lótus Negra|Apunhalada Pelas Costas|Ladroagem|Aprendendo Magias|Conjuração|Desbravador|Herbalismo)[.](.*)$/);
+          const heading = line.match(/^(Assassino|Passo de Fumaça|Lótus Negra|Apunhalada Pelas Costas|Ladroagem|Aprendendo Magias|Conjuração|Desbravador|Herbalismo|Instinto Primitivo|Devastar|Fúria)[.](.*)$/);
           if (heading) {
             const strong = document.createElement("strong");
             strong.style.display = "inline";
@@ -1109,6 +1172,25 @@
         chosen.displayDesc = chosen.blackLotusResults.length === 2
           ? "Lótus Negra (1: dois talentos): " + chosen.blackLotusResults.map(item => "d12 " + item.roll + " — " + item.displayDesc).join("; ")
           : "Lótus Negra (d12 " + chosen.blackLotusResults[0].roll + "): " + chosen.blackLotusResults[0].displayDesc;
+      } else if (entry.choice === "barbarianStatOrMelee") {
+        const choice = randInt(0, 2);
+        if (choice === 2) {
+          chosen.id = "BarbarianMeleeAttackBonus";
+          chosen.talentRolledName = "+1 para Ataques Corpo a Corpo";
+          chosen.talentRolledDesc = "+1 to melee attacks";
+          chosen.bonusName = "Plus1ToHit";
+          chosen.bonusTo = "Melee attacks";
+          chosen.displayDesc = "+1 em ataques corpo a corpo";
+        } else {
+          const code = choice === 0 ? "STR" : "CON";
+          const stat = code === "STR" ? "Força" : "Constituição";
+          chosen.id = "StatBonus";
+          chosen.talentRolledName = "+2 de " + stat;
+          chosen.talentRolledDesc = "+2 " + (code === "STR" ? "Strength" : "Constitution");
+          chosen.bonusName = "StatBonus";
+          chosen.bonusTo = code + ":+2";
+          chosen.displayDesc = "+2 em " + stat;
+        }
       } else if (entry.choice === "assassinStatOrMelee") {
         const choice = randInt(0, 2);
         if (choice === 2) {

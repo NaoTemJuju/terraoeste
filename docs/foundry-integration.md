@@ -270,3 +270,16 @@ Formato de referência:
 ```
 
 Confira também margens CSS. Não insira um salto de linha entre `Armas:` e o primeiro nome da lista. Um `\n` em uma string HTML não garante espaço vertical visível.
+
+
+## 11. Bárbaro
+
+O gerador já tinha Bárbaro em `CLASS_DICE` com d8 de PV; a inclusão em `class.js` acrescenta descrição, equipamento, habilidades e a tabela 2d6 enviada pelo usuário. A habilidade Fúria fica descrita com duração, redução de dano, Vantagem, imunidades, moral, obrigação de atacar e teste de Constituição ao fim. A descrição de Devastar preserva a condição de CA do alvo.
+
+Na tabela de talentos, o resultado 7–9 pede uma escolha explícita entre +2 FOR, +2 CON e +1 em ataques corpo a corpo. A escolha manual e o sorteio automático usam `StatBonus` com `STR:+2`/`CON:+2` ou `Plus1ToHit` com `Melee attacks`, identificadores já usados pelo projeto e cobertos pelo mapa oficial consultado. O resultado 3–6 usa `Plus1ToMeleeDamage`, chave já utilizada para o talento de dano da Lótus Negra.
+
+O módulo independente `terraoeste-class-content` fornece documentos nativos para o conteúdo ausente. Crítico e usos adicionais de Fúria agora exportam `TerraOeste.BarbarianCriticalRange` e `TerraOeste.BarbarianExtraFuryUse`, registrados com UUIDs reais em `registry.json`. O efeito de crítico soma -1 em `system.roll.melee.critical-success` por aquisição. A habilidade Fúria usa contador nativo; o módulo ajusta seu máximo conforme os talentos adicionais, mantendo usos gastos. Instinto Primitivo e vantagem da Fúria usam efeitos situacionais selecionáveis. Devastar, duração, redução de dano, imunidades, moral, obrigação de atacar e perda/recuperação de Constituição permanecem manuais.
+
+A opção 12 reutiliza o seletor comum de “talento ou +2 atributos”. A seleção manual e o sorteio aleatório da faixa 7–9 devem resultar no mesmo benefício exportável. A lógica foi revisada no código, mas a interface real do Foundry, o ganho natural em nível e o importador ainda precisam de validação na instalação alvo.
+
+O módulo preserva aliases antigos e recupera talentos descritivos de JSONs anteriores por contagem de ocorrências, sem acrescentar linhas de nível nem duplicar bônus já exportados. As fontes dos compêndios são JSONs editáveis versionados. Ver [documentação do módulo de conteúdo](../foundry-module/terraoeste-class-content/README.md) para expansão, build, instalação e limites de automação.

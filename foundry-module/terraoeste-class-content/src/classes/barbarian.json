@@ -1,0 +1,151 @@
+{
+  "_id": "TO00000000000001",
+  "name": "Bárbaro",
+  "type": "Class",
+  "img": "icons/sundries/scrolls/scroll-bound-red-tan.webp",
+  "flags": {
+    "terraoeste-class-content": {
+      "contentId": "barbarian"
+    }
+  },
+  "folder": null,
+  "sort": 100000,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "13.350",
+    "systemId": "shadowdark",
+    "systemVersion": "4.0.6"
+  },
+  "system": {
+    "description": "<p>Guerreiros de fúria primeva que entram em um frenesi cego e sanguinário no calor da batalha, incapazes de distinguir amigo de inimigo.</p><p><strong>Armas:</strong> adaga, arco longo, espada longa, espadão, lança, machado, machado de batalha e machadão. <strong>Armaduras:</strong> couro e escudos. <strong>PV:</strong> d8 por nível.</p><p>Machado de Batalha usa o item provisório do módulo, com dano 1d12 autorizado pelo usuário; ajuste suas demais regras no compêndio.</p>",
+    "source": {
+      "title": "terraoeste"
+    },
+    "properties": [],
+    "languages": {
+      "common": 0,
+      "rare": 0,
+      "select": 0,
+      "selectOptions": [],
+      "fixed": []
+    },
+    "alignment": "neutral",
+    "allArmor": false,
+    "allWeapons": false,
+    "allMeleeWeapons": false,
+    "allRangedWeapons": false,
+    "armor": [
+      "Compendium.shadowdark.gear.Item.EoTEHXApVDS7rHfw",
+      "Compendium.shadowdark.gear.Item.UWp4WkkiaBMSXYPE"
+    ],
+    "weapons": [
+      "Compendium.terraoeste-class-content.gear.Item.TO00000000000019",
+      "Compendium.shadowdark.gear.Item.C3mc5OlKPSJNMrng",
+      "Compendium.shadowdark.gear.Item.GzA5T0aewhouRsa3",
+      "Compendium.shadowdark.gear.Item.ZPUhNMmwXXrtbCXi",
+      "Compendium.shadowdark.gear.Item.eqUuf9OGupuGPsBM",
+      "Compendium.shadowdark.gear.Item.brIFMH0sOVmqX02N",
+      "Compendium.shadowdark.gear.Item.3DxwBvjceq0FxcsC",
+      "Compendium.shadowdark.gear.Item.9Pnhl6SOsbf6qDmt"
+    ],
+    "talents": [
+      "Compendium.terraoeste-class-content.talents.Item.TO00000000000002",
+      "Compendium.terraoeste-class-content.talents.Item.TO00000000000003"
+    ],
+    "talentChoices": [],
+    "talentChoiceCount": 1,
+    "classAbilities": [
+      "Compendium.terraoeste-class-content.class-abilities.Item.TO00000000000010"
+    ],
+    "classAbilityChoices": [],
+    "classAbilityChoiceCount": 0,
+    "classTalentTable": "Compendium.terraoeste-class-content.rollable-tables.RollTable.TO00000000000017",
+    "hitPoints": "d8",
+    "patron": {
+      "required": false,
+      "startingBoons": 0
+    },
+    "spellcasting": {
+      "ability": "",
+      "baseDifficulty": 10,
+      "class": "",
+      "spellsknown": {
+        "1": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "2": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "3": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "4": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "5": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "6": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "7": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "8": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "9": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "10": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        }
+      }
+    },
+    "titles": []
+  },
+  "effects": []
+}
+

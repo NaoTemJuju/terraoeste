@@ -1,0 +1,41 @@
+{
+  "items": {
+    "Weapon": {
+      "Machado de Batalha": "Compendium.terraoeste-class-content.gear.Item.TO00000000000019",
+      "Battleaxe": "Compendium.terraoeste-class-content.gear.Item.TO00000000000019"
+    }
+  },
+  "classes": {
+    "Bárbaro": "Compendium.terraoeste-class-content.classes.Item.TO00000000000001",
+    "Barbarian": "Compendium.terraoeste-class-content.classes.Item.TO00000000000001"
+  },
+  "classBonuses": {
+    "Bárbaro": {
+      "Plus1ToMeleeDamage": "Compendium.terraoeste-class-content.talents.Item.TO00000000000005",
+      "Plus1ToHit_Melee attacks": "Compendium.terraoeste-class-content.talents.Item.TO00000000000008",
+      "StatBonus_STR:+2": "Compendium.terraoeste-class-content.talents.Item.TO00000000000006",
+      "StatBonus_CON:+2": "Compendium.terraoeste-class-content.talents.Item.TO00000000000007",
+      "StatBonus_DEX:+2": "Compendium.terraoeste-class-content.talents.Item.TO00000000000020",
+      "StatBonus_INT:+2": "Compendium.terraoeste-class-content.talents.Item.TO00000000000021",
+      "StatBonus_WIS:+2": "Compendium.terraoeste-class-content.talents.Item.TO00000000000022",
+      "StatBonus_CHA:+2": "Compendium.terraoeste-class-content.talents.Item.TO00000000000023",
+      "StatBonus_STR:+1": "Compendium.terraoeste-class-content.talents.Item.TO00000000000011",
+      "StatBonus_DEX:+1": "Compendium.terraoeste-class-content.talents.Item.TO00000000000012",
+      "StatBonus_CON:+1": "Compendium.terraoeste-class-content.talents.Item.TO00000000000013",
+      "StatBonus_INT:+1": "Compendium.terraoeste-class-content.talents.Item.TO00000000000014",
+      "StatBonus_WIS:+1": "Compendium.terraoeste-class-content.talents.Item.TO00000000000015",
+      "StatBonus_CHA:+1": "Compendium.terraoeste-class-content.talents.Item.TO00000000000016"
+    }
+  },
+  "bonuses": {
+    "TerraOeste.BarbarianCriticalRange": "Compendium.terraoeste-class-content.talents.Item.TO00000000000004",
+    "BarbarianCriticalRange": "Compendium.terraoeste-class-content.talents.Item.TO00000000000004",
+    "TerraOeste.BarbarianExtraFuryUse": "Compendium.terraoeste-class-content.talents.Item.TO00000000000009",
+    "BarbarianExtraFuryUse": "Compendium.terraoeste-class-content.talents.Item.TO00000000000009"
+  },
+  "legacyTalents": {
+    "BarbarianCriticalRange": "TerraOeste.BarbarianCriticalRange",
+    "BarbarianExtraFuryUse": "TerraOeste.BarbarianExtraFuryUse"
+  }
+}
+
