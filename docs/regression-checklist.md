@@ -113,3 +113,17 @@ Esses comandos verificam sintaxe e estrutura JSON. Testes adicionais devem usar 
 - [ ] Atualizar contrato, diagnóstico e este roteiro quando houver uma nova causa ou novo identificador.
 
 Este roteiro não garante ausência de falhas futuras. Ele registra os pontos que produziram erros reais e ajuda a detectar regressões antes da publicação.
+
+
+## Bárbaro
+
+- [ ] A classe aparece com PV d8, lista de armas e armadura/escudo informados.
+- [ ] A descrição mostra Instinto Primitivo, Devastar e todos os termos de Fúria, incluindo a condição de CA e a perda de Constituição.
+- [ ] A tabela 2d6 mostra os cinco intervalos e a instrução de duplicidade do resultado 2 no cabeçalho.
+- [ ] 2 → crítico corpo a corpo com 19; resultados 2 adicionais ficam anotados para ampliar o alcance crítico em 1.
+- [ ] 3–6 → chave `Plus1ToMeleeDamage` com alvo compatível no mapa.
+- [ ] 7–9 → escolher FOR, CON ou ataque corpo a corpo; verificar os alvos `STR:+2`, `CON:+2` e `Melee attacks` nos modos manual e aleatório.
+- [ ] 10–11 → um uso diário adicional de Fúria aparece como regra descritiva e não emite bônus fictício.
+- [ ] 12 → escolha de qualquer talento da tabela ou distribuição de +2 atributos; a opção escolhida sobrevive à exportação.
+- [ ] Crítico, Fúria e habilidades narrativas não aparecem como itens não encontrados nem recebem efeitos técnicos sem identificador confirmado.
+- [ ] Validar manualmente o ganho natural de nível e a importação na versão alvo do Foundry; a revisão de código não substitui essa confirmação.
