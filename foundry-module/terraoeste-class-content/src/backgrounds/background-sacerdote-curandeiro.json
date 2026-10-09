@@ -1,0 +1,29 @@
+{
+  "_id": "TO00000000000197",
+  "name": "Curandeiro",
+  "type": "Background",
+  "img": "icons/svg/book.svg",
+  "flags": {
+    "terraoeste-class-content": {
+      "contentId": "background-sacerdote-curandeiro",
+      "class": "Sacerdote"
+    }
+  },
+  "folder": null,
+  "sort": 197000,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "13.350",
+    "systemId": "shadowdark",
+    "systemVersion": "4.0.6"
+  },
+  "system": {
+    "description": "<p>Você tratava dos enfermos de sua vila, vivendo humildemente.</p>",
+    "source": {
+      "title": "terraoeste"
+    },
+    "properties": []
+  }
+}

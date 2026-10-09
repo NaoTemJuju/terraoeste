@@ -1,0 +1,29 @@
+{
+  "_id": "TO00000000000120",
+  "name": "Mediador",
+  "type": "Background",
+  "img": "icons/svg/book.svg",
+  "flags": {
+    "terraoeste-class-content": {
+      "contentId": "background-bruxo-mediador",
+      "class": "Bruxo"
+    }
+  },
+  "folder": null,
+  "sort": 120000,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "13.350",
+    "systemId": "shadowdark",
+    "systemVersion": "4.0.6"
+  },
+  "system": {
+    "description": "<p>Você negociava passagem segura com espíritos locais.</p>",
+    "source": {
+      "title": "terraoeste"
+    },
+    "properties": []
+  }
+}

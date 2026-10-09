@@ -1,8 +1,8 @@
 {
   "id": "terraoeste-class-content",
   "title": "TerraOeste: Classes e Talentos",
-  "description": "Conteúdo próprio editável para Shadowdark. Classe Bárbaro, talentos, Fúria e tabelas; integração com o importador TerraOeste.",
-  "version": "0.1.0",
+  "description": "Conteúdo editável para Shadowdark: classes, talentos, habilidades, tabelas, equipamento e antecedentes próprios de TerraOeste.",
+  "version": "0.2.0",
   "authors": [
     {
       "name": "TerraOeste"
@@ -33,7 +33,10 @@
       "path": "packs/gear",
       "type": "Item",
       "system": "shadowdark",
-      "ownership": {"PLAYER": "OBSERVER", "ASSISTANT": "OWNER"}
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
     },
     {
       "name": "classes",
@@ -78,6 +81,17 @@
         "PLAYER": "OBSERVER",
         "ASSISTANT": "OWNER"
       }
+    },
+    {
+      "name": "backgrounds",
+      "label": "TerraOeste — Antecedentes",
+      "path": "packs/backgrounds",
+      "type": "Item",
+      "system": "shadowdark",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
     }
   ],
   "packFolders": [
@@ -90,7 +104,8 @@
         "classes",
         "talents",
         "class-abilities",
-        "rollable-tables"
+        "rollable-tables",
+        "backgrounds"
       ]
     }
   ],
@@ -102,4 +117,3 @@
     }
   }
 }
-

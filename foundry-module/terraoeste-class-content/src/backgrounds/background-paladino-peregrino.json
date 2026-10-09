@@ -1,0 +1,29 @@
+{
+  "_id": "TO00000000000179",
+  "name": "Peregrino",
+  "type": "Background",
+  "img": "icons/svg/book.svg",
+  "flags": {
+    "terraoeste-class-content": {
+      "contentId": "background-paladino-peregrino",
+      "class": "Paladino"
+    }
+  },
+  "folder": null,
+  "sort": 179000,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "13.350",
+    "systemId": "shadowdark",
+    "systemVersion": "4.0.6"
+  },
+  "system": {
+    "description": "<p>Você peregrinava por fé, buscando redenção e justiça.</p>",
+    "source": {
+      "title": "terraoeste"
+    },
+    "properties": []
+  }
+}

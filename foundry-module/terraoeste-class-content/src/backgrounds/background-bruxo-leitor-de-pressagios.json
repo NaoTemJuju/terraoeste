@@ -1,0 +1,29 @@
+{
+  "_id": "TO00000000000121",
+  "name": "Leitor de Presságios",
+  "type": "Background",
+  "img": "icons/svg/book.svg",
+  "flags": {
+    "terraoeste-class-content": {
+      "contentId": "background-bruxo-leitor-de-pressagios",
+      "class": "Bruxo"
+    }
+  },
+  "folder": null,
+  "sort": 121000,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "13.350",
+    "systemId": "shadowdark",
+    "systemVersion": "4.0.6"
+  },
+  "system": {
+    "description": "<p>Você guiava viagens e colheitas pelos sinais do céu.</p>",
+    "source": {
+      "title": "terraoeste"
+    },
+    "properties": []
+  }
+}

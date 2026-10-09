@@ -1,0 +1,29 @@
+{
+  "_id": "TO00000000000191",
+  "name": "Carregador",
+  "type": "Background",
+  "img": "icons/svg/book.svg",
+  "flags": {
+    "terraoeste-class-content": {
+      "contentId": "background-peao-carregador",
+      "class": "Peão"
+    }
+  },
+  "folder": null,
+  "sort": 191000,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "13.350",
+    "systemId": "shadowdark",
+    "systemVersion": "4.0.6"
+  },
+  "system": {
+    "description": "<p>Você passou a vida erguendo sacas e móveis por umas moedas.</p>",
+    "source": {
+      "title": "terraoeste"
+    },
+    "properties": []
+  }
+}

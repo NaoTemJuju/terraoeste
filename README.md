@@ -8,10 +8,10 @@ Gerador de personagens de Shadowdark em português, com exportação de JSON par
 - [Diagnóstico e soluções dos problemas conhecidos](docs/troubleshooting.md): causas confirmadas, investigação e limitações atuais.
 - [Roteiro de prevenção e regressão](docs/regression-checklist.md): verificações antes de publicar uma correção.
 - [Instalação e atualização do módulo](foundry-module/terraoeste-foundry-choice-guard/README.md).
-- [Módulo de conteúdo: classes, talentos, habilidades e tabelas editáveis](foundry-module/terraoeste-class-content/README.md).
+- [Módulo de conteúdo: classes, talentos, habilidades, tabelas, equipamento e antecedentes editáveis](foundry-module/terraoeste-class-content/README.md).
 - [Instruções para agentes e colaboradores](AGENTS.md).
 
-Esses documentos registram o módulo de escolhas **0.8.8** e, em 9 de outubro de 2026, o módulo de conteúdo **0.1.0**, preparado contra o código local do Shadowdark 4.0.6. O novo conteúdo ainda requer validação na interface real. Ao atualizar o Shadowdark ou o Babele, confira novamente os caminhos de efeitos, os UUIDs e as APIs descritas.
+Esses documentos registram o módulo de escolhas **0.8.8** e, em 9 de outubro de 2026, o módulo de conteúdo **0.2.0**, preparado contra o código local do Shadowdark 4.0.6. O novo conteúdo ainda requer validação na interface real. Ao atualizar o Shadowdark ou o Babele, confira novamente os caminhos de efeitos, os UUIDs e as APIs descritas.
 
 ## O que o projeto faz
 
@@ -80,7 +80,7 @@ Configure esses valores no ambiente correspondente. Não coloque o valor de `GM_
 4. Abra o importador Shadowdarkling e cole o JSON.
 5. Confira os itens não encontrados, conclua a importação e confira os efeitos da ficha criada.
 
-Um talento ser exibido com o nome correto não prova que seu efeito foi aplicado. Confira a chave do efeito, a opção selecionada e uma rolagem da arma, magia ou remédio correspondente.
+Um talento ser exibido com o nome correto não prova que seu efeito foi aplicado. Confira a chave do efeito, a opção selecionada e uma rolagem da arma, magia ou remédio correspondente. Antecedentes da lista TerraOeste ficam no novo compêndio do módulo de conteúdo; atualize o ZIP do módulo para que a importação resolva nomes como **Matador de Rua**.
 
 ## Exemplos para diagnóstico
 

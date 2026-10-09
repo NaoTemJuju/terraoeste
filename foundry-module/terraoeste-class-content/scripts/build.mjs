@@ -14,7 +14,7 @@ for (const pack of manifest.packs) {
     const data = JSON.parse(await fs.readFile(path.join(dir, file), "utf8"));
     if (!/^[a-zA-Z0-9]{16}$/.test(data._id)) throw new Error(`ID inválido: ${file}`);
     if (JSON.stringify(data).includes("REPLACEME")) throw new Error(`Parâmetro pendente: ${file}`);
-    if (pack.type === "Item" && !["Class", "Talent", "Class Ability", "Weapon", "Armor", "Basic"].includes(data.type)) throw new Error(`Tipo inválido: ${file}`);
+    if (pack.type === "Item" && !["Class", "Talent", "Class Ability", "Weapon", "Armor", "Basic", "Background"].includes(data.type)) throw new Error(`Tipo inválido: ${file}`);
     documents.push(data);
   }
   if (new Set(documents.map(doc => doc._id)).size !== documents.length) throw new Error(`IDs repetidos: ${pack.name}`);

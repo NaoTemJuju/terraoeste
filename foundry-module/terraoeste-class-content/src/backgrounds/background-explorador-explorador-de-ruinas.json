@@ -1,0 +1,29 @@
+{
+  "_id": "TO00000000000146",
+  "name": "Explorador de Ruínas",
+  "type": "Background",
+  "img": "icons/svg/book.svg",
+  "flags": {
+    "terraoeste-class-content": {
+      "contentId": "background-explorador-explorador-de-ruinas",
+      "class": "Explorador"
+    }
+  },
+  "folder": null,
+  "sort": 146000,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "13.350",
+    "systemId": "shadowdark",
+    "systemVersion": "4.0.6"
+  },
+  "system": {
+    "description": "<p>Você mapeava corredores e salas de lugares perdidos.</p>",
+    "source": {
+      "title": "terraoeste"
+    },
+    "properties": []
+  }
+}

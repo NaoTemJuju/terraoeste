@@ -1,0 +1,29 @@
+{
+  "_id": "TO00000000000169",
+  "name": "Charlatão",
+  "type": "Background",
+  "img": "icons/svg/book.svg",
+  "flags": {
+    "terraoeste-class-content": {
+      "contentId": "background-malandro-charlatao",
+      "class": "Malandro"
+    }
+  },
+  "folder": null,
+  "sort": 169000,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "13.350",
+    "systemId": "shadowdark",
+    "systemVersion": "4.0.6"
+  },
+  "system": {
+    "description": "<p>Você enganava com charme e promessas em mercados lotados.</p>",
+    "source": {
+      "title": "terraoeste"
+    },
+    "properties": []
+  }
+}

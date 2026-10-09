@@ -1,0 +1,29 @@
+{
+  "_id": "TO00000000000181",
+  "name": "Capelão",
+  "type": "Background",
+  "img": "icons/svg/book.svg",
+  "flags": {
+    "terraoeste-class-content": {
+      "contentId": "background-paladino-capelao",
+      "class": "Paladino"
+    }
+  },
+  "folder": null,
+  "sort": 181000,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "13.350",
+    "systemId": "shadowdark",
+    "systemVersion": "4.0.6"
+  },
+  "system": {
+    "description": "<p>Você era o responsável pelo bem-estar espiritual e moral dos soldados.</p>",
+    "source": {
+      "title": "terraoeste"
+    },
+    "properties": []
+  }
+}

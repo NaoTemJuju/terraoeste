@@ -26,6 +26,29 @@ Use este roteiro antes de publicar mudanças em classes, exportação ou módulo
 
 Confira ambas as funções de exportação em `final.js`, além de `normalizedTalentRecord` e dos caminhos manual/aleatório em `class.js`.
 
+## Bardo
+
+- [ ] Classe exportada como `Bard` e reconhecida pelo importador como `Bard (Legacy)`.
+- [ ] Descrição, armas, armadura, PV d6, quatro línguas comuns adicionais e uma rara aparecem na ficha do site.
+- [ ] Artes Bárdicas, Fascinar, Inspirar e Mago Diletante aparecem completos na descrição da classe.
+- [ ] A tabela 2d6 exibe os cinco resultados e informa que um 2 repetido deve ser rolado novamente.
+- [ ] Modo manual e aleatório rerrolam 2 quando um resultado 2 já foi obtido na mesma sequência.
+- [ ] 3–6 → a opção de ataque gera `Plus1ToHit` / `Melee and ranged attacks`; Fascinar conserva escolha descritiva sem chave não mapeada.
+- [ ] 7–9 → distribuição dos +2 entre atributos é mantida na ficha e no JSON.
+- [ ] 10–11 e 2 permanecem registrados na ficha sem criar bônus com IDs inventados.
+- [ ] 12 permite escolher talento da tabela ou distribuir +2 entre atributos.
+- [ ] Importar JSON de Bardo no Shadowdark 4.0.6 local; validar o nome Bardo (Legado) e a resolução dos bônus de atributo/ataque.
+
+## Antecedentes TerraOeste
+
+- [ ] Build cria pack `backgrounds` do tipo Item e aceita documentos `Background`.
+- [ ] O pack tem 102 antecedentes; cada classe tem seis e IDs/`contentId` são únicos.
+- [ ] Os 102 nomes exatos estão em `registry.items.Background` e cada UUID resolve para um documento do pack.
+- [ ] `exportSources()` inclui o novo pack, e `import-sources` consegue atualizar qualquer documento exportado.
+- [ ] Importação por JSON de **Matador de Rua** resolve `system.background` para o documento TerraOeste.
+- [ ] Trocar por um nome que não existe mantém o diagnóstico padrão sem selecionar outro background parecido.
+- [ ] As descrições são preservadas e não geram Active Effects ou bônus implícitos.
+
 ## Importação e efeitos
 
 | Caso | Resultado esperado |

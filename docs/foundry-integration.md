@@ -136,6 +136,18 @@ Confira combinações específicas no mapa do sistema. O caso `Plus1ToHitAndDama
 
 O PR #3 também padronizou nomes visíveis de Mago, Guerreiro e Ladrão. Esses nomes melhoram a apresentação e a consistência, enquanto os identificadores oficiais continuam necessários para resolução técnica.
 
+## Bardo no gerador
+
+O Shadowdark 4.0.6 já traz a classe antiga como **Bard (Legacy)**. O importador converte a classe exportada como `Bard` para esse nome; portanto, o site usa `foundryName: "Bard"` e não precisa criar outra classe no módulo TerraOeste.
+
+O site apresenta Línguas, Artes Bárdicas, Fascinar, Inspirar e Mago Diletante, além do equipamento informado. A tabela 2d6 tem rerrolagem de resultado 2 repetido. No talento 3–6, o bônus de ataques usa a combinação mapeada `Plus1ToHit_Melee and ranged attacks`. As opções narrativas de Fascinar, tempo livre e Farra ficam registradas em `terraOesteClassTalents`, sem `bonusName` inventado: o mapa local não oferece chaves confirmadas para esses três efeitos, então o JSON não deve produzir um talento “não encontrado” por identificador fabricado. O talento 7–9 usa os bônus oficiais `StatBonus` por atributo.
+
+## Antecedentes TerraOeste
+
+O módulo de conteúdo 0.2.0 adiciona um compêndio de documentos nativos do tipo `Background` com os 102 antecedentes do documento fornecido, seis para cada uma das 17 classes. `registry.items.Background` associa os nomes exatos aos UUIDs do compêndio `terraoeste-class-content.backgrounds`. O wrapper do importador consulta esse registro antes da busca normal por nome, permitindo importar, por exemplo, **Matador de Rua**, sem editar o compêndio original do Shadowdark.
+
+As descrições são texto narrativo e não aplicam bônus mecânicos. Nomes podem se sobrepor aos de backgrounds nativos; a associação direta do registro garante que os nomes incluídos apontem para o conteúdo TerraOeste. A classe associada fica em `flags.terraoeste-class-content.class` para edição/exportação posterior. Depois de atualizar o módulo, confira o pack de Antecedentes e importe um personagem com cada nome que havia falhado.
+
 ## 6. `REPLACEME`: modelos e escolhas concretas
 
 `REPLACEME` no item genérico de compêndio pode ser um parâmetro legítimo. No item adquirido pelo personagem, ele precisa ser resolvido quando a regra exige uma escolha.

@@ -1,0 +1,29 @@
+{
+  "_id": "TO00000000000188",
+  "name": "Mercante de Peles",
+  "type": "Background",
+  "img": "icons/svg/book.svg",
+  "flags": {
+    "terraoeste-class-content": {
+      "contentId": "background-patrulheiro-mercante-de-peles",
+      "class": "Patrulheiro"
+    }
+  },
+  "folder": null,
+  "sort": 188000,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "13.350",
+    "systemId": "shadowdark",
+    "systemVersion": "4.0.6"
+  },
+  "system": {
+    "description": "<p>Você caçava e vendia peles valiosas em mercados distantes.</p>",
+    "source": {
+      "title": "terraoeste"
+    },
+    "properties": []
+  }
+}
