@@ -62,16 +62,16 @@
   // Lista conferida no compêndio de magias de Bruxo da instalação Shadowdark.
   // `value` conserva o nome original para a resolução pelo importador.
   const WITCH_SPELLS = [
-    { label: "Caldeirão", value: "Cauldron", duration: "", range: "" },
-    { label: "Carvalho, Freixo e Espinheiro", value: "Oak, Ash, Thorn", duration: "", range: "" },
-    { label: "Dança das Sombras", value: "Shadowdance", duration: "", range: "" },
-    { label: "Encantar Pessoa", value: "Charm Person", duration: "", range: "" },
-    { label: "Fantoche", value: "Puppet", duration: "", range: "" },
-    { label: "Hipnotizar", value: "Hypnotize", duration: "", range: "" },
-    { label: "Homem-Salgueiro", value: "Willowman", duration: "", range: "" },
-    { label: "Luz de Bruxa", value: "Witchlight", duration: "", range: "" },
-    { label: "Mau Olhado", value: "Eyebite", duration: "", range: "" },
-    { label: "Névoa", value: "Fog", duration: "", range: "" }
+    { label: "Caldeirão", value: "Cauldron", duration: "1 rodada", range: "Adjacente", description: "Você conjura um caldeirão borbulhante ao seu lado. Ele pode consertar um item mundano quebrado colocado dentro dele; fazer um sapo gordo e coaxante saltar para fora e seguir suas instruções por 3 rodadas; ou guardar até 3 espaços de itens, que serão expelidos na próxima vez que você conjurar esta magia." },
+    { label: "Carvalho, Freixo e Espinheiro", value: "Oak, Ash, Thorn", duration: "Concentração", range: "Você", description: "Enquanto a magia durar, fadas, demônios e diabos não podem atacar você. Esses seres também não podem possuir, compelir nem enfeitiçar você." },
+    { label: "Dança das Sombras", value: "Shadowdance", duration: "3 rodadas", range: "Perto", description: "Você molda sombras em uma ilusão visual e audível convincente, em um ponto Perto. A ilusão pode ter o tamanho de uma pessoa e se mover dentro de uma distância Perto do local onde surgiu. Ela não afeta objetos físicos; tocá-la revela que é falsa." },
+    { label: "Encantar Pessoa", value: "Charm Person", duration: "1d8 dias", range: "Perto", description: "Você enfeitiça um humanoide de nível 2 ou inferior dentro do alcance Perto, que passa a considerar você um amigo. A magia termina se você ou seus aliados fizerem algo prejudicial ao alvo. Quando o efeito acaba, o alvo sabe que foi enfeitiçado magicamente." },
+    { label: "Fantoche", value: "Puppet", duration: "Concentração", range: "Adjacente", description: "Um humanoide de nível 2 ou inferior que você tocar fica preso aos seus movimentos e os imita no seu turno. Se isso fizer a criatura ferir diretamente a si mesma ou a um aliado, ela pode fazer um teste de Carisma CD 15; se passar, resiste à imitação." },
+    { label: "Hipnotizar", value: "Hypnotize", duration: "Concentração", range: "Perto", description: "Uma criatura de nível 3 ou inferior que possa ver você fica atordoada. Se perder a linha de visão para você, pode fazer um teste de Carisma CD 15; se passar, a magia termina." },
+    { label: "Homem-Salgueiro", value: "Willowman", duration: "Instantâneo", range: "Perto", description: "Você invoca o Homem-Salgueiro na mente de uma criatura, enchendo-a de terror sobrenatural. Escolha uma criatura de nível 2 ou inferior dentro do alcance: ela deve fazer imediatamente um teste de moral, mesmo que normalmente não pudesse fazê-lo, como no caso de mortos-vivos." },
+    { label: "Luz de Bruxa", value: "Witchlight", duration: "Concentração", range: "Perto", description: "Você invoca uma luz flutuante de pântano que ilumina um raio Adjacente ao redor dela. A luz pode mudar de cor e assumir formas vagas; no seu turno, ela pode flutuar até uma distância Perto." },
+    { label: "Mau Olhado", value: "Eyebite", duration: "Instantâneo", range: "Perto", description: "Uma criatura à sua escolha sofre 1d4 de dano e não consegue ver você até o fim do próximo turno dela." },
+    { label: "Névoa", value: "Fog", duration: "Concentração", range: "Adjacente", description: "Uma nuvem espessa de névoa surge em uma área Adjacente ao seu redor, dificultando que vejam você. A nuvem se move com você. Ataques contra criaturas dentro dela são feitos com desvantagem." }
   ];
   const classSpells = cls => cls === "Bruxo" ? WITCH_SPELLS : cls === "Mago" ? MAGE_SPELLS : [];
   const spellListKey = cls => cls === "Bruxo" ? "witchSpells" : "mageSpells";
@@ -1109,8 +1109,26 @@
     mageSpellTables.append(info);
     const spellList = classSpells(cls);
     const spellListTable = isWitch
-      ? makeTable("Magias de 1º nível de Bruxo", ["Magia"], spellList.map(spell => [spell.label]))
+      ? makeTable("Magias de 1º nível de Bruxo", ["Magia","Duração","Alcance"], spellList.map(spell => [spell.label,spell.duration,spell.range]))
       : makeTable("Magias de 1º círculo", ["Magia","Duração","Alcance"], spellList.map(spell => [spell.label,spell.duration,spell.range]));
+    if (isWitch) {
+      spellListTable.table.classList.add("witch-spell-list");
+      spellListTable.table.querySelectorAll("tbody tr").forEach((row, index) => {
+        const spell = spellList[index];
+        const nameCell = row.querySelector("th");
+        const info = document.createElement("details");
+        info.className = "witch-spell-info";
+        const trigger = document.createElement("summary");
+        trigger.textContent = "i";
+        trigger.title = `Descrição de ${spell.label}`;
+        trigger.setAttribute("aria-label", trigger.title);
+        const description = document.createElement("div");
+        description.className = "witch-spell-info__content";
+        description.textContent = spell.description;
+        info.append(trigger, description);
+        nameCell.append(info);
+      });
+    }
     mageSpellTables.append(spellListTable.title, spellListTable.table);
   }
 
