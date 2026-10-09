@@ -46,18 +46,18 @@
     }
   };
   const MAGE_SPELLS = [
-    { label: "Alarme", value: "Alarm", duration: "1 dia", range: "Adjacente" },
-    { label: "Armadura Arcana", value: "Mage Armor", duration: "10 rodadas", range: "Você" },
-    { label: "Detectar Magia", value: "Detect Magic", duration: "Concentração", range: "Perto" },
-    { label: "Disco Flutuante", value: "Floating Disk", duration: "10 rodadas", range: "Perto" },
-    { label: "Encantar Pessoa", value: "Charm Person", duration: "1d8 dias", range: "Perto" },
-    { label: "Luz", value: "Light", duration: "1h (tempo real)", range: "Adjacente" },
-    { label: "Mãos Flamejantes", value: "Burning Hands", duration: "Instantâneo", range: "Adjacente" },
-    { label: "Míssil Mágico", value: "Magic Missile", duration: "Instantâneo", range: "Longe" },
-    { label: "Obstruir Porta", value: "Hold Portal", duration: "10 rodadas", range: "Perto" },
-    { label: "Proteção contra o Mal", value: "Protection from Evil", duration: "Concentração", range: "Adjacente" },
-    { label: "Queda Suave", value: "Feather Fall", duration: "Instantâneo", range: "Você" },
-    { label: "Sono", value: "Sleep", duration: "Instantâneo", range: "Perto" }
+    { label: "Alarme", value: "Alarm", duration: "1 dia", range: "Adjacente", description: "Você toca um objeto, como o batente de uma porta, e instala nele um alarme mágico. Se uma criatura que você não tenha indicado ao conjurar tocar ou atravessar o objeto, um sino mágico soa na sua cabeça." },
+    { label: "Armadura Arcana", value: "Mage Armor", duration: "10 rodadas", range: "Você", description: "Uma camada invisível de força mágica protege seus pontos vitais. Sua Classe de Armadura passa a ser 14 (18 em um teste de conjuração crítico) durante a duração da magia." },
+    { label: "Detectar Magia", value: "Detect Magic", duration: "Concentração", range: "Perto", description: "Você sente a presença de magia dentro do alcance Perto enquanto a magia durar. Se concentrar por duas rodadas, percebe suas propriedades gerais. Barreiras completas bloqueiam a magia." },
+    { label: "Disco Flutuante", value: "Floating Disk", duration: "10 rodadas", range: "Perto", description: "Você cria um disco circular côncavo de força que flutua à altura da cintura e pode carregar até 20 espaços de equipamento. Ele permanece dentro do alcance Perto de você e não atravessa quedas ou fossos mais altos que uma pessoa." },
+    { label: "Encantar Pessoa", value: "Charm Person", duration: "1d8 dias", range: "Perto", description: "Você enfeitiça um humanoide de nível 2 ou inferior dentro do alcance Perto, que passa a considerar você um amigo durante a magia. O efeito termina se você ou seus aliados fizerem algo prejudicial ao alvo. Quando termina, o alvo sabe que foi enfeitiçado magicamente." },
+    { label: "Luz", value: "Light", duration: "1h (tempo real)", range: "Adjacente", description: "Um objeto que você toca brilha com uma luz intensa e sem calor, iluminando até o alcance Perto por 1 hora de tempo real." },
+    { label: "Mãos Flamejantes", value: "Burning Hands", duration: "Instantâneo", range: "Adjacente", description: "Você abre os dedos com os polegares unidos e libera um círculo de chamas que preenche uma área Perto ao seu redor. Criaturas na área sofrem 1d6 de dano. Objetos inflamáveis desacompanhados pegam fogo." },
+    { label: "Míssil Mágico", value: "Magic Missile", duration: "Instantâneo", range: "Longe", description: "Você tem Vantagem no teste para conjurar esta magia. Um projétil brilhante de força dispara da sua mão aberta e causa 1d4 de dano a um alvo." },
+    { label: "Obstruir Porta", value: "Hold Portal", duration: "10 rodadas", range: "Perto", description: "Você mantém magicamente um portal fechado durante a magia. Para abri-lo, uma criatura precisa passar em um teste de Força contra seu teste de conjuração. A magia Arrombar encerra este efeito." },
+    { label: "Proteção contra o Mal", value: "Protection from Evil", duration: "Concentração", range: "Adjacente", description: "Durante a magia, seres caóticos têm desvantagem em ataques e testes de conjuração hostis contra o alvo. Eles também não podem possuí-lo, compeli-lo ou enfeitiçá-lo. Se o alvo já estiver possuído, a entidade faz um teste de Carisma contra seu último teste de conjuração; se falhar, é expulsa." },
+    { label: "Queda Suave", value: "Feather Fall", duration: "Instantâneo", range: "Você", description: "Você pode tentar conjurar esta magia quando estiver caindo. Sua descida fica lenta o bastante para que pouse em segurança, de pé." },
+    { label: "Sono", value: "Sleep", duration: "Instantâneo", range: "Perto", description: "Você cria um encantamento sonolento em um cubo de tamanho Perto a partir de você. Criaturas vivas na área com nível 2 ou inferior caem em sono profundo. Ferimentos ou sacudidas vigorosas as despertam." }
   ];
   // Lista conferida no compêndio de magias de Bruxo da instalação Shadowdark.
   // `value` conserva o nome original para a resolução pelo importador.
@@ -1111,20 +1111,20 @@
     const spellListTable = isWitch
       ? makeTable("Magias de 1º nível de Bruxo", ["Magia","Duração","Alcance"], spellList.map(spell => [spell.label,spell.duration,spell.range]))
       : makeTable("Magias de 1º círculo", ["Magia","Duração","Alcance"], spellList.map(spell => [spell.label,spell.duration,spell.range]));
-    if (isWitch) {
-      spellListTable.table.classList.add("witch-spell-list");
+    {
+      spellListTable.table.classList.add("spell-list-table");
       spellListTable.table.querySelectorAll("tbody tr").forEach((row, index) => {
         const spell = spellList[index];
         const nameCell = row.querySelector("th");
         const name = document.createElement("span");
-        name.className = "witch-spell-name";
+        name.className = "spell-name";
         const label = document.createElement("button");
         label.type = "button";
-        label.className = "witch-spell-name__label";
+        label.className = "spell-name__label";
         label.textContent = spell.label;
         const description = document.createElement("div");
-        description.className = "witch-spell-info__content";
-        description.id = `witch-spell-description-${index + 1}`;
+        description.className = "spell-info__content";
+        description.id = `${isWitch ? "witch" : "mage"}-spell-description-${index + 1}`;
         description.textContent = spell.description;
         label.setAttribute("aria-label", `Mostrar descrição de ${spell.label}`);
         label.setAttribute("aria-controls", description.id);
