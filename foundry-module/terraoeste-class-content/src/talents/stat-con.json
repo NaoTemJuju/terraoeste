@@ -1,0 +1,54 @@
+{
+  "_id": "TO00000000000013",
+  "name": "+1 em Constituição",
+  "type": "Talent",
+  "img": "icons/skills/melee/strike-axe-blood-red.webp",
+  "flags": {
+    "terraoeste-class-content": {
+      "contentId": "stat-con"
+    }
+  },
+  "folder": null,
+  "sort": 1300000,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "13.350",
+    "systemId": "shadowdark",
+    "systemVersion": "4.0.6"
+  },
+  "system": {
+    "description": "<p>+1 em Constituição.</p>",
+    "source": {
+      "title": "terraoeste"
+    },
+    "properties": [],
+    "talentClass": "level",
+    "level": 0
+  },
+  "effects": [
+    {
+      "_id": "TE00000000000130",
+      "name": "+1 em Constituição",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "disabled": false,
+      "transfer": true,
+      "changes": [
+        {
+          "key": "system.abilities.con.base",
+          "mode": 2,
+          "value": "1",
+          "priority": 20
+        }
+      ],
+      "duration": {},
+      "flags": {
+        "shadowdark": {
+          "situational": false
+        }
+      }
+    }
+  ]
+}
+

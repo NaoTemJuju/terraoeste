@@ -16,7 +16,7 @@ Para instalar ou atualizar o módulo, leia também `foundry-module/terraoeste-fo
 - Distinga `id`, nome exibido, `bonusName`, `bonusTo`, UUID e slug. A resolução de talentos do importador verificado usa `bonusName`/`bonusTo`.
 - Não conclua que trocar `name` corrige um talento ausente. Reproduza a resolução com o mapa e confira `fromUuid`.
 - Não atribua erros de talentos a `coreRulesOnly` ou `activeSources` sem verificar o consumidor desses campos. No importador examinado, `activeSources` verifica fontes ausentes e não filtra `_findTalent`.
-- Ao criar novos talentos, use chaves oficiais do mapa. Quando já existirem JSONs antigos, mantenha aliases compatíveis no site e no módulo.
+- Ao criar novos talentos, use chaves oficiais do mapa ou chaves TerraOeste explicitamente registradas em `foundry-module/terraoeste-class-content/registry.json` apontando para documentos reais. Nunca exporte IDs sem resolução. Quando já existirem JSONs antigos, mantenha aliases compatíveis no site e no módulo.
 - Preserve os valores escolhidos em geração manual, geração aleatória, personagem salvo/compartilhado, exportação e importação.
 - Ao tratar `REPLACEME`, copie o item original do compêndio e substitua os parâmetros necessários na cópia. Preserve valores e modos dos efeitos conforme a semântica do sistema.
 - Confira todas as alterações de um efeito, não apenas `effects[0].changes[0]`. Há diferenças entre placeholder em `key` e em `value`.

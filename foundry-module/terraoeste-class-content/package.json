@@ -1,0 +1,12 @@
+{
+  "name": "terraoeste-class-content-build",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "import-sources": "node scripts/import-sources.mjs"
+  },
+  "devDependencies": {
+    "classic-level": "3.0.0"
+  }
+}

@@ -120,10 +120,27 @@ Este roteiro não garante ausência de falhas futuras. Ele registra os pontos qu
 - [ ] A classe aparece com PV d8, lista de armas e armadura/escudo informados.
 - [ ] A descrição mostra Instinto Primitivo, Devastar e todos os termos de Fúria, incluindo a condição de CA e a perda de Constituição.
 - [ ] A tabela 2d6 mostra os cinco intervalos e a instrução de duplicidade do resultado 2 no cabeçalho.
-- [ ] 2 → crítico corpo a corpo com 19; resultados 2 adicionais ficam anotados para ampliar o alcance crítico em 1.
+- [ ] 2 → crítico corpo a corpo com 19; duas aquisições → 18, sem alterar ataques à distância/magias.
 - [ ] 3–6 → chave `Plus1ToMeleeDamage` com alvo compatível no mapa.
 - [ ] 7–9 → escolher FOR, CON ou ataque corpo a corpo; verificar os alvos `STR:+2`, `CON:+2` e `Melee attacks` nos modos manual e aleatório.
-- [ ] 10–11 → um uso diário adicional de Fúria aparece como regra descritiva e não emite bônus fictício.
+- [ ] 10–11 → chave TerraOeste resolve o talento nativo; contador de Fúria passa de 1 para 2 e preserva usos gastos.
 - [ ] 12 → escolha de qualquer talento da tabela ou distribuição de +2 atributos; a opção escolhida sobrevive à exportação.
 - [ ] Crítico, Fúria e habilidades narrativas não aparecem como itens não encontrados nem recebem efeitos técnicos sem identificador confirmado.
 - [ ] Validar manualmente o ganho natural de nível e a importação na versão alvo do Foundry; a revisão de código não substitui essa confirmação.
+
+## Módulo de conteúdo
+
+- [ ] Build gera cinco packs com IDs e referências internas válidos, sem REPLACEME.
+- [ ] Todos os aliases/chaves do registro resolvem documentos reais.
+- [ ] JSON antigo apenas descritivo é recuperado; JSON novo não duplica o mesmo bônus.
+- [ ] Duas aquisições iguais sobrevivem; não confundir deduplicação com apagar um talento repetido.
+- [ ] Classe importada contém Instinto Primitivo, Devastar, Fúria e referência à tabela.
+- [ ] Instinto e Fúria não concedem vantagem fora das situações selecionadas.
+- [ ] Criar/apagar talentos adicionais ajusta usos; máximo editado pelo mestre continua preservado.
+- [ ] Gastar uso, descansar e recarregar não criam usos adicionais de novo.
+- [ ] Conferir cliente GM + jogador: apenas um cliente faz o ajuste de usos.
+- [ ] Token sem vínculo também recebe ajuste de usos.
+- [ ] Módulo de escolhas ativo/inativo e Babele PT/EN não alteram resolução por UUID.
+- [ ] Resultado 12 no Foundry: escolher talento OU arrastar dois +1 da tabela de distribuição (podem ser iguais).
+- [ ] Exportar fontes, editar, reimportar e compilar preserva IDs e descrições.
+- [ ] Fonte TerraOeste aparece e pode ser selecionada quando filtros de fontes estão ativos.

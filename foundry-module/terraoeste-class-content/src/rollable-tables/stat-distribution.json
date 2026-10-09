@@ -1,0 +1,117 @@
+{
+  "_id": "TO00000000000018",
+  "name": "Distribuir entre Atributos (TerraOeste)",
+  "img": "icons/svg/d20-grey.svg",
+  "flags": {
+    "terraoeste-class-content": {
+      "contentId": "stat-distribution"
+    }
+  },
+  "folder": null,
+  "sort": 1800000,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "13.350",
+    "systemId": "shadowdark",
+    "systemVersion": "4.0.6"
+  },
+  "description": "<p>Distribua +2 pontos entre atributos: escolha e arraste dois talentos +1 desta tabela para o avanço de nível. Pode repetir o mesmo atributo. A tabela também permite rolar cada ponto, se desejado.</p>",
+  "formula": "1d6",
+  "replacement": true,
+  "displayRoll": true,
+  "results": [
+    {
+      "_id": "TR00000000000016",
+      "type": "document",
+      "name": "+1 em Força",
+      "description": "",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000011",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        1,
+        1
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000017",
+      "type": "document",
+      "name": "+1 em Destreza",
+      "description": "",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000012",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        2,
+        2
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000018",
+      "type": "document",
+      "name": "+1 em Constituição",
+      "description": "",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000013",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        3,
+        3
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000019",
+      "type": "document",
+      "name": "+1 em Inteligência",
+      "description": "",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000014",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        4,
+        4
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000020",
+      "type": "document",
+      "name": "+1 em Sabedoria",
+      "description": "",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000015",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        5,
+        5
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000021",
+      "type": "document",
+      "name": "+1 em Carisma",
+      "description": "",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000016",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        6,
+        6
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    }
+  ]
+}
+

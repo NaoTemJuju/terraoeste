@@ -375,10 +375,10 @@
       foundryName: "Bárbaro",
       title: "Talentos de Bárbaro",
       entries: [
-        { min: 2, max: 2, id: "BarbarianCriticalRange", name: "Crítico corpo a corpo (19)", desc: "Você causa crítico em ataques corpo a corpo com resultado 19. Cada resultado 2 adicional amplia o alcance crítico em 1", foundryDesc: "Critical hit on melee attacks with a result of 19; each additional result of 2 expands the critical range by 1", exportAsBonus: false },
+        { min: 2, max: 2, id: "BarbarianCriticalRange", name: "Crítico corpo a corpo (19)", desc: "Você causa crítico em ataques corpo a corpo com resultado 19. Cada resultado 2 adicional amplia o alcance crítico em 1", foundryDesc: "Critical hit on melee attacks with a result of 19; each additional result of 2 expands the critical range by 1", bonusName: "TerraOeste.BarbarianCriticalRange", bonusTo: "TerraOeste.BarbarianCriticalRange" },
         { min: 3, max: 6, id: "Plus1ToMeleeDamage", name: "+1 para Dano Corpo a Corpo", desc: "+1 de dano para ataques corpo a corpo", foundryDesc: "+1 to melee damage", bonusName: "Plus1ToMeleeDamage", bonusTo: "Plus1ToMeleeDamage" },
         { min: 7, max: 9, id: "BarbarianStatOrMelee", choice: "barbarianStatOrMelee", desc: "+2 em Força ou Constituição, ou +1 em ataques corpo a corpo", foundryDesc: "+2 Strength or Constitution, or +1 to melee attacks" },
-        { min: 10, max: 11, id: "BarbarianExtraFuryUse", name: "Uso Adicional de Fúria", desc: "Ganhe um uso adicional da habilidade Fúria a cada dia", foundryDesc: "Gain one additional use of Fury per day", exportAsBonus: false },
+        { min: 10, max: 11, id: "BarbarianExtraFuryUse", name: "Uso Adicional de Fúria", desc: "Ganhe um uso adicional da habilidade Fúria a cada dia", foundryDesc: "Gain one additional use of Fury per day", bonusName: "TerraOeste.BarbarianExtraFuryUse", bonusTo: "TerraOeste.BarbarianExtraFuryUse" },
         { min: 12, max: 12, id: "BarbarianChooseTalentOrStats", choice: "twelve", desc: "Escolha um talento ou distribua +2 pontos entre os seus atributos", foundryDesc: "Choose a talent or distribute +2 points among ability scores" }
       ]
     },
@@ -713,7 +713,7 @@
         result.displayDesc = `+2 em ${stat}`;
         finish(result);
       }, result.statOptions || ["STR","DEX","CHA"]));
-    } else if (["weaponMastery", "armorMastery", "magicItem", "mageStatOrCasting", "mageKnownSpell", "mageExtraSpell", "rangerWeaponDamage", "rangerAttackBonus", "rangerHerbalism", "assassinStatOrMelee", "assassinBlackLotus"].includes(result.needsChoice)) {
+    } else if (["weaponMastery", "armorMastery", "magicItem", "mageStatOrCasting", "mageKnownSpell", "mageExtraSpell", "rangerWeaponDamage", "rangerAttackBonus", "rangerHerbalism", "assassinStatOrMelee", "assassinBlackLotus", "barbarianStatOrMelee"].includes(result.needsChoice)) {
       showEntryChoice(config.entries.find(entry => entry.id === result.id), result, choiceArea);
     } else if (result.needsChoice === "rangerTwelve") {
       const select = document.createElement("select");
