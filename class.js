@@ -1118,20 +1118,22 @@
         const nameCell = row.querySelector("th");
         const name = document.createElement("span");
         name.className = "witch-spell-name";
-        const label = document.createElement("span");
+        const label = document.createElement("button");
+        label.type = "button";
         label.className = "witch-spell-name__label";
         label.textContent = spell.label;
-        const info = document.createElement("details");
-        info.className = "witch-spell-info";
-        const trigger = document.createElement("summary");
-        trigger.textContent = "i";
-        trigger.title = `Descrição de ${spell.label}`;
-        trigger.setAttribute("aria-label", trigger.title);
         const description = document.createElement("div");
         description.className = "witch-spell-info__content";
+        description.id = `witch-spell-description-${index + 1}`;
         description.textContent = spell.description;
-        info.append(trigger, description);
-        name.append(label, info);
+        label.setAttribute("aria-label", `Mostrar descrição de ${spell.label}`);
+        label.setAttribute("aria-controls", description.id);
+        label.setAttribute("aria-expanded", "false");
+        label.addEventListener("click", () => {
+          const expanded = name.classList.toggle("is-open");
+          label.setAttribute("aria-expanded", String(expanded));
+        });
+        name.append(label, description);
         nameCell.replaceChildren(name);
       });
     }
