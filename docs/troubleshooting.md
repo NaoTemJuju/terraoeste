@@ -241,3 +241,12 @@ Acrescente ao documento:
 - Evidência de testes e limites, distinguindo mocks da interface real.
 - Commit/PR e versão do módulo instalada.
 - Caso incluído no roteiro de regressão.
+
+
+## Inclusão do Bárbaro: limites de automação
+
+A classe já constava em `CLASS_DICE` com d8. A mudança no site inclui descrição, equipamento, habilidades e a tabela 2d6. Para o resultado 7–9, o seletor produz bônus oficiais já mapeados (`StatBonus` para Força/Constituição ou `Plus1ToHit` para ataques corpo a corpo). O resultado 3–6 usa a chave `Plus1ToMeleeDamage` também usada pelo Assassino.
+
+Resultados de crítico com 19/alcance crítico, uso diário adicional de Fúria e demais habilidades especiais do Bárbaro não têm efeito técnico confirmado no mapa/importador consultado. O código os marca como não exportáveis em `bonuses`, para evitar que IDs inventados apareçam como itens não encontrados. A ficha registra a regra para consulta; o mestre ainda precisa aplicá-la manualmente. Isso não confirma automação ou importação desses efeitos no Foundry.
+
+Evidência desta alteração: leitura estática do fluxo de talentos de `class.js`, dos identificadores já empregados pelo projeto e do mapa upstream consultado. A instalação local não foi acessível nesta sessão; não foi possível executar a interface, o ganho natural de nível ou a importação. Ao reproduzir, conferir português/inglês, opção 12, os três caminhos de 7–9, e garantir que crítico/Fúria não gerem bônus desconhecidos.
