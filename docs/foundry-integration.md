@@ -325,3 +325,24 @@ O módulo registra a classe em `registry.classes`, as chaves específicas do Ca�
 Água Benta e Estaca estão no compêndio de Equipamento e são registrados como itens básicos editáveis. Dano, preço e propriedades permanecem em aberto; não preencher esses valores com suposições. A classe lista as armas existentes com UUIDs conferidos no mapa Shadowdark 4.0.6 e documenta esses dois itens customizados.
 
 O resultado 2 repetido na tabela de talentos do Caçador é rolado novamente. A escolha inicial e resultados adicionais de Presa não devem repetir uma presa já adquirida. Confirme no JSON final `terraOesteClassOptions.prey`, idioma e bônus; confira que cada bônus resolve o documento específico registrado. O build do módulo valida referências, mas não substitui uma importação real de personagem em mundo de teste.
+
+## 13. Druida
+
+A classe exporta como `Druida`, usa SAB, PV d6, adaga/cajado/clava/funda, couro/escudos, Druídico/Silvestre e Verdana. As fontes são as imagens e o PDF enviados pelo usuário, com as correções confirmadas em 10/10/2026. A página 1 do PDF corresponde aos graus 1–2, a página 2 aos graus 3–4 e a página 3 ao grau 5. Após 1 natural na conjuração, role d12 na tabela correspondente.
+
+`druid-data.js` contém as 16 magias, duração, alcance, descrição e os três desastres; deve carregar antes de `class.js`. O marcador “Wizard (N)” nas imagens não determina a classe dessas magias. A imagem repetida de Invocar Tempestade/Forma de Árvore não adiciona documentos duplicados. Falar com Animais foi retirado por instrução do usuário: Fala Verdadeira/Truespeech é de grau 2 e conta normalmente entre as magias conhecidas.
+
+Na criação, escolha duas magias diferentes de grau 1. `terraOesteClassOptions.druidSpells` conserva os nomes originais; `spellsKnown` mostra os nomes localizados. Cada magia também produz um bônus `Spell: Druida, Tier N, Spell M` com `sourceName: Druida` e `bonusName` localizado. Um talento de magia adicional exporta tanto o talento quanto a magia; vantagem em magia é limitada às magias conhecidas.
+
+| Escolha | Chave exportada | `bonusTo` |
+| --- | --- | --- |
+| Vantagem em Forma Selvagem | `TerraOeste.DruidWildShapeAdvantage` | Mesma chave |
+| Magia adicional | `TerraOeste.DruidExtraSpell` | Nome original da magia |
+| Vantagem em magia | `TerraOeste.DruidSpellAdvantage` | Nome original da magia |
+| +2 em CON/SAB | `StatBonus` | `CON:+2` / `WIS:+2` |
+| +1 em conjuração | `Plus1ToCastingSpells` | `Casting spells` |
+| +1 em ataque corpo a corpo | `Plus1ToHit` | `Melee attacks` |
+
+A progressão, do nível 1 ao 10, é: `2/0/0/0/0`, `3/0/0/0/0`, `3/1/0/0/0`, `3/2/0/0/0`, `3/2/1/0/0`, `3/2/2/0/0`, `3/3/2/1/0`, `3/3/2/2/0`, `3/3/2/2/1`, `3/3/3/2/2`. Não conceder a lista inteira de magias ou todos os talentos da tabela como benefícios fixos.
+
+Forma Selvagem mantém um aviso visível: faltam animais e CDs. Não inventar esses dados. A forma da habilidade volta com 1 PV; a magia Forma de Árvore volta com 0 PV, como em sua fonte. O módulo permanece em um pacote local separado e não deve ser adicionado ao Git do site. Sintaxe conferida; interface e importação no Foundry não foram executadas nesta atualização.

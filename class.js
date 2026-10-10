@@ -73,7 +73,9 @@
     { label: "Mau Olhado", value: "Eyebite", duration: "Instantâneo", range: "Perto", description: "Uma criatura à sua escolha sofre 1d4 de dano e não consegue ver você até o fim do próximo turno dela." },
     { label: "Névoa", value: "Fog", duration: "Concentração", range: "Adjacente", description: "Uma nuvem espessa de névoa surge em uma área Adjacente ao seu redor, dificultando que vejam você. A nuvem se move com você. Ataques contra criaturas dentro dela são feitos com desvantagem." }
   ];
-  const classSpells = cls => cls === "Bruxo" ? WITCH_SPELLS : cls === "Mago" ? MAGE_SPELLS : [];
+  const DRUID_SPELLS = window.TERRAOESTE_DRUID_DATA?.spells || [];
+  const druidSpell = value => DRUID_SPELLS.find(spell => [spell.value,spell.label].some(name => name.toLocaleLowerCase("pt-BR") === String(value || "").trim().toLocaleLowerCase("pt-BR")));
+  const classSpells = cls => cls === "Druida" ? DRUID_SPELLS.filter(spell => spell.tier === 1) : cls === "Bruxo" ? WITCH_SPELLS : cls === "Mago" ? MAGE_SPELLS : [];
   const spellListKey = cls => cls === "Bruxo" ? "witchSpells" : "mageSpells";
   const witchKnownSpellRows = [
     ["1","3","–","–","–","–"], ["2","4","–","–","–","–"],
@@ -95,7 +97,8 @@
       const extra = (Array.isArray(talents) ? talents : [])
         .filter(talent => talent?.id === "DruidExtraSpell" && talent.bonusTo)
         .map(talent => String(talent.bonusTo).trim());
-      return { spellsKnown: [...new Set([...selected, ...extra].map(value => String(value || "").trim()).filter(Boolean))].join(", ") || "None", bonuses: [] };
+      const known = [...new Set([...selected,...extra].map(value => druidSpell(value)?.value).filter(Boolean))].map(druidSpell);
+      return { spellsKnown: known.map(spell => spell.label).join(", ") || "None", bonuses: known.map((spell,index) => ({sourceType:"Class",sourceName:"Druida",sourceCategory:"Ability",name:`Spell: Druida, Tier ${spell.tier}, Spell ${index+1}`,bonusName:spell.label,bonusTo:`Tier:${spell.tier}, Spell:${index+1}`,gainedAtLevel:1})) };
     }
     if (!["Mago", "Bruxo"].includes(cls)) return { spellsKnown: "None", bonuses: [] };
     const spells = classSpells(cls);
@@ -201,6 +204,7 @@
       const prey = HUNTER_PREY.find(item => item.value === choices.prey);
       return prey ? `Presa: ${prey.label}${prey.language ? `; idioma: ${prey.language}` : ""}` : "";
     }
+    if (cls === "Druida") return `Magias conhecidas: ${(choices.druidSpells || []).map(value => druidSpell(value)?.label).filter(Boolean).join(", ")}`;
     if (cls === "Mago") {
       const spells = (choices.mageSpells || []).map(value => MAGE_SPELLS.find(spell => spell.value === value)?.label).filter(Boolean);
       return spells.length ? `Magias de 1º círculo: ${spells.join(", ")}` : "";
@@ -215,6 +219,7 @@
     return [weapon ? `Maestria em Armas: ${weapon}` : "", grit ? `Bravura: ${grit}` : ""].filter(Boolean).join("; ");
   };
   window.app.randomClassFeatureChoices = cls => {
+    if (cls === "Druida") { const pool=classSpells(cls).slice(); return {druidSpells:[pool.splice(randInt(0,pool.length-1),1)[0].value,pool.splice(randInt(0,pool.length-1),1)[0].value]}; }
     if (cls === "Caçador") return { prey: HUNTER_PREY[randInt(0, HUNTER_PREY.length - 1)].value };
     if (cls === "Guerreiro") return {
       weaponMastery: FIGHTER_WEAPON_TYPES[randInt(0, FIGHTER_WEAPON_TYPES.length - 1)].value,
@@ -525,13 +530,13 @@
     "Druida": [
       "Deusa da Natureza. Você deve ter Verdana como sua divindade.",
       "",
-      "Falar com Animais. Você conhece a magia Falar com Animais. Ela não conta para seu número de magias conhecidas.",
+      "Comunicação com animais. Use Fala Verdadeira (Truespeech), uma magia de grau 2 que conta normalmente entre suas magias conhecidas.",
       "",
       "Vínculo Natural. Você atravessa e se localiza por florestas densas com facilidade e não deixa rastros. Você tem Vantagem em testes relacionados à natureza selvagem e aos animais.",
       "",
       "Forma Selvagem. Você pode se transformar em um animal da lista de Forma Selvagem com um teste de Constituição. Você mantém Inteligência, Sabedoria e Carisma, mas assume a Força, Destreza, Constituição, PV, CA, movimento, ataques e características do animal. Não pode falar ou conjurar magias enquanto estiver transformado. Ao chegar a 0 PV, volta à forma verdadeira com 1 PV. Se falhar no teste, não pode tentar novamente até descansar. Se tirar 1 natural, role também na tabela de Desastre Selvagem.",
       "",
-      "Conjuração. Você pode conjurar magias de Druida que conhece. No 1º nível, conhece duas magias de nível 1 à sua escolha da lista de magias de Druida. Consulte a tabela de magias conhecidas por nível. Se tirar 1 natural em um teste de conjuração, role também na tabela de Desastre Selvagem."
+      "Conjuração. Você usa Sabedoria para conjurar magias de Druida; a CD é 10 + o grau da magia. No 1º nível, conhece duas magias de grau 1 à sua escolha. Consulte a tabela de magias conhecidas por nível. Se tirar 1 natural em conjuração, role 1d12 em Desastre Selvagem: graus 1–2, 3–4 ou 5, conforme a magia."
     ].join("\n"),
     "Patrulheiro": RANGER_SPECIAL_ABILITY,
     "Malandro": THIEF_SPECIAL_ABILITY,
@@ -949,35 +954,17 @@
             chosen.id = "DruidWildShapeAdvantage";
             chosen.talentRolledName = "Vantagem em Forma Selvagem";
             chosen.talentRolledDesc = "Advantage on Wild Shape checks";
-            chosen.bonusName = "";
-            chosen.bonusTo = "";
-            chosen.exportAsBonus = false;
+            chosen.bonusName = "TerraOeste.DruidWildShapeAdvantage";
+            chosen.bonusTo = "TerraOeste.DruidWildShapeAdvantage";
+            chosen.exportAsBonus = true;
             chosen.displayDesc = "Vantagem nos testes de Forma Selvagem";
             complete(chosen);
           } else if (select.value === "spell") {
-            const name = document.createElement("input");
-            name.type = "text";
-            name.placeholder = "Nome da magia adicional";
-            const tier = document.createElement("select");
-            tier.append(new Option("Nível da magia", ""));
-            for (let level = 1; level <= 5; level++) tier.append(new Option(String(level), String(level)));
-            const save = document.createElement("button");
-            save.type = "button";
-            save.className = "ghost";
-            save.textContent = "Registrar magia";
-            save.addEventListener("click", () => {
-              if (!name.value.trim() || !tier.value) return;
-              chosen.id = "DruidExtraSpell";
-              chosen.talentRolledName = "Magia Adicional de Druida";
-              chosen.talentRolledDesc = "Learn one additional druid spell of a tier you know";
-              chosen.bonusName = "";
-              chosen.bonusTo = name.value.trim();
-              chosen.exportAsBonus = false;
-              chosen.druidSpellTier = Number(tier.value);
-              chosen.displayDesc = `Magia adicional registrada: ${name.value.trim()} (nível ${tier.value})`;
-              complete(chosen);
-            });
-            extra.append(name, tier, save);
+            const name=document.createElement("select");name.append(new Option("Escolha uma magia adicional de 1º grau",""));
+            const known=[...(state.classFeatures?.druidSpells || pending.classFeatureChoices?.druidSpells || []),...(pending.classLevelTalents || []).filter(t=>t?.id==="DruidExtraSpell").map(t=>t.bonusTo)];
+            classSpells("Druida").filter(spell=>!known.includes(spell.value)).forEach(spell=>name.append(new Option(spell.label,spell.value)));
+            name.addEventListener("change",()=>{if(!name.value)return; chosen.id="DruidExtraSpell";chosen.talentRolledName="Magia Adicional de Druida";chosen.bonusName="TerraOeste.DruidExtraSpell";chosen.bonusTo=name.value;chosen.exportAsBonus=true;chosen.druidSpellTier=1;chosen.displayDesc=`Magia adicional: ${druidSpell(name.value).label}`;complete(chosen);});
+            extra.append(name);
           } else {
             updateTalentContinueButton();
           }
@@ -1007,24 +994,11 @@
         });
         details.append(select);
       } else if (entry.choice === "druidKnownSpell") {
-        const spellName = document.createElement("input");
-        spellName.type = "text";
-        spellName.placeholder = "Nome de uma magia de Druida que você conhece";
-        const save = document.createElement("button");
-        save.type = "button";
-        save.className = "ghost";
-        save.textContent = "Registrar magia";
-        save.addEventListener("click", () => {
-          const value = spellName.value.trim();
-          if (!value) return;
-          chosen.talentRolledName = "Vantagem em Conjuração";
-          chosen.talentRolledDesc = "Advantage casting one druid spell you know";
-          chosen.bonusName = "AdvOnCastOneSpell";
-          chosen.bonusTo = value;
-          chosen.displayDesc = `Vantagem ao conjurar: ${value}`;
-          complete(chosen);
-        });
-        details.append(spellName, save);
+        const spellName=document.createElement("select");spellName.append(new Option("Escolha uma magia conhecida",""));
+        const known=[...(state.classFeatures?.druidSpells || pending.classFeatureChoices?.druidSpells || []),...(pending.classLevelTalents || []).filter(t=>t?.id==="DruidExtraSpell").map(t=>t.bonusTo)];
+        [...new Set(known)].forEach(value=>{const spell=druidSpell(value);if(spell)spellName.append(new Option(spell.label,spell.value));});
+        spellName.addEventListener("change",()=>{if(!spellName.value)return;chosen.talentRolledName="Vantagem em Conjuração";chosen.bonusName="TerraOeste.DruidSpellAdvantage";chosen.bonusTo=spellName.value;chosen.displayDesc=`Vantagem ao conjurar: ${druidSpell(spellName.value).label}`;complete(chosen);});
+        details.append(spellName);
       } else if (entry.choice === "bardAttackOrFascinate") {
         const select = document.createElement("select");
         select.append(new Option("Escolha o benefício", ""), new Option("+1 em ataques corpo a corpo e à distância", "attacks"), new Option("+1 em testes de Fascinar", "fascinate"));
@@ -1481,13 +1455,20 @@
     info.append(trigger, knownSpellTable.title, knownSpellTable.table);
     mageSpellTables.append(info);
     if (isDruid) {
-      const note = document.createElement("p");
-      note.textContent = "Falar com Animais é uma magia adicional e não ocupa um espaço de magia conhecida. A lista de magias de Druida será incluída quando for enviada.";
+      const note=document.createElement("p"); note.className="hint";
+      note.textContent="Forma Selvagem — PENDENTE: adicionar a lista de animais e as CDs de transformação. Conjuração usa Sabedoria. Um 1 natural exige 1d12 em Desastre Selvagem: graus 1–2, 3–4 ou 5.";
       mageSpellTables.append(note);
-      return;
+      for (const mishap of window.TERRAOESTE_DRUID_DATA?.mishaps || []) {
+        const details=document.createElement("details");
+        const summary=document.createElement("summary");summary.textContent=mishap.label;
+        const table=makeTable(mishap.label,["d12","Desastre"],mishap.rows.map((text,index)=>[String(index+1),text]));
+        details.append(summary,table.table);mageSpellTables.append(details);
+      }
     }
-    const spellList = classSpells(cls);
-    const spellListTable = isWitch
+    const spellList = isDruid ? DRUID_SPELLS : classSpells(cls);
+    const spellListTable = isDruid
+      ? makeTable("Magias de Druida", ["Magia","Grau / Duração","Alcance"], spellList.map(spell => [spell.label,`${spell.tier} / ${spell.duration}`,spell.range]))
+      : isWitch
       ? makeTable("Magias de 1º nível de Bruxo", ["Magia","Duração","Alcance"], spellList.map(spell => [spell.label,spell.duration,spell.range]))
       : makeTable("Magias de 1º círculo", ["Magia","Duração","Alcance"], spellList.map(spell => [spell.label,spell.duration,spell.range]));
     {
@@ -1503,7 +1484,7 @@
         label.textContent = spell.label;
         const description = document.createElement("div");
         description.className = "spell-info__content";
-        description.id = `${isWitch ? "witch" : "mage"}-spell-description-${index + 1}`;
+        description.id = `${isDruid ? "druid" : isWitch ? "witch" : "mage"}-spell-description-${index + 1}`;
         description.textContent = spell.description;
         label.setAttribute("aria-label", `Mostrar descrição de ${spell.label}`);
         label.setAttribute("aria-controls", description.id);
@@ -1661,30 +1642,20 @@
         wrap.append(heading, detail, select, custom);
         classFeatureChoices.append(wrap);
       } else if (cls === "Druida") {
-        pending.classFeatureChoices = pending.classFeatureChoices || {};
-        const selectedSpells = Array.isArray(pending.classFeatureChoices.druidSpells) ? pending.classFeatureChoices.druidSpells : [];
-        pending.classFeatureChoices.druidSpells = [selectedSpells[0] || "", selectedSpells[1] || ""];
-        const heading = document.createElement("strong");
-        heading.textContent = "Magias de 1º nível (escolha 2 da lista de Druida)";
-        const note = document.createElement("small");
-        note.textContent = "Falar com Animais é uma magia adicional e não ocupa uma dessas escolhas. Digite os nomes das outras magias; a lista será adicionada quando for enviada.";
-        classFeatureChoices.append(heading, note);
-        pending.classFeatureChoices.druidSpells.forEach((value, index) => {
-          const wrap = document.createElement("label");
-          wrap.className = "class-feature-choice";
-          const label = document.createElement("strong");
-          label.textContent = `Magia ${index + 1}`;
-          const input = document.createElement("input");
-          input.type = "text";
-          input.placeholder = "Nome da magia de Druida";
-          input.value = value;
-          input.addEventListener("input", () => {
-            pending.classFeatureChoices.druidSpells[index] = input.value.trim();
-            updateConfirmButton();
-          });
-          wrap.append(label, input);
-          classFeatureChoices.append(wrap);
-        });
+        pending.classFeatureChoices ??= {};
+        const values=pending.classFeatureChoices.druidSpells || [];
+        pending.classFeatureChoices.druidSpells=[druidSpell(values[0])?.value || "",druidSpell(values[1])?.value || ""];
+        const heading=document.createElement("strong");heading.textContent="Magias de 1º grau (escolha 2)";
+        const note=document.createElement("small");note.textContent="Você conjura com Sabedoria. A comunicação com animais usa Fala Verdadeira, uma magia de grau 2. Não há magia gratuita adicional.";
+        classFeatureChoices.append(heading,note);
+        const selects=[];
+        const refresh=()=>selects.forEach(select=>[...select.options].forEach(option=>option.disabled=!!option.value && option.value!==select.value && pending.classFeatureChoices.druidSpells.includes(option.value)));
+        pending.classFeatureChoices.druidSpells.forEach((value,index)=>{
+          const label=document.createElement("label");label.className="class-feature-choice";label.append(`Magia ${index+1}`);
+          const select=document.createElement("select");select.append(new Option("Escolha uma magia",""));classSpells(cls).forEach(spell=>select.append(new Option(spell.label,spell.value)));select.value=value;
+          select.addEventListener("change",()=>{pending.classFeatureChoices.druidSpells[index]=select.value;refresh();updateConfirmButton();});
+          selects.push(select);label.append(select);classFeatureChoices.append(label);
+        });refresh();
       } else if (isSpellcaster) {
         const spells = classSpells(cls);
         const listKey = spellListKey(cls);
@@ -1947,20 +1918,8 @@
         chosen.faithfulTool = tool?.value || "Equipment chosen manually";
         chosen.displayDesc = `+2 espaços; Ferramenta Fiel adicional: ${tool?.label || "escolha manual"}`;
       } else if (entry.choice === "druidWildShapeOrSpell") {
-        if (randInt(0, 1) === 0) {
-          chosen.id = "DruidWildShapeAdvantage";
-          chosen.talentRolledName = "Vantagem em Forma Selvagem";
-          chosen.talentRolledDesc = "Advantage on Wild Shape checks";
-          chosen.displayDesc = "Vantagem nos testes de Forma Selvagem";
-        } else {
-          chosen.id = "DruidExtraSpell";
-          chosen.talentRolledName = "Magia Adicional de Druida";
-          chosen.talentRolledDesc = "Learn one additional druid spell of a tier you know";
-          chosen.displayDesc = "Magia adicional de um nível conhecido (escolha a magia)";
-        }
-        chosen.bonusName = "";
-        chosen.bonusTo = "";
-        chosen.exportAsBonus = false;
+        if(randInt(0,1)===0){chosen.id="DruidWildShapeAdvantage";chosen.talentRolledName="Vantagem em Forma Selvagem";chosen.bonusName="TerraOeste.DruidWildShapeAdvantage";chosen.bonusTo="TerraOeste.DruidWildShapeAdvantage";chosen.exportAsBonus=true;chosen.displayDesc="Vantagem nos testes de Forma Selvagem";}
+        else{const known=[...(state.classFeatures?.druidSpells || []),...(pending.classLevelTalents || []).filter(t=>t?.id==="DruidExtraSpell").map(t=>t.bonusTo)];const pool=classSpells("Druida").filter(spell=>!known.includes(spell.value));const spell=pool[randInt(0,pool.length-1)];if(!spell){chosen.id="DruidWildShapeAdvantage";chosen.bonusName="TerraOeste.DruidWildShapeAdvantage";chosen.bonusTo=chosen.bonusName;chosen.exportAsBonus=true;chosen.displayDesc="Vantagem nos testes de Forma Selvagem";}else{chosen.id="DruidExtraSpell";chosen.talentRolledName="Magia Adicional de Druida";chosen.bonusName="TerraOeste.DruidExtraSpell";chosen.bonusTo=spell.value;chosen.druidSpellTier=1;chosen.exportAsBonus=true;chosen.displayDesc=`Magia adicional: ${spell.label}`;}}
       } else if (entry.choice === "druidCastingOrMelee") {
         if (randInt(0, 1) === 0) {
           chosen.id = "Plus1ToCastingSpells";
@@ -1978,12 +1937,12 @@
           chosen.displayDesc = "+1 em ataques corpo a corpo";
         }
       } else if (entry.choice === "druidKnownSpell") {
-        const knownSpells = Array.isArray(state.classFeatures?.druidSpells) ? state.classFeatures.druidSpells.filter(Boolean) : [];
+        const knownSpells = [...new Set([...(state.classFeatures?.druidSpells || []),...(pending.classLevelTalents || []).filter(t=>t?.id==="DruidExtraSpell").map(t=>t.bonusTo)].filter(Boolean))];
         const spell = knownSpells.length ? knownSpells[randInt(0, knownSpells.length - 1)] : "";
         chosen.talentRolledName = "Vantagem em Conjuração";
         chosen.talentRolledDesc = "Advantage casting one druid spell you know";
         if (spell) {
-          chosen.bonusName = "AdvOnCastOneSpell";
+          chosen.bonusName = "TerraOeste.DruidSpellAdvantage";
           chosen.bonusTo = spell;
           chosen.displayDesc = `Vantagem ao conjurar: ${spell}`;
         } else {
