@@ -190,6 +190,9 @@ Este roteiro não garante ausência de falhas futuras. Ele registra os pontos qu
 - [ ] Exportar fontes, editar, reimportar e compilar preserva IDs e descrições.
 - [ ] Fonte TerraOeste aparece e pode ser selecionada quando filtros de fontes estão ativos.
 - [ ] Caçador aparece no seletor do site, exige Presa inicial e mostra idioma/talento correspondentes.
+- [ ] A classe do Caçador não registra opções como talentos fixos: `system.talents` fica vazio e `system.talentChoices` oferece as dez presas como escolha inicial.
+- [ ] No nível 1, personagem seleciona e recebe apenas uma presa; as nove opções restantes não aparecem como talentos adquiridos.
+- [ ] Nas rolagens 2, 3–5, 6–9 e 12, os resultados contêm links para os documentos escolhíveis; arrastar um deles ao campo Talentos da janela de nível adiciona somente a escolha feita.
 - [ ] Cada presa concede a língua correta; Constructos e Golens e Mortos-Vivos não adicionam idioma.
 - [ ] A tabela 2d6 do Caçador mostra os intervalos 2, 3–5, 6–9, 10–11 e 12; resultado 2 repetido é rolado novamente.
 - [ ] Tabela d10 de Presas contém dez tipos e aponta a documentos existentes no pack Talentos.

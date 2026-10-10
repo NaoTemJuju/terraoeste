@@ -48,7 +48,8 @@
       "Compendium.shadowdark.gear.Item.ZPUhNMmwXXrtbCXi",
       "Compendium.shadowdark.gear.Item.brIFMH0sOVmqX02N"
     ],
-    "talents": [
+    "talents": [],
+    "talentChoices": [
       "Compendium.terraoeste-class-content.talents.Item.TO00000000000024",
       "Compendium.terraoeste-class-content.talents.Item.TO00000000000025",
       "Compendium.terraoeste-class-content.talents.Item.TO00000000000026",
@@ -58,16 +59,8 @@
       "Compendium.terraoeste-class-content.talents.Item.TO00000000000030",
       "Compendium.terraoeste-class-content.talents.Item.TO00000000000031",
       "Compendium.terraoeste-class-content.talents.Item.TO00000000000032",
-      "Compendium.terraoeste-class-content.talents.Item.TO00000000000033",
-      "Compendium.terraoeste-class-content.talents.Item.TO00000000000034",
-      "Compendium.terraoeste-class-content.talents.Item.TO00000000000035",
-      "Compendium.terraoeste-class-content.talents.Item.TO00000000000036",
-      "Compendium.terraoeste-class-content.talents.Item.TO00000000000037",
-      "Compendium.terraoeste-class-content.talents.Item.TO00000000000006",
-      "Compendium.terraoeste-class-content.talents.Item.TO00000000000020",
-      "Compendium.terraoeste-class-content.talents.Item.TO00000000000021"
+      "Compendium.terraoeste-class-content.talents.Item.TO00000000000033"
     ],
-    "talentChoices": [],
     "talentChoiceCount": 1,
     "classAbilities": [
       "Compendium.terraoeste-class-content.class-abilities.Item.TO00000000000011",

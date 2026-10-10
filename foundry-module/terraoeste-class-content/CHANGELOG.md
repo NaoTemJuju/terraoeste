@@ -1,5 +1,10 @@
 # Histórico de versões
 
+## 0.3.1
+
+- Corrige o Caçador para não adicionar as opções como talentos fixos; as dez presas agora são uma escolha inicial.
+- Adiciona links às opções de presa, treinamento, atributos e talento nos resultados da tabela. Na subida de nível, o jogador pode abrir/arrastar o documento escolhido para o campo Talentos do Shadowdark.
+
 ## 0.3.0
 
 - Adiciona a classe Caçador e suas três habilidades editáveis.
