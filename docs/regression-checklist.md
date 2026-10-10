@@ -44,7 +44,7 @@ Confira ambas as funções de exportação em `final.js`, além de `normalizedTa
 - [ ] Site mostra descrição, armas adaga/cajado, armadura de couro, PV d4 e escolha de idioma entre Diabólico, Primordial e Silvestre.
 - [ ] Familiar e Conjuração exibem texto completo; a ficha mostra a progressão de magias conhecidas por nível enviada pelo usuário.
 - [ ] Escolha manual e aleatória produzem três magias distintas dentre as dez magias de Bruxo verificadas no compêndio instalado.
-- [ ] Cada uma das dez magias mostra duração e alcance corretos; passar o mouse sobre o nome ou focá-lo pelo teclado revela a descrição localizada; clique/toque alterna a descrição em telas sem hover.
+- [ ] Cada uma das dez magias mostra duração e alcance corretos; passar o mouse sobre o nome ou focá-lo pelo teclado revela a descrição localizada.
 - [ ] O talento 3–7 oferece +2 Carisma ou +1 em testes de conjuração e exporta `StatBonus` ou `Plus1ToCastingSpells`.
 - [ ] O talento 8–9 permite escolher apenas uma magia conhecida e exporta `AdvOnCastOneSpell` com o rótulo da magia PT-BR como `bonusTo`.
 - [ ] O talento 10–11 permite escolher uma magia ainda não conhecida; essa escolha entra em `spellsKnown` e gera seu bônus de magia no JSON.
@@ -175,7 +175,7 @@ Este roteiro não garante ausência de falhas futuras. Ele registra os pontos qu
 
 ## Módulo de conteúdo
 
-- [ ] Build gera cinco packs com IDs e referências internas válidos, sem REPLACEME.
+- [ ] Build gera seis packs com IDs e referências internas válidos, sem REPLACEME.
 - [ ] Todos os aliases/chaves do registro resolvem documentos reais.
 - [ ] JSON antigo apenas descritivo é recuperado; JSON novo não duplica o mesmo bônus.
 - [ ] Duas aquisições iguais sobrevivem; não confundir deduplicação com apagar um talento repetido.
@@ -189,4 +189,11 @@ Este roteiro não garante ausência de falhas futuras. Ele registra os pontos qu
 - [ ] Resultado 12 no Foundry: escolher talento OU arrastar dois +1 da tabela de distribuição (podem ser iguais).
 - [ ] Exportar fontes, editar, reimportar e compilar preserva IDs e descrições.
 - [ ] Fonte TerraOeste aparece e pode ser selecionada quando filtros de fontes estão ativos.
-
+- [ ] Caçador aparece no seletor do site, exige Presa inicial e mostra idioma/talento correspondentes.
+- [ ] Cada presa concede a língua correta; Constructos e Golens e Mortos-Vivos não adicionam idioma.
+- [ ] A tabela 2d6 do Caçador mostra os intervalos 2, 3–5, 6–9, 10–11 e 12; resultado 2 repetido é rolado novamente.
+- [ ] Tabela d10 de Presas contém dez tipos e aponta a documentos existentes no pack Talentos.
+- [ ] Resultado 2 escolhe uma nova Presa sem duplicar presa existente; treinamentos oferecem escudos, cota de malha ou qualquer arma.
+- [ ] Bônus `TerraOeste.HunterPrey_<slug>` e `TerraOeste.HunterTraining_<slug>` resolvem talentos reais via registry escopado ao Caçador.
+- [ ] Água Benta e Estaca aparecem no pack Equipamento como itens editáveis; dano/preço/propriedades não foram presumidos.
+- [ ] Classe Caçador referencia UUIDs existentes para armas, armadura, habilidades e tabela; PV é d6.

@@ -1,0 +1,175 @@
+{
+  "folder": null,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "13.350",
+    "systemId": "shadowdark",
+    "systemVersion": "4.0.6"
+  },
+  "_id": "TO00000000000019",
+  "name": "Tabela de Presas: Caçador",
+  "img": "icons/svg/d20-grey.svg",
+  "flags": {
+    "terraoeste-class-content": {
+      "contentId": "hunter-prey-table"
+    }
+  },
+  "description": "<p>Role 1d10. A presa concede seu talento permanentemente ativo e o idioma indicado, quando houver.</p>",
+  "formula": "1d10",
+  "replacement": true,
+  "displayRoll": true,
+  "results": [
+    {
+      "_id": "TR00000000000201",
+      "type": "document",
+      "name": "Anjos",
+      "description": "Vantagem em ataques à distância contra inimigos voadores (enquanto estão voando)",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000024",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        1,
+        1
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000202",
+      "type": "document",
+      "name": "Criaturas Aquáticas",
+      "description": "Vantagem em nadar e prender a respiração, independentemente da armadura; estar debaixo d'água não causa Desvantagem em nada",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000025",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        2,
+        2
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000203",
+      "type": "document",
+      "name": "Bestas e Monstros",
+      "description": "Criaturas com −2 INT ou menos têm testes de moral CD 18 ao lutar contra você",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000026",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        3,
+        3
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000204",
+      "type": "document",
+      "name": "Constructos e Golens",
+      "description": "Se uma criatura for imune ao seu dano, ela sofre metade do dano em vez disso",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000027",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        4,
+        4
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000205",
+      "type": "document",
+      "name": "Demônios e Diabos",
+      "description": "Você recebe metade do dano de fogo",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000028",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        5,
+        5
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000206",
+      "type": "document",
+      "name": "Dragões",
+      "description": "Vantagem em testes de DES para evitar ataques de área de efeito",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000029",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        6,
+        6
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000207",
+      "type": "document",
+      "name": "Coisas Anciãs e Elementais",
+      "description": "Vantagem em testes de CON contra clima frio e calor extremos (não fogo)",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000030",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        7,
+        7
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000208",
+      "type": "document",
+      "name": "Feéricos e Plantas",
+      "description": "Vantagem em testes de CON contra veneno e doença",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000031",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        8,
+        8
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000209",
+      "type": "document",
+      "name": "Gigantes, Ogros e Trolls",
+      "description": "Vantagem em testes para se esconder ou enganar criaturas do tamanho de um cavalo ou maiores",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000032",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        9,
+        9
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000210",
+      "type": "document",
+      "name": "Mortos-Vivos",
+      "description": "Você pode conjurar expulsar mortos-vivos e consagrar água como se fosse um sacerdote; use INT para o teste",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000033",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        10,
+        10
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    }
+  ]
+}

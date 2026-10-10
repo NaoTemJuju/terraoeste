@@ -1,0 +1,38 @@
+{
+  "folder": null,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "13.350",
+    "systemId": "shadowdark",
+    "systemVersion": "4.0.6"
+  },
+  "_id": "TO00000000000012",
+  "name": "Presa",
+  "type": "Class Ability",
+  "img": "icons/skills/trades/academics-book-study-blue.webp",
+  "flags": {
+    "terraoeste-class-content": {
+      "contentId": "hunter-prey-ability"
+    }
+  },
+  "system": {
+    "description": "<p>Escolha uma presa. Você conhece o idioma correspondente, quando houver, e ganha o talento registrado para esse tipo de criatura. O talento permanece ativo fora de combate. Ao ganhar um talento de Caçador, você pode usar a <a class=\"content-link\" data-uuid=\"Compendium.terraoeste-class-content.rollable-tables.RollTable.TO00000000000019\">Tabela de Presas</a> em vez da tabela principal.</p>",
+    "source": {
+      "title": "terraoeste"
+    },
+    "properties": [],
+    "ability": "",
+    "group": "Caçador",
+    "dc": 10,
+    "limitedUses": false,
+    "loseOnFailure": false,
+    "lost": false,
+    "uses": {
+      "available": 0,
+      "max": 0
+    }
+  },
+  "effects": []
+}

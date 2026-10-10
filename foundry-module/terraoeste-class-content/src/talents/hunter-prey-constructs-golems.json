@@ -1,0 +1,30 @@
+{
+  "folder": null,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "13.350",
+    "systemId": "shadowdark",
+    "systemVersion": "4.0.6"
+  },
+  "_id": "TO00000000000027",
+  "name": "Presa: Constructos e Golens",
+  "type": "Talent",
+  "img": "icons/skills/melee/strike-axe-blood-red.webp",
+  "flags": {
+    "terraoeste-class-content": {
+      "contentId": "hunter-prey-constructs-golems"
+    }
+  },
+  "system": {
+    "description": "<p>Se uma criatura for imune ao seu dano, ela sofre metade do dano em vez disso</p>",
+    "source": {
+      "title": "terraoeste"
+    },
+    "properties": [],
+    "talentClass": "level",
+    "level": 0
+  },
+  "effects": []
+}

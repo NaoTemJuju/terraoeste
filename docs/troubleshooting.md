@@ -262,3 +262,13 @@ A classe já constava em `CLASS_DICE` com d8. A mudança no site inclui descriç
 **Evidência:** leitura local dos esquemas, mapa, importador, ActiveEffectSD e consumidores de rolagem do Shadowdark 4.0.6; consulta ao esquema de TableResult do Foundry 13.350. Crítico é -1 no limiar somente de ataques corpo a corpo. Usos adicionais ajustam o contador da Fúria. O build valida o registro e as referências internas, mas a interface/rolagem real ainda precisa de validação. Duração e demais condições narrativas não são automatizadas. Machado de Batalha foi incluído com 1d12 autorizado pelo usuário; demais campos são provisórios e editáveis.
 
 **Diagnóstico futuro:** conferir módulo ativo, UUID em `registry.json`, presença do documento em `src` e nos bancos compilados, compatibilidade do importador e filtros de fontes. Trocar o nome exibido não substitui um documento ausente. Nunca criar efeitos de JSON arbitrário nem editar o sistema para registrar uma classe.
+
+## Caçador ausente ou bônus de Presa não encontrado
+
+**Causa confirmada:** o Caçador estava na lista de classes/dados de PV, mas sem tabela, opções iniciais nem registro de classe no módulo. As presas também não existiam como documentos de talento no compêndio.
+
+**Correção:** a classe foi implementada no gerador e no compêndio Classes. Talentos, habilidades e tabelas foram criados nos packs correspondentes e todas as chaves `TerraOeste.HunterPrey_<slug>` e `TerraOeste.HunterTraining_<slug>` apontam para UUIDs em `registry.json`. Línguas derivam da presa selecionada; mortos-vivos e constructos/golens não concedem língua. Água Benta e Estaca agora são itens básicos editáveis, sem estatísticas inventadas.
+
+**Diagnóstico:** confira que `class` é `Caçador`, `terraOesteClassOptions.prey` contém slug válido, `sourceName` do bônus corresponde ao Caçador e `bonusName`/`bonusTo` formam exatamente uma chave registrada. Se o Foundry disser que o item não existe, regenere os packs após `npm run build`, atualize o módulo e reabra os compêndios. Não troque a grafia do talento ou slug sem atualizar o registro.
+
+**Limite:** efeitos da Presa variam por tipo de criatura e condições de cena; ficam registrados em descrições editáveis e requerem aplicação manual. A resolução de UUIDs é verificada pelo build, mas precisa também de importação real para validar integração com o importador instalado.

@@ -519,7 +519,7 @@
       }
       // Calcula línguas
       if (window.langs && typeof window.langs.computeLanguagePools === 'function'){
-        const langState = window.langs.computeLanguagePools({ race, cls, alignment: align });
+        const langState = window.langs.computeLanguagePools({ race, cls, alignment: align, prey: state.classFeatures?.prey });
         state.langs = langState;
         const { final, choices } = window.langs.applyRandom(langState);
         state.langsFinal = final;
@@ -551,6 +551,12 @@
         ? window.app.randomClassLevelTalents(cls, race, state.raceTalent)
         : [window.app.randomClassLevelTalent?.(cls)].filter(Boolean);
       state.classLevelTalent = initialClassTalents.length ? initialClassTalents : null;
+      if (cls === "Caçador" && window.langs?.computeLanguagePools) {
+        const prey = [state.classFeatures?.prey, ...initialClassTalents.filter(item => item?.bonusName === "TerraOeste.HunterPrey").map(item => item.bonusTo)].filter(Boolean);
+        const langState = window.langs.computeLanguagePools({ race, cls, alignment: align, prey });
+        state.langs = langState;
+        state.langsFinal = window.langs.applyRandom(langState).final;
+      }
       // Define nome aleatório baseado na raça
       // randomNameByRace é definido em nome.js e anexado ao namespace app
       const nameGenFn = (window.app && typeof window.app.randomNameByRace === 'function') ? window.app.randomNameByRace : null;
@@ -1061,5 +1067,4 @@
     set __loadedRawObj(val){ __loadedRawObj = val; }
   };
 })();
-
 

@@ -1,0 +1,100 @@
+{
+  "folder": null,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "13.350",
+    "systemId": "shadowdark",
+    "systemVersion": "4.0.6"
+  },
+  "_id": "TO00000000000020",
+  "name": "Class Talents: Caçador",
+  "img": "icons/svg/d20-grey.svg",
+  "flags": {
+    "terraoeste-class-content": {
+      "contentId": "hunter-class-table"
+    }
+  },
+  "description": "<p>Role 2d6. Resultado 2 repetido: role novamente. No resultado 12, escolha um talento ou distribua +2 pontos entre atributos.</p>",
+  "formula": "2d6",
+  "replacement": true,
+  "displayRoll": true,
+  "results": [
+    {
+      "_id": "TR00000000000211",
+      "type": "text",
+      "name": "Presa adicional",
+      "description": "Escolha uma nova presa na Tabela de Presas.",
+      "documentUuid": null,
+      "img": "icons/svg/d20-grey.svg",
+      "range": [
+        2,
+        2
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000212",
+      "type": "text",
+      "name": "Treinamento",
+      "description": "Escolha entre escudos, cota de malha ou qualquer arma.",
+      "documentUuid": null,
+      "img": "icons/svg/d20-grey.svg",
+      "range": [
+        3,
+        5
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000213",
+      "type": "text",
+      "name": "Aprimoramento de atributo",
+      "description": "Escolha +2 em Força, Destreza ou Inteligência.",
+      "documentUuid": null,
+      "img": "icons/svg/d20-grey.svg",
+      "range": [
+        6,
+        9
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000214",
+      "type": "document",
+      "name": "+1 para Ataques Corpo a Corpo e à Distância",
+      "description": "+1 para ataques corpo a corpo e à distância.",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000037",
+      "img": "icons/svg/d20-grey.svg",
+      "range": [
+        10,
+        11
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000215",
+      "type": "text",
+      "name": "Escolha um talento ou +2 pontos",
+      "description": "Escolha um talento da tabela ou distribua +2 pontos entre atributos.",
+      "documentUuid": null,
+      "img": "icons/svg/d20-grey.svg",
+      "range": [
+        12,
+        12
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    }
+  ]
+}
