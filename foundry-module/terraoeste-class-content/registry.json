@@ -2,11 +2,7 @@
   "items": {
     "Weapon": {
       "Machado de Batalha": "Compendium.terraoeste-class-content.gear.Item.TO00000000000019",
-      "Battleaxe": "Compendium.terraoeste-class-content.gear.Item.TO00000000000019",
-      "Mangual": "Compendium.terraoeste-class-content.gear.Item.TO00000000000022",
-      "Flail": "Compendium.terraoeste-class-content.gear.Item.TO00000000000022",
-      "Lança Longa": "Compendium.terraoeste-class-content.gear.Item.TO00000000000023",
-      "Long Spear": "Compendium.terraoeste-class-content.gear.Item.TO00000000000023"
+      "Battleaxe": "Compendium.terraoeste-class-content.gear.Item.TO00000000000019"
     },
     "Background": {
       "Ajudante de Taverna": "Compendium.terraoeste-class-content.backgrounds.Item.TO00000000000113",
@@ -123,9 +119,7 @@
     "Bárbaro": "Compendium.terraoeste-class-content.classes.Item.TO00000000000001",
     "Barbarian": "Compendium.terraoeste-class-content.classes.Item.TO00000000000001",
     "Caçador": "Compendium.terraoeste-class-content.classes.Item.TO00000000000002",
-    "Hunter": "Compendium.terraoeste-class-content.classes.Item.TO00000000000002",
-    "Cavaleiro": "Compendium.terraoeste-class-content.classes.Item.TO00000000000003",
-    "Knight": "Compendium.terraoeste-class-content.classes.Item.TO00000000000003"
+    "Hunter": "Compendium.terraoeste-class-content.classes.Item.TO00000000000002"
   },
   "classBonuses": {
     "Bárbaro": {
@@ -162,14 +156,6 @@
       "StatBonus_DEX:+2": "Compendium.terraoeste-class-content.talents.Item.TO00000000000020",
       "StatBonus_INT:+2": "Compendium.terraoeste-class-content.talents.Item.TO00000000000021",
       "Plus1ToHit_Melee and ranged attacks": "Compendium.terraoeste-class-content.talents.Item.TO00000000000037"
-    },
-    "Cavaleiro": {
-      "TerraOeste.KnightCritical_TerraOeste.KnightCritical": "Compendium.terraoeste-class-content.talents.Item.TO00000000000038",
-      "TerraOeste.KnightCritical": "Compendium.terraoeste-class-content.talents.Item.TO00000000000038",
-      "Plus1ToHit_Melee and ranged attacks": "Compendium.terraoeste-class-content.talents.Item.TO00000000000039",
-      "StatBonus_STR:+2": "Compendium.terraoeste-class-content.talents.Item.TO00000000000006",
-      "StatBonus_CON:+2": "Compendium.terraoeste-class-content.talents.Item.TO00000000000007",
-      "StatBonus_CHA:+2": "Compendium.terraoeste-class-content.talents.Item.TO00000000000023"
     }
   },
   "bonuses": {
