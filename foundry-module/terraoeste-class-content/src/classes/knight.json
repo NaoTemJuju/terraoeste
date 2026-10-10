@@ -1,15 +1,15 @@
 {
-  "_id": "TO00000000000002",
-  "name": "Caçador",
+  "_id": "TO00000000000003",
+  "name": "Cavaleiro",
   "type": "Class",
   "img": "icons/sundries/scrolls/scroll-bound-red-tan.webp",
   "flags": {
     "terraoeste-class-content": {
-      "contentId": "hunter"
+      "contentId": "knight"
     }
   },
   "folder": null,
-  "sort": 100000,
+  "sort": 300000,
   "ownership": {
     "default": 0
   },
@@ -19,7 +19,7 @@
     "systemVersion": "4.0.6"
   },
   "system": {
-    "description": "<p>Matadores de dragões grisalhos, caçadores de vampiros, estudiosos e campeões destruidores de demônios que dedicaram seus estudos à destruição de monstros.</p><p><strong>Armas:</strong> adaga, água benta, arco curto, arco longo, bestas, espada curta, espada longa, estaca e lança. <strong>Armadura:</strong> couro. <strong>PV:</strong> d6 por nível.</p><p>Água Benta e Estaca são itens básicos provisórios e editáveis do módulo; seus valores mecânicos ficam em aberto.</p>",
+    "description": "<p>Combatentes orgulhosos e habilidosos que lutam em nome da cavalaria e da honra. Para derrotar seus inimigos, contam com mais do que uma lâmina afiada e uma grande armadura de aço.</p><p><strong>Armas:</strong> adaga, besta, clava, espada bastarda, espada curta, espada longa, lança longa, mangual e maça. <strong>Armaduras:</strong> todas e escudos. <strong>PV:</strong> d8 por nível.</p><p>Lança Longa e Mangual estão incluídos como itens editáveis provisórios; dano, propriedades, preço e carga precisam ser ajustados pela mesa.</p>",
     "source": {
       "title": "terraoeste"
     },
@@ -37,40 +37,37 @@
     "allMeleeWeapons": false,
     "allRangedWeapons": false,
     "armor": [
-      "Compendium.shadowdark.gear.Item.EoTEHXApVDS7rHfw"
+      "Compendium.shadowdark.gear.Item.EoTEHXApVDS7rHfw",
+      "Compendium.shadowdark.gear.Item.DeqtKQQzI6HTYvV0",
+      "Compendium.shadowdark.gear.Item.UDyHeJCreIFZ9y2I",
+      "Compendium.shadowdark.gear.Item.BAJQqFdkN9lGFAyZ",
+      "Compendium.shadowdark.gear.Item.o0261gnDqGC5hQB1",
+      "Compendium.shadowdark.gear.Item.RSNMsNqyV39N9C29",
+      "Compendium.shadowdark.gear.Item.UWp4WkkiaBMSXYPE"
     ],
     "weapons": [
       "Compendium.shadowdark.gear.Item.C3mc5OlKPSJNMrng",
-      "Compendium.shadowdark.gear.Item.UfHAWj5weH111Bea",
-      "Compendium.shadowdark.gear.Item.GzA5T0aewhouRsa3",
       "Compendium.shadowdark.gear.Item.eeVEJexfirwWzOVu",
+      "Compendium.shadowdark.gear.Item.JM2XN855QYNhgtre",
+      "Compendium.shadowdark.gear.Item.1T8oUkfkBtYTLNF3",
       "Compendium.shadowdark.gear.Item.KQTWQwznjK80gVEU",
       "Compendium.shadowdark.gear.Item.ZPUhNMmwXXrtbCXi",
-      "Compendium.shadowdark.gear.Item.brIFMH0sOVmqX02N"
+      "Compendium.terraoeste-class-content.gear.Item.TO00000000000023",
+      "Compendium.terraoeste-class-content.gear.Item.TO00000000000022",
+      "Compendium.shadowdark.gear.Item.jGZyVuFJnW7QcBFX"
     ],
     "talents": [],
-    "talentChoices": [
-      "Compendium.terraoeste-class-content.talents.Item.TO00000000000024",
-      "Compendium.terraoeste-class-content.talents.Item.TO00000000000025",
-      "Compendium.terraoeste-class-content.talents.Item.TO00000000000026",
-      "Compendium.terraoeste-class-content.talents.Item.TO00000000000027",
-      "Compendium.terraoeste-class-content.talents.Item.TO00000000000028",
-      "Compendium.terraoeste-class-content.talents.Item.TO00000000000029",
-      "Compendium.terraoeste-class-content.talents.Item.TO00000000000030",
-      "Compendium.terraoeste-class-content.talents.Item.TO00000000000031",
-      "Compendium.terraoeste-class-content.talents.Item.TO00000000000032",
-      "Compendium.terraoeste-class-content.talents.Item.TO00000000000033"
-    ],
-    "talentChoiceCount": 1,
+    "talentChoices": [],
+    "talentChoiceCount": 0,
     "classAbilities": [
-      "Compendium.terraoeste-class-content.class-abilities.Item.TO00000000000011",
-      "Compendium.terraoeste-class-content.class-abilities.Item.TO00000000000012",
-      "Compendium.terraoeste-class-content.class-abilities.Item.TO00000000000013"
+      "Compendium.terraoeste-class-content.class-abilities.Item.TO00000000000014",
+      "Compendium.terraoeste-class-content.class-abilities.Item.TO00000000000015",
+      "Compendium.terraoeste-class-content.class-abilities.Item.TO00000000000016"
     ],
     "classAbilityChoices": [],
     "classAbilityChoiceCount": 0,
-    "classTalentTable": "Compendium.terraoeste-class-content.rollable-tables.RollTable.TO00000000000020",
-    "hitPoints": "d6",
+    "classTalentTable": "Compendium.terraoeste-class-content.rollable-tables.RollTable.TO00000000000021",
+    "hitPoints": "d8",
     "patron": {
       "required": false,
       "startingBoons": 0

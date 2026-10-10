@@ -272,3 +272,13 @@ A classe já constava em `CLASS_DICE` com d8. A mudança no site inclui descriç
 **Diagnóstico:** confira que `class` é `Caçador`, `terraOesteClassOptions.prey` contém slug válido, `sourceName` do bônus corresponde ao Caçador e `bonusName`/`bonusTo` formam exatamente uma chave registrada. Se o Foundry disser que o item não existe, regenere os packs após `npm run build`, atualize o módulo e reabra os compêndios. Não troque a grafia do talento ou slug sem atualizar o registro.
 
 **Limite:** efeitos da Presa variam por tipo de criatura e condições de cena; ficam registrados em descrições editáveis e requerem aplicação manual. A resolução de UUIDs é verificada pelo build, mas precisa também de importação real para validar integração com o importador instalado.
+
+## Opções da tabela de talentos do Caçador sem links clicáveis
+
+**Sintoma:** na RollTable 2d6, somente o resultado 10–11 aparecia como talento clicável. Presa adicional, Treinamento, Aprimoramento de atributo e as opções do resultado 12 eram texto sem ligação nativa aos documentos do compêndio.
+
+**Causa confirmada:** esses resultados estavam como `type: "text"`, com `documentUuid: null`; descrições continham macros `@UUID[...]`, mas a visualização da RollTable não as apresentava como resultados documentais. O resultado 10–11 já usava `type: "document"` e um UUID real, o que explica a diferença visível.
+
+**Correção:** a partir da versão 0.3.2, a tabela mantém uma instrução textual para cada faixa e também inclui resultados `type: "document"` sobrepostos com UUIDs dos talentos selecionáveis. Resultado 12 também liga a tabela de distribuição entre atributos. Essas referências oferecem as opções; o jogador deve arrastar somente a opção escolhida para o campo Talentos do avanço.
+
+**Verificação:** `npm run build` valida que cada UUID de resultado resolve para um documento real em `src`. A confirmação de que os links aparecem e podem ser arrastados ainda requer abrir a RollTable no Foundry após atualizar o módulo; esta verificação de interface não foi simulada pelo build.

@@ -44,9 +44,7 @@
     "Zarabatana"
   ];
 
-  const MAESTRIA_POR_CLASSE = {
-    "Cavaleiro": ARMAS_MAESTRIA.map(nome => ({ nome }))
-  };
+  const MAESTRIA_POR_CLASSE = {};
 
   // ====== UI da etapa Maestria ======
   // state: objeto de estado global (window.app.state)

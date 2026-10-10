@@ -124,6 +124,11 @@
     { label: "Cota de Malha", value: "Chainmail" },
     { label: "Armadura de Placas", value: "Plate mail" }
   ];
+  const KNIGHT_ARMOR_TYPES = [
+    ...FIGHTER_ARMOR_TYPES,
+    { label: "Cota de Malha de Mithral", value: "Mithral Chainmail" },
+    { label: "Armadura de Placas de Mithral", value: "Mithral Plate Mail" }
+  ];
   const HUNTER_PREY = [
     { value: "angels", label: "Anjos", language: "Celestial", talent: "Vantagem em ataques à distância contra voadores em voo" },
     { value: "aquatic", label: "Criaturas Aquáticas", language: "Merês", talent: "Vantagem em nadar e prender a respiração; debaixo d'água, nada causa Desvantagem" },
@@ -246,6 +251,7 @@
     "Ladrão": THIEF_DESCRIPTION,
     "Bardo": "Bardos são viajantes bem-vindos e conselheiros sábios; sua tarefa é proteger e compartilhar o conhecimento transmitido através dos tempos.",
     "Caçador": "Matadores de dragões grisalhos, caçadores de vampiros, estudiosos e campeões destruidores de demônios que dedicaram seus estudos à destruição de monstros.",
+    "Cavaleiro": "Combatentes orgulhosos e habilidosos que lutam em nome da cavalaria e da honra. Para derrotar seus inimigos, contam com mais do que uma lâmina afiada e uma grande armadura de aço.",
     "Bruxo": "Manipuladores dos segredos ocultos e da magia ancestral, tecendo feitiços com elementos misteriosos e pactos sombrios. Guiados por intuições profundas, portadores de maldições.",
     "Guerreiro": "Gladiadores ensanguentados usando armaduras amassadas, duelistas acrobáticos com suas espadas de arremesso, ou arqueiros élficos de visão aguçada que forjam suas lendas com aço e coragem.",
     "Mago": "Adeptos tatuados com runas, sábios usando óculos, e bruxas conjuradoras de chamas que ousam manipular as terríveis forças da magia.",
@@ -257,6 +263,7 @@
     "Bárbaro": { weapons: "Adaga, arco longo, espada longa, espadão, lança, machado, machado de batalha e machadão", armor: "Armadura de couro e escudos", hp: "1d8 por nível" },
     "Bardo": { weapons: "Adaga, arco curto, besta, cajado, espada curta, lança e maça", armor: "Armadura de couro, cota de malha e escudos", hp: "1d6 por nível" },
     "Caçador": { weapons: "Adaga, água benta, arco curto, arco longo, bestas, espada curta, espada longa, estaca e lança", armor: "Armadura de couro", hp: "1d6 por nível", languages: "Todos os idiomas concedidos por sua presa" },
+    "Cavaleiro": { weapons: "Adaga, besta, clava, espada bastarda, espada curta, espada longa, lança longa, mangual e maça", armor: "Todas as armaduras e escudos", hp: "1d8 por nível" },
     "Patrulheiro": { weapons: "Adaga, arco longo, espada longa, arco curto, espada curta, lança e cajado", armor: "Armadura de couro e cota de malha", hp: "1d8 por nível" },
     "Guerreiro": { weapons: "Todas as armas", armor: "Todas as armaduras", hp: "1d8 por nível" },
     "Malandro": { weapons: "Adaga, besta, clava, espada curta e arco curto", armor: "Armadura de couro e cota de malha de mithral", hp: "1d4 por nível" },
@@ -349,6 +356,17 @@
       secondaryDice: "d10",
       secondaryEntries: HUNTER_PREY.map((prey, index) => ({ roll: String(index + 1), effect: `${prey.label}${prey.language ? ` (${prey.language})` : ""}: ${prey.talent}` }))
     },
+    "Cavaleiro": {
+      title: "Talentos de Cavaleiro",
+      effectHeader: "Efeito (2 duplicado = +1 uso por dia)",
+      entries: [
+        { roll: "2", effect: "1/dia, transforme um ataque corpo a corpo em um crítico; cada resultado 2 adicional concede +1 uso diário" },
+        { roll: "3–6", effect: "+1 para ataques corpo a corpo e à distância" },
+        { roll: "7–9", effect: "+2 em Força, Constituição ou Carisma" },
+        { roll: "10–11", effect: "Escolha um tipo de armadura; você ganha +1 CA ao usá-la" },
+        { roll: "12", effect: "Escolha um talento ou distribua +2 pontos entre atributos" }
+      ]
+    },
     "Guerreiro": {
       title: "Talentos de Guerreiro",
       entries: [
@@ -429,6 +447,13 @@
       "Presa. Escolha um tipo de monstro para ser sua presa. Você conhece a língua falada por essas criaturas (se houver) e recebe o talento correspondente na Tabela de Presas. Esses talentos estão sempre ativos, mesmo quando você não está lutando contra sua presa. Sempre que ganha um novo talento, você pode rolar na Tabela de Presas em vez da tabela de Talentos de Caçador.",
       "",
       "Conhecimento sobre Monstros. Você tem Vantagem em testes para relembrar informações sobre suas presas e suas fraquezas, rastrear ou intimidar essas criaturas."
+    ].join("\n"),
+    "Cavaleiro": [
+      "Égide. Você ganha +1 de CA com escudos. Ao final do seu turno, pode escolher um aliado próximo para proteger, concedendo-lhe +1 de CA até seu próximo turno.",
+      "",
+      "Fardo Leve. Armaduras, incluindo escudos, que você está equipado preenchem um espaço de equipamento a menos.",
+      "",
+      "Montarias. Sempre que adquirir uma montaria, seu comportamento é no mínimo confiável: ela vem quando você chama e nunca se assusta. Sua montaria tem níveis adicionais iguais à metade do seu nível, arredondada para baixo. Se perder sua montaria, você pode usar seu tempo livre para adquirir e treinar outra. Passe em um teste de Carisma CD 15 para que a nova criatura se torne sua montaria; reduza a CD em um passo a cada tentativa."
     ].join("\n"),
     "Patrulheiro": RANGER_SPECIAL_ABILITY,
     "Malandro": THIEF_SPECIAL_ABILITY,
@@ -533,6 +558,17 @@
         { min: 6, max: 9, id: "StatBonus", choice: "stat", statOptions: ["STR", "DEX", "INT"], desc: "+2 para Força, Destreza ou Inteligência", foundryDesc: "+2 Strength, Dexterity, or Intelligence", bonusName: "StatBonus" },
         { min: 10, max: 11, id: "HunterAttackBonus", name: "+1 para Ataques Corpo a Corpo e à Distância", desc: "+1 para ataques corpo a corpo e à distância", foundryDesc: "+1 to melee and ranged attacks", bonusName: "Plus1ToHit", bonusTo: "Melee and ranged attacks" },
         { min: 12, max: 12, id: "HunterChooseTalentOrStats", choice: "twelve", desc: "Escolha um talento ou +2 pontos para distribuir", foundryDesc: "Choose a talent or distribute +2 points among ability scores" }
+      ]
+    },
+    "Cavaleiro": {
+      foundryName: "Cavaleiro",
+      title: "Talentos de Cavaleiro",
+      entries: [
+        { min: 2, max: 2, id: "KnightCriticalAttack", name: "Ataque Crítico (1/dia)", desc: "1/dia, transforme um ataque corpo a corpo em um crítico; cada resultado 2 adicional concede +1 uso diário", foundryDesc: "Once per day, turn a melee attack into a critical hit; each additional result of 2 grants one extra daily use", bonusName: "TerraOeste.KnightCritical", bonusTo: "TerraOeste.KnightCritical" },
+        { min: 3, max: 6, id: "HunterAttackBonus", name: "+1 para Ataques Corpo a Corpo e à Distância", desc: "+1 para ataques corpo a corpo e à distância", foundryDesc: "+1 to melee and ranged attacks", bonusName: "Plus1ToHit", bonusTo: "Melee and ranged attacks" },
+        { min: 7, max: 9, id: "StatBonus", choice: "stat", statOptions: ["STR", "CON", "CHA"], desc: "+2 para Força, Constituição ou Carisma", foundryDesc: "+2 Strength, Constitution, or Charisma", bonusName: "StatBonus" },
+        { min: 10, max: 11, id: "ArmorMastery", name: "+1 CA com Armadura Escolhida", choice: "knightArmorMastery", desc: "Escolha um tipo de armadura; você ganha +1 CA ao usá-la", foundryDesc: "Choose one type of armor; you gain +1 AC while wearing it", bonusName: "ArmorMastery" },
+        { min: 12, max: 12, id: "KnightChooseTalentOrStats", choice: "twelve", desc: "Escolha um talento ou distribua +2 pontos entre atributos", foundryDesc: "Choose a talent or distribute +2 points among ability scores" }
       ]
     },
     "Patrulheiro": {
@@ -712,16 +748,17 @@
         };
         details.append(makeStatSelect("Primeiro ponto", code => { selected[0] = code; updateStats(); }, null, 1));
         details.append(makeStatSelect("Segundo ponto", code => { selected[1] = code; updateStats(); }, null, 1));
-      } else if (entry.choice === "weaponMastery" || entry.choice === "armorMastery") {
+      } else if (["weaponMastery", "armorMastery", "knightArmorMastery"].includes(entry.choice)) {
         const weapon = entry.choice === "weaponMastery";
+        const armorOptions = entry.choice === "knightArmorMastery" ? KNIGHT_ARMOR_TYPES : FIGHTER_ARMOR_TYPES;
         const select = document.createElement("select");
         select.append(new Option(weapon ? "Escolha uma arma" : "Escolha uma armadura", ""));
-        (weapon ? FIGHTER_WEAPON_TYPES : FIGHTER_ARMOR_TYPES).forEach(option => select.append(new Option(option.label, option.value)));
+        (weapon ? FIGHTER_WEAPON_TYPES : armorOptions).forEach(option => select.append(new Option(option.label, option.value)));
         select.addEventListener("change", () => {
           if (!select.value) { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); return; }
           chosen.bonusTo = select.value;
           chosen.talentRolledName = entry.name || (weapon ? "Maestria em Armas" : "Maestria em Armaduras");
-          chosen.displayDesc = weapon ? `Maestria em Armas adicional: ${(FIGHTER_WEAPON_TYPES.find(item => item.value === select.value) || {}).label}` : `+1 na CA usando ${(FIGHTER_ARMOR_TYPES.find(item => item.value === select.value) || {}).label}`;
+          chosen.displayDesc = weapon ? `Maestria em Armas adicional: ${(FIGHTER_WEAPON_TYPES.find(item => item.value === select.value) || {}).label}` : `+1 na CA usando ${(armorOptions.find(item => item.value === select.value) || {}).label}`;
           complete(chosen);
         });
         details.append(select);
@@ -990,7 +1027,7 @@
         result.displayDesc = `+2 em ${stat}`;
         finish(result);
       }, result.statOptions || ["STR","DEX","CHA"]));
-    } else if (["weaponMastery", "armorMastery", "magicItem", "mageStatOrCasting", "mageKnownSpell", "mageExtraSpell", "witchStatOrCasting", "witchKnownSpell", "witchExtraSpell", "rangerWeaponDamage", "rangerAttackBonus", "rangerHerbalism", "assassinStatOrMelee", "assassinBlackLotus", "barbarianStatOrMelee", "bardAttackOrFascinate", "hunterNewPrey", "hunterTraining", "distributeStats"].includes(result.needsChoice)) {
+    } else if (["weaponMastery", "armorMastery", "knightArmorMastery", "magicItem", "mageStatOrCasting", "mageKnownSpell", "mageExtraSpell", "witchStatOrCasting", "witchKnownSpell", "witchExtraSpell", "rangerWeaponDamage", "rangerAttackBonus", "rangerHerbalism", "assassinStatOrMelee", "assassinBlackLotus", "barbarianStatOrMelee", "bardAttackOrFascinate", "hunterNewPrey", "hunterTraining", "distributeStats"].includes(result.needsChoice)) {
       showEntryChoice(config.entries.find(entry => entry.id === result.id), result, choiceArea);
     } else if (result.needsChoice === "rangerTwelve") {
       const select = document.createElement("select");
@@ -1296,7 +1333,7 @@
         classInfoAbility.replaceChildren();
         specialAbility.split(String.fromCharCode(10)).forEach((line, index) => {
           if (index) classInfoAbility.append(document.createElement("br"));
-          const heading = line.match(/^(Assassino|Passo de Fumaça|Lótus Negra|Apunhalada Pelas Costas|Ladroagem|Aprendendo Magias|Conjuração|Familiar|Desbravador|Herbalismo|Instinto Primitivo|Devastar|Fúria|Tático|Presa|Conhecimento sobre Monstros)[.](.*)$/);
+          const heading = line.match(/^(Assassino|Passo de Fumaça|Lótus Negra|Apunhalada Pelas Costas|Ladroagem|Aprendendo Magias|Conjuração|Familiar|Desbravador|Herbalismo|Instinto Primitivo|Devastar|Fúria|Tático|Presa|Conhecimento sobre Monstros|Égide|Fardo Leve|Montarias)[.](.*)$/);
           if (heading) {
             const strong = document.createElement("strong");
             strong.style.display = "inline";
@@ -1618,8 +1655,9 @@
         chosen.bonusTo = weapon.value;
         chosen.talentRolledName = entry.name || "WeaponMastery";
         chosen.displayDesc = `Maestria em Armas adicional: ${weapon.label}`;
-      } else if (entry.choice === "armorMastery") {
-        const armor = FIGHTER_ARMOR_TYPES[randInt(0, FIGHTER_ARMOR_TYPES.length - 1)];
+      } else if (entry.choice === "armorMastery" || entry.choice === "knightArmorMastery") {
+        const armorOptions = entry.choice === "knightArmorMastery" ? KNIGHT_ARMOR_TYPES : FIGHTER_ARMOR_TYPES;
+        const armor = armorOptions[randInt(0, armorOptions.length - 1)];
         chosen.bonusTo = armor.value;
         chosen.talentRolledName = entry.name || "ArmorMastery";
         chosen.displayDesc = `+1 na CA usando ${armor.label}`;
@@ -1826,9 +1864,7 @@
         }
       }
 
-      // Etapa de Maestria em Arma (mastery.js): só aparece para classes
-      // com opções cadastradas (ex.: Cavaleiro). Para as demais, a
-      // etapa é pulada automaticamente e segue direto para Origem.
+      // Mantém compatibilidade com opções personalizadas; Cavaleiro não usa a etapa antiga de Maestria.
       if (typeof window.attachMasteryStep === "function") {
         window.attachMasteryStep(state, goToOriginStep);
       } else {

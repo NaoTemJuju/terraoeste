@@ -154,6 +154,14 @@ O Mago usa a mesma apresentação para as 12 magias de 1º círculo da lista ini
 
 Os talentos 2d6 reutilizam identificadores confirmados no mapa instalado: `TeleportToFamiliar`, `StatBonus`, `Plus1ToCastingSpells`, `AdvOnCastOneSpell` e `PickExtraSpell`. Para `AdvOnCastOneSpell`, `bonusTo` deve ser o rótulo PT-BR escolhido, pois o módulo de escolhas converte o nome à chave de efeito individual da magia. Resultado 2 duplicado não é rerrolado; cada resultado concede um uso diário adicional conforme a tabela. A progressão de magias conhecidas por nível é apresentada no site conforme a tabela enviada.
 
+## Cavaleiro no gerador e no módulo
+
+O site exporta `class: "Cavaleiro"`, PV d8, descrição e tabela 2d6. Os resultados 2 repetidos não são rerrolados: cada ocorrência concede +1 uso diário do Ataque Crítico. A etapa antiga de escolha informativa de Maestria foi retirada do fluxo desta classe; a escolha de armadura da faixa 10–11 permanece como talento da tabela.
+
+O compêndio de Classes contém o Cavaleiro e referências a Égide, Fardo Leve e Montarias; a tabela `Class Talents: Cavaleiro` liga os resultados selecionáveis a documentos Talent reais. O bônus de ataque e os três bônus de atributo resolvem via `registry.classBonuses.Cavaleiro`; ArmorMastery continua sendo um documento nativo do Shadowdark. O talento próprio de crítico e os efeitos de proteção, redução de carga e progressão de montaria são descritos para controle manual quando não há efeito nativo confirmado.
+
+O mapa instalado fornece UUIDs para armas e armaduras existentes. Mangual e Lança Longa não aparecem no mapa; o módulo cria itens editáveis sem dano/preço/propriedades presumidos. Ajuste esses dois itens no compêndio antes de usá-los.
+
 ## Antecedentes TerraOeste
 
 O módulo de conteúdo 0.2.0 adiciona um compêndio de documentos nativos do tipo `Background` com os 102 antecedentes do documento fornecido, seis para cada uma das 17 classes. `registry.items.Background` associa os nomes exatos aos UUIDs do compêndio `terraoeste-class-content.backgrounds`. O wrapper do importador consulta esse registro antes da busca normal por nome, permitindo importar, por exemplo, **Matador de Rua**, sem editar o compêndio original do Shadowdark.

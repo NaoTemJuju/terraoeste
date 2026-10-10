@@ -1,0 +1,296 @@
+{
+  "_id": "TO00000000000021",
+  "name": "Class Talents: Cavaleiro",
+  "img": "icons/svg/d20-grey.svg",
+  "flags": {
+    "terraoeste-class-content": {
+      "contentId": "knight-class-table"
+    }
+  },
+  "folder": null,
+  "sort": 2100000,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "13.350",
+    "systemId": "shadowdark",
+    "systemVersion": "4.0.6"
+  },
+  "description": "<p>Role 2d6. Cada resultado 2 repetido concede +1 uso diário do Ataque Crítico. No resultado 12, escolha um talento desta tabela ou distribua +2 pontos entre atributos.</p>",
+  "formula": "2d6",
+  "replacement": true,
+  "displayRoll": true,
+  "results": [
+    {
+      "_id": "TR00000000000250",
+      "type": "text",
+      "name": "Ataque Crítico (1/dia)",
+      "description": "Uma vez por dia, transforme um ataque corpo a corpo em crítico; resultados 2 adicionais concedem +1 uso diário.",
+      "documentUuid": null,
+      "img": "icons/svg/d20-grey.svg",
+      "range": [
+        2,
+        2
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000251",
+      "type": "document",
+      "name": "Ataque Crítico (1/dia)",
+      "description": "",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000038",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        2,
+        2
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000252",
+      "type": "text",
+      "name": "+1 em ataques corpo a corpo e à distância",
+      "description": "",
+      "documentUuid": null,
+      "img": "icons/svg/d20-grey.svg",
+      "range": [
+        3,
+        6
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000253",
+      "type": "document",
+      "name": "+1 para Ataques Corpo a Corpo e à Distância",
+      "description": "",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000039",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        3,
+        6
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000254",
+      "type": "text",
+      "name": "Escolha +2 em Força, Constituição ou Carisma",
+      "description": "",
+      "documentUuid": null,
+      "img": "icons/svg/d20-grey.svg",
+      "range": [
+        7,
+        9
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000255",
+      "type": "document",
+      "name": "+2 em Força",
+      "description": "",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000006",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        7,
+        9
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000256",
+      "type": "document",
+      "name": "+2 em Constituição",
+      "description": "",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000007",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        7,
+        9
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000257",
+      "type": "document",
+      "name": "+2 em Carisma",
+      "description": "",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000023",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        7,
+        9
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000258",
+      "type": "text",
+      "name": "Escolha um tipo de armadura; +1 CA enquanto usá-la",
+      "description": "",
+      "documentUuid": null,
+      "img": "icons/svg/d20-grey.svg",
+      "range": [
+        10,
+        11
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000259",
+      "type": "document",
+      "name": "+1 CA com Armadura Escolhida",
+      "description": "",
+      "documentUuid": "Compendium.shadowdark.talents.Item.BsRPGhKXYwJBI9ex",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        10,
+        11
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000260",
+      "type": "text",
+      "name": "Escolha um talento da tabela ou distribua +2 pontos entre atributos",
+      "description": "",
+      "documentUuid": null,
+      "img": "icons/svg/d20-grey.svg",
+      "range": [
+        12,
+        12
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000261",
+      "type": "document",
+      "name": "Ataque Crítico (1/dia)",
+      "description": "",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000038",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        12,
+        12
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000262",
+      "type": "document",
+      "name": "+1 para Ataques Corpo a Corpo e à Distância",
+      "description": "",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000039",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        12,
+        12
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000263",
+      "type": "document",
+      "name": "+2 em Força",
+      "description": "",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000006",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        12,
+        12
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000264",
+      "type": "document",
+      "name": "+2 em Constituição",
+      "description": "",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000007",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        12,
+        12
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000265",
+      "type": "document",
+      "name": "+2 em Carisma",
+      "description": "",
+      "documentUuid": "Compendium.terraoeste-class-content.talents.Item.TO00000000000023",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        12,
+        12
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000266",
+      "type": "document",
+      "name": "+1 CA com Armadura Escolhida",
+      "description": "",
+      "documentUuid": "Compendium.shadowdark.talents.Item.BsRPGhKXYwJBI9ex",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        12,
+        12
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "TR00000000000267",
+      "type": "document",
+      "name": "Distribuir +2 pontos entre atributos",
+      "description": "",
+      "documentUuid": "Compendium.terraoeste-class-content.rollable-tables.RollTable.TO00000000000018",
+      "img": "icons/skills/melee/strike-axe-blood-red.webp",
+      "range": [
+        12,
+        12
+      ],
+      "weight": 1,
+      "drawn": false,
+      "flags": {}
+    }
+  ]
+}

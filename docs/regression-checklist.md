@@ -192,7 +192,7 @@ Este roteiro não garante ausência de falhas futuras. Ele registra os pontos qu
 - [ ] Caçador aparece no seletor do site, exige Presa inicial e mostra idioma/talento correspondentes.
 - [ ] A classe do Caçador não registra opções como talentos fixos: `system.talents` fica vazio e `system.talentChoices` oferece as dez presas como escolha inicial.
 - [ ] No nível 1, personagem seleciona e recebe apenas uma presa; as nove opções restantes não aparecem como talentos adquiridos.
-- [ ] Nas rolagens 2, 3–5, 6–9 e 12, os resultados contêm links para os documentos escolhíveis; arrastar um deles ao campo Talentos da janela de nível adiciona somente a escolha feita.
+- [ ] Nas rolagens 2, 3–5, 6–9 e 12, cada opção aparece como resultado de documento com UUID nativo; arrastar um deles ao campo Talentos da janela de nível adiciona somente a escolha feita.
 - [ ] Cada presa concede a língua correta; Constructos e Golens e Mortos-Vivos não adicionam idioma.
 - [ ] A tabela 2d6 do Caçador mostra os intervalos 2, 3–5, 6–9, 10–11 e 12; resultado 2 repetido é rolado novamente.
 - [ ] Tabela d10 de Presas contém dez tipos e aponta a documentos existentes no pack Talentos.
@@ -200,3 +200,17 @@ Este roteiro não garante ausência de falhas futuras. Ele registra os pontos qu
 - [ ] Bônus `TerraOeste.HunterPrey_<slug>` e `TerraOeste.HunterTraining_<slug>` resolvem talentos reais via registry escopado ao Caçador.
 - [ ] Água Benta e Estaca aparecem no pack Equipamento como itens editáveis; dano/preço/propriedades não foram presumidos.
 - [ ] Classe Caçador referencia UUIDs existentes para armas, armadura, habilidades e tabela; PV é d6.
+
+## Cavaleiro
+
+- [ ] O Cavaleiro aparece no site e exporta o nome localizado exato `Cavaleiro`; a etapa antiga de Maestria não aparece no fluxo.
+- [ ] Site e módulo exibem PV d8, lista de armas/armaduras e as regras completas de Égide, Fardo Leve e Montarias.
+- [ ] O documento de classe liga as três habilidades, o equipamento disponível, a tabela `Class Talents: Cavaleiro` e mantém `talents` vazio.
+- [ ] Mangual e Lança Longa existem no pack de equipamento com campos mecânicos explicitamente provisórios e editáveis.
+- [ ] A tabela 2d6 usa faixas 2, 3–6, 7–9, 10–11 e 12; duplicar 2 concede uso diário adicional e não provoca rerrolagem.
+- [ ] Resultados 2, 3–6, 7–9, 10–11 e 12 apontam a documentos corretos; faixas de escolha mostram suas opções, sem adquirir todas de uma vez.
+- [ ] O talento 2 pode ser selecionado/exportado/importado e ocorrências repetidas permanecem separadas para contar usos diários.
+- [ ] O resultado 3–6 aplica +1 em ataques melee/ranged; 7–9 permite escolher apenas FOR, CON ou CAR.
+- [ ] O resultado 10–11 escolhe armadura normal ou de mithral e aplica +1 CA somente com o tipo selecionado.
+- [ ] Resultado 12 permite escolher um talento listado ou distribuir +2 pontos, preservando a opção escolhida.
+- [ ] Equipamento, resultados nativos e bônus foram conferidos contra `map-shadowdarkling.json` da instalação; interface real/avanço de nível ainda precisa de confirmação se não disponível nesta sessão.
