@@ -24,7 +24,7 @@ O efeito de Fúria **não** liga vantagem permanente nem encerra sozinho após 3
 
 O mapa instalado não possui Machado de Batalha. A pedido do usuário, o módulo inclui uma versão provisória **1d12**, já vinculada à classe. Carga 1, uma mão, alcance próximo, preço não definido (0) e ausência de propriedades adicionais são valores provisórios editáveis; não representam regras oficiais confirmadas.
 
-O mapa verificado também não possui Água Benta nem Estaca. O módulo inclui ambos no compêndio de equipamento como itens básicos editáveis, sem inventar dano, preço ou propriedades; ajuste esses campos conforme as regras da mesa. O Caçador é um documento de classe completo, com três habilidades editáveis, talentos registrados, tabela 2d6 e tabela d10 de Presas. Talentos situacionais descrevem o efeito para aplicação manual, sem automações não verificadas.
+O mapa verificado também não possui Água Benta nem Estaca. O módulo inclui ambos no compêndio de equipamento como itens básicos editáveis, sem inventar dano, preço ou propriedades; ajuste esses campos conforme as regras da mesa. O Caçador é um documento de classe completo, com três habilidades editáveis, talentos registrados, tabela 2d6 e tabela d10 de Presas. `system.talents` fica vazio, pois a classe não concede essas opções como talentos fixos; os dez talentos de Presa ficam em `system.talentChoices` para a escolha inicial, e só a presa escolhida é adquirida. Nas subidas de nível, o Shadowdark pede que o jogador arraste o talento escolhido para o campo **Talentos**. As instruções dos resultados de escolha agora incluem links diretos para os documentos disponíveis. Talentos situacionais descrevem o efeito para aplicação manual, sem automações não verificadas.
 
 ## Instalar
 
@@ -37,7 +37,7 @@ O módulo de escolhas `terraoeste-foundry-choice-guard` pode continuar ativo. Am
 
 Ainda não existe URL de download automático publicada. O manifesto da pasta de fontes não instala sozinho: é necessário gerar/obter o ZIP com os bancos compilados.
 
-O ZIP compilado da versão atual fica em `release/terraoeste-class-content-0.3.0.zip`. Após modificar fontes, reconstrua-o antes de publicar uma nova versão. O manifesto não depende da presença de Node/npm no PC do jogador.
+O ZIP compilado da versão atual fica em `release/terraoeste-class-content-0.3.1.zip`. Após modificar fontes, reconstrua-o antes de publicar uma nova versão. O manifesto não depende da presença de Node/npm no PC do jogador.
 
 ## Editar no Foundry
 
@@ -92,7 +92,7 @@ Na pasta deste módulo:
 ```powershell
 npm ci
 npm run build
-Compress-Archive -LiteralPath "./dist/terraoeste-class-content" -DestinationPath "./release/terraoeste-class-content-0.3.0.zip" -Force
+Compress-Archive -LiteralPath "./dist/terraoeste-class-content" -DestinationPath "./release/terraoeste-class-content-0.3.1.zip" -Force
 ```
 
 O build valida IDs, referências internas e registro, rejeita placeholders, gera LevelDB somente nesta pasta e prepara `dist/terraoeste-class-content`. Não acessa bancos do Foundry. `src` e `registry.json` são as fontes versionadas; `packs` e `dist` são artefatos gerados.
