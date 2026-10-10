@@ -65,7 +65,7 @@
     "Bárbaro":     { },
     "Bardo":       { bonus: { common: 4, rare: 1 } },
     "Bruxo":       { pickOne: ["Diabólico","Primordial","Silvestre"] },
-    "Caçador":     { pickOneOrNone: ["Celestial","Merês","Tânico","Diabólico","Dracônico","Primordial","Silvestre","Gigantês"] },
+    "Caçador":     { },
     "Druida":      { grant: ["Druídico","Silvestre"] },
     "Cavaleiro":   { },
     "Explorador":  { bonus: { common: 2 } },
@@ -128,7 +128,7 @@
    * @param {string} opts.race
    * @param {string} opts.cls
    * @param {string} [opts.alignment]
-   * @param {*} [opts.prey] Parâmetro reservado para caçadores (gancho futuro)
+   * @param {string} [opts.prey] Tipo de presa escolhido por um Caçador.
    * @returns {Object} Um objeto contendo as línguas concedidas, as
    *   quantidades de escolhas de línguas comuns/raras e as listas de
    *   escolhas opcionais.
@@ -161,9 +161,15 @@
     if (Array.isArray(clsInfo.pickOneOrNone) && clsInfo.pickOneOrNone.length){
       optionalSets.push({ type: "one-of-or-none", pool: clsInfo.pickOneOrNone });
     }
-    // (gancho futuro) filtrar pool por presa no caso de Caçador
     if (cls === "Caçador" && prey){
-      // Implementação futura para restringir opções baseadas em presa
+      const selectedPrey = Array.isArray(prey) ? prey : [prey];
+      const preyLanguages = {
+        angels: "Celestial", aquatic: "Merês", "beasts-monsters": "Tânico",
+        "demons-devils": "Diabólico", dragons: "Dracônico",
+        "ancients-elementals": "Primordial", "fey-plants": "Silvestre",
+        "giants-ogres-trolls": "Gigantês"
+      };
+      selectedPrey.forEach(kind => { if (preyLanguages[kind]) granted.push(preyLanguages[kind]); });
     }
 
     // Remove duplicados antes de construir os pools de seleção

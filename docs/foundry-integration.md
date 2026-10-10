@@ -308,3 +308,12 @@ A opção 12 reutiliza o seletor comum de “talento ou +2 atributos”. A sele�
 
 O módulo preserva aliases antigos e recupera talentos descritivos de JSONs anteriores por contagem de ocorrências, sem acrescentar linhas de nível nem duplicar bônus já exportados. As fontes dos compêndios são JSONs editáveis versionados. Ver [documentação do módulo de conteúdo](../foundry-module/terraoeste-class-content/README.md) para expansão, build, instalação e limites de automação.
 
+## 12. Caçador
+
+Caçador já aparecia em `CLASS_DICE`, mas faltavam as regras no site e documentos próprios nos compêndios. A classe agora exporta como **Caçador**, d6, armadura de couro, habilidades Tático/Presa/Conhecimento sobre Monstros e uma escolha inicial obrigatória de Presa. A Presa concede o idioma indicado pela tabela quando a criatura tiver idioma; uma Presa adicional do talento 2 também acrescenta seu idioma. Os talentos exportados para essas escolhas são `TerraOeste.HunterPrey` com `bonusTo` igual ao slug estável da presa.
+
+O módulo registra a classe em `registry.classes`, as chaves específicas do Caçador em `registry.classBonuses.Caçador`, dez documentos de talentos de Presa, três treinamentos, um talento de ataque, três habilidades, a tabela 2d6 da classe e a tabela d10 de Presas. Os resultados numéricos +2 apontam para talentos de atributo já existentes no módulo; o bônus +1 de ataque tem documento próprio com modificadores corpo a corpo e à distância. Valores condicionais como imunidade, metade de dano e testes contra alvos específicos são descrições para aplicação manual, não efeitos automáticos inventados.
+
+Água Benta e Estaca estão no compêndio de Equipamento e são registrados como itens básicos editáveis. Dano, preço e propriedades permanecem em aberto; não preencher esses valores com suposições. A classe lista as armas existentes com UUIDs conferidos no mapa Shadowdark 4.0.6 e documenta esses dois itens customizados.
+
+O resultado 2 repetido na tabela de talentos do Caçador é rolado novamente. A escolha inicial e resultados adicionais de Presa não devem repetir uma presa já adquirida. Confirme no JSON final `terraOesteClassOptions.prey`, idioma e bônus; confira que cada bônus resolve o documento específico registrado. O build do módulo valida referências, mas não substitui uma importação real de personagem em mundo de teste.

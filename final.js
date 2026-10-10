@@ -21,7 +21,8 @@
     const langState = window.langs.computeLanguagePools({
       race: state.race,
       cls: state.cls,
-      alignment: state.align
+      alignment: state.align,
+      prey: [state.classFeatures?.prey, ...(state.classLevelTalent || []).filter(item => item?.bonusName === "TerraOeste.HunterPrey").map(item => item.bonusTo)].filter(Boolean)
     });
     state.langs = langState;
 
@@ -609,5 +610,4 @@
   window.app.renderLanguages = renderLanguages;
   window.app.finalizeCharacter = finalize;
 })();
-
 

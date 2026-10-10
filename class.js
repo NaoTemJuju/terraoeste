@@ -124,8 +124,28 @@
     { label: "Cota de Malha", value: "Chainmail" },
     { label: "Armadura de Placas", value: "Plate mail" }
   ];
+  const HUNTER_PREY = [
+    { value: "angels", label: "Anjos", language: "Celestial", talent: "Vantagem em ataques à distância contra voadores em voo" },
+    { value: "aquatic", label: "Criaturas Aquáticas", language: "Merês", talent: "Vantagem em nadar e prender a respiração; debaixo d'água, nada causa Desvantagem" },
+    { value: "beasts-monsters", label: "Bestas e Monstros", language: "Tânico", talent: "Criaturas com INT −2 ou menos fazem testes de moral CD 18 para lutar contra você" },
+    { value: "constructs-golems", label: "Constructos e Golens", language: "", talent: "Criaturas imunes a um tipo de dano sofrem metade desse dano em vez disso" },
+    { value: "demons-devils", label: "Demônios e Diabos", language: "Diabólico", talent: "Você sofre metade do dano de fogo" },
+    { value: "dragons", label: "Dragões", language: "Dracônico", talent: "Vantagem em testes de Destreza contra ataques de área" },
+    { value: "ancients-elementals", label: "Coisas Anciãs e Elementais", language: "Primordial", talent: "Vantagem em testes de Constituição contra frio e calor extremos (não fogo)" },
+    { value: "fey-plants", label: "Feéricos e Plantas", language: "Silvestre", talent: "Vantagem em testes de Constituição contra veneno e doença" },
+    { value: "giants-ogres-trolls", label: "Gigantes, Ogros e Trolls", language: "Gigantês", talent: "Vantagem em testes para se esconder ou enganar criaturas do tamanho de um cavalo ou maiores" },
+    { value: "undead", label: "Mortos-Vivos", language: "", talent: "Você pode expulsar mortos-vivos e consagrar água como um sacerdote; use Inteligência no teste" }
+  ];
 
   function makeClassFeatureBonuses(cls, choices){
+    if (cls === "Caçador" && choices?.prey) {
+      const prey = HUNTER_PREY.find(item => item.value === choices.prey);
+      return prey ? [{
+        sourceType: "Class", sourceName: "Caçador", sourceCategory: "Ability",
+        name: `Presa: ${prey.label}`, bonusName: "TerraOeste.HunterPrey",
+        bonusTo: prey.value, gainedAtLevel: 1
+      }] : [];
+    }
     if (!["Guerreiro", "Fighter"].includes(cls) || !choices) return [];
     const weapon = FIGHTER_WEAPON_TYPES.find(item => item.value === choices.weaponMastery);
     const grit = choices.grit;
@@ -144,6 +164,10 @@
   window.app.getClassFeatureBonuses = makeClassFeatureBonuses;
   window.app.getClassFeatureDisplay = (cls, choices) => {
     if (!choices) return "";
+    if (cls === "Caçador") {
+      const prey = HUNTER_PREY.find(item => item.value === choices.prey);
+      return prey ? `Presa: ${prey.label}${prey.language ? `; idioma: ${prey.language}` : ""}` : "";
+    }
     if (cls === "Mago") {
       const spells = (choices.mageSpells || []).map(value => MAGE_SPELLS.find(spell => spell.value === value)?.label).filter(Boolean);
       return spells.length ? `Magias de 1º círculo: ${spells.join(", ")}` : "";
@@ -154,6 +178,7 @@
     return [weapon ? `Maestria em Armas: ${weapon}` : "", grit ? `Bravura: ${grit}` : ""].filter(Boolean).join("; ");
   };
   window.app.randomClassFeatureChoices = cls => {
+    if (cls === "Caçador") return { prey: HUNTER_PREY[randInt(0, HUNTER_PREY.length - 1)].value };
     if (cls === "Guerreiro") return {
       weaponMastery: FIGHTER_WEAPON_TYPES[randInt(0, FIGHTER_WEAPON_TYPES.length - 1)].value,
       grit: randInt(0, 1) ? "Strength" : "Dexterity"
@@ -220,6 +245,7 @@
     "Malandro": THIEF_DESCRIPTION,
     "Ladrão": THIEF_DESCRIPTION,
     "Bardo": "Bardos são viajantes bem-vindos e conselheiros sábios; sua tarefa é proteger e compartilhar o conhecimento transmitido através dos tempos.",
+    "Caçador": "Matadores de dragões grisalhos, caçadores de vampiros, estudiosos e campeões destruidores de demônios que dedicaram seus estudos à destruição de monstros.",
     "Bruxo": "Manipuladores dos segredos ocultos e da magia ancestral, tecendo feitiços com elementos misteriosos e pactos sombrios. Guiados por intuições profundas, portadores de maldições.",
     "Guerreiro": "Gladiadores ensanguentados usando armaduras amassadas, duelistas acrobáticos com suas espadas de arremesso, ou arqueiros élficos de visão aguçada que forjam suas lendas com aço e coragem.",
     "Mago": "Adeptos tatuados com runas, sábios usando óculos, e bruxas conjuradoras de chamas que ousam manipular as terríveis forças da magia.",
@@ -230,6 +256,7 @@
     "Assassino": { weapons: "Adaga, boleadeira, chicote de lâminas, cimitarra, lança, shuriken e zarabatana", armor: "Armadura de couro", hp: "1d6 por nível", languages: "Diabólico" },
     "Bárbaro": { weapons: "Adaga, arco longo, espada longa, espadão, lança, machado, machado de batalha e machadão", armor: "Armadura de couro e escudos", hp: "1d8 por nível" },
     "Bardo": { weapons: "Adaga, arco curto, besta, cajado, espada curta, lança e maça", armor: "Armadura de couro, cota de malha e escudos", hp: "1d6 por nível" },
+    "Caçador": { weapons: "Adaga, água benta, arco curto, arco longo, bestas, espada curta, espada longa, estaca e lança", armor: "Armadura de couro", hp: "1d6 por nível", languages: "Todos os idiomas concedidos por sua presa" },
     "Patrulheiro": { weapons: "Adaga, arco longo, espada longa, arco curto, espada curta, lança e cajado", armor: "Armadura de couro e cota de malha", hp: "1d8 por nível" },
     "Guerreiro": { weapons: "Todas as armas", armor: "Todas as armaduras", hp: "1d8 por nível" },
     "Malandro": { weapons: "Adaga, besta, clava, espada curta e arco curto", armor: "Armadura de couro e cota de malha de mithral", hp: "1d4 por nível" },
@@ -308,6 +335,20 @@
         { roll: "12", effect: "Escolha um talento ou distribua +2 pontos entre seus atributos" }
       ]
     },
+    "Caçador": {
+      title: "Talentos de Caçador",
+      effectHeader: "Efeito (2 duplicado = rolar novamente)",
+      entries: [
+        { roll: "2", effect: "Ganhe uma nova presa de sua escolha" },
+        { roll: "3–5", effect: "Você é treinado em escudos, cota de malha ou qualquer arma" },
+        { roll: "6–9", effect: "+2 para Força, Destreza ou Inteligência" },
+        { roll: "10–11", effect: "+1 para ataques corpo a corpo e à distância" },
+        { roll: "12", effect: "Escolha um talento ou +2 pontos para distribuir" }
+      ],
+      secondaryTitle: "Tabela de Presas",
+      secondaryDice: "d10",
+      secondaryEntries: HUNTER_PREY.map((prey, index) => ({ roll: String(index + 1), effect: `${prey.label}${prey.language ? ` (${prey.language})` : ""}: ${prey.talent}` }))
+    },
     "Guerreiro": {
       title: "Talentos de Guerreiro",
       entries: [
@@ -381,6 +422,13 @@
       "• Você deve atacar um inimigo ou aliado no seu turno.",
       "• Ao fim do efeito, faça um teste de Constituição CD 15 ou perca 1 ponto de Constituição.",
       "Você recupera o ponto de Constituição perdido após uma noite de descanso."
+    ].join("\n"),
+    "Caçador": [
+      "Tático. Você pode usar seu bônus de Inteligência em vez de Força ou Destreza em jogadas de ataque.",
+      "",
+      "Presa. Escolha um tipo de monstro para ser sua presa. Você conhece a língua falada por essas criaturas (se houver) e recebe o talento correspondente na Tabela de Presas. Esses talentos estão sempre ativos, mesmo quando você não está lutando contra sua presa. Sempre que ganha um novo talento, você pode rolar na Tabela de Presas em vez da tabela de Talentos de Caçador.",
+      "",
+      "Conhecimento sobre Monstros. Você tem Vantagem em testes para relembrar informações sobre suas presas e suas fraquezas, rastrear ou intimidar essas criaturas."
     ].join("\n"),
     "Patrulheiro": RANGER_SPECIAL_ABILITY,
     "Malandro": THIEF_SPECIAL_ABILITY,
@@ -474,6 +522,17 @@
         { min: 7, max: 9, id: "TwoStatPoints", choice: "distributeStats", desc: "Distribua +2 pontos entre seus atributos", foundryDesc: "Distribute +2 points among ability scores", bonusName: "StatBonus" },
         { min: 10, max: 11, id: "BardCarousingBonus", name: "+2 em Rolagens de Farra", desc: "Adicione +2 às rolagens de Farra do seu grupo", foundryDesc: "Add +2 to your party's carousing rolls", exportAsBonus: false },
         { min: 12, max: 12, id: "BardChooseTalentOrStats", choice: "twelve", desc: "Escolha um talento ou distribua +2 pontos entre seus atributos", foundryDesc: "Choose a talent or distribute +2 points among ability scores" }
+      ]
+    },
+    "Caçador": {
+      foundryName: "Caçador",
+      title: "Talentos de Caçador",
+      entries: [
+        { min: 2, max: 2, id: "HunterNewPrey", choice: "hunterNewPrey", desc: "Ganhe uma nova presa de sua escolha", foundryDesc: "Gain a new prey of your choice", bonusName: "TerraOeste.HunterPrey" },
+        { min: 3, max: 5, id: "HunterTraining", choice: "hunterTraining", desc: "Você é treinado em escudos, cota de malha ou qualquer arma", foundryDesc: "You are trained in shields, chainmail, or any weapon", bonusName: "TerraOeste.HunterTraining" },
+        { min: 6, max: 9, id: "StatBonus", choice: "stat", statOptions: ["STR", "DEX", "INT"], desc: "+2 para Força, Destreza ou Inteligência", foundryDesc: "+2 Strength, Dexterity, or Intelligence", bonusName: "StatBonus" },
+        { min: 10, max: 11, id: "HunterAttackBonus", name: "+1 para Ataques Corpo a Corpo e à Distância", desc: "+1 para ataques corpo a corpo e à distância", foundryDesc: "+1 to melee and ranged attacks", bonusName: "Plus1ToHit", bonusTo: "Melee and ranged attacks" },
+        { min: 12, max: 12, id: "HunterChooseTalentOrStats", choice: "twelve", desc: "Escolha um talento ou +2 pontos para distribuir", foundryDesc: "Choose a talent or distribute +2 points among ability scores" }
       ]
     },
     "Patrulheiro": {
@@ -795,6 +854,44 @@
           complete(chosen);
         });
         details.append(select);
+      } else if (entry.choice === "hunterNewPrey") {
+        const acquired = [state.classFeatures?.prey, ...(pending.classLevelTalents || []).filter(item => item?.bonusName === "TerraOeste.HunterPrey").map(item => item.bonusTo)];
+        const options = HUNTER_PREY.filter(prey => !acquired.includes(prey.value));
+        const select = document.createElement("select");
+        select.append(new Option("Escolha uma nova presa", ""));
+        options.forEach(prey => select.append(new Option(prey.label, prey.value)));
+        select.addEventListener("change", () => {
+          const prey = options.find(item => item.value === select.value);
+          if (!prey) { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); return; }
+          chosen.id = "HunterPrey";
+          chosen.bonusName = "TerraOeste.HunterPrey";
+          chosen.bonusTo = prey.value;
+          chosen.talentRolledName = `Presa: ${prey.label}`;
+          chosen.talentRolledDesc = prey.talent;
+          chosen.displayDesc = `Nova presa: ${prey.label}${prey.language ? ` (${prey.language})` : ""}`;
+          complete(chosen);
+        });
+        details.append(select);
+      } else if (entry.choice === "hunterTraining") {
+        const options = [
+          { label: "Escudos", value: "shields" },
+          { label: "Cota de malha", value: "chainmail" },
+          { label: "Qualquer arma", value: "all-weapons" }
+        ];
+        const select = document.createElement("select");
+        select.append(new Option("Escolha o treinamento", ""));
+        options.forEach(option => select.append(new Option(option.label, option.value)));
+        select.addEventListener("change", () => {
+          const option = options.find(item => item.value === select.value);
+          if (!option) { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); return; }
+          chosen.bonusName = "TerraOeste.HunterTraining";
+          chosen.bonusTo = option.value;
+          chosen.talentRolledName = `Treinamento: ${option.label}`;
+          chosen.talentRolledDesc = `Trained in ${option.label.toLowerCase()}`;
+          chosen.displayDesc = `Treinamento adicional: ${option.label}`;
+          complete(chosen);
+        });
+        details.append(select);
       } else if (entry.choice === "magicItem") {
         const select = document.createElement("select");
         select.append(new Option("Selecione uma categoria de item mágico", ""));
@@ -893,7 +990,7 @@
         result.displayDesc = `+2 em ${stat}`;
         finish(result);
       }, result.statOptions || ["STR","DEX","CHA"]));
-    } else if (["weaponMastery", "armorMastery", "magicItem", "mageStatOrCasting", "mageKnownSpell", "mageExtraSpell", "witchStatOrCasting", "witchKnownSpell", "witchExtraSpell", "rangerWeaponDamage", "rangerAttackBonus", "rangerHerbalism", "assassinStatOrMelee", "assassinBlackLotus", "barbarianStatOrMelee", "bardAttackOrFascinate", "distributeStats"].includes(result.needsChoice)) {
+    } else if (["weaponMastery", "armorMastery", "magicItem", "mageStatOrCasting", "mageKnownSpell", "mageExtraSpell", "witchStatOrCasting", "witchKnownSpell", "witchExtraSpell", "rangerWeaponDamage", "rangerAttackBonus", "rangerHerbalism", "assassinStatOrMelee", "assassinBlackLotus", "barbarianStatOrMelee", "bardAttackOrFascinate", "hunterNewPrey", "hunterTraining", "distributeStats"].includes(result.needsChoice)) {
       showEntryChoice(config.entries.find(entry => entry.id === result.id), result, choiceArea);
     } else if (result.needsChoice === "rangerTwelve") {
       const select = document.createElement("select");
@@ -1002,7 +1099,7 @@
     button.disabled = nextIndex >= count || !!pending.classLevelTalentDraft;
     button.addEventListener("click", () => {
       let roll = randInt(1, 6) + randInt(1, 6);
-      while (cls === "Bardo" && roll === 2 && pending.classLevelTalents.some(item => item?.roll === 2)) roll = randInt(1, 6) + randInt(1, 6);
+      while (["Bardo", "Caçador"].includes(cls) && roll === 2 && pending.classLevelTalents.some(item => item?.roll === 2)) roll = randInt(1, 6) + randInt(1, 6);
       const entry = config.entries.find(item => roll >= item.min && roll <= item.max);
       const result = resultForEntry(entry, roll);
       pending.classLevelTalentDraft = { result, index: nextIndex };
@@ -1199,7 +1296,7 @@
         classInfoAbility.replaceChildren();
         specialAbility.split(String.fromCharCode(10)).forEach((line, index) => {
           if (index) classInfoAbility.append(document.createElement("br"));
-          const heading = line.match(/^(Assassino|Passo de Fumaça|Lótus Negra|Apunhalada Pelas Costas|Ladroagem|Aprendendo Magias|Conjuração|Familiar|Desbravador|Herbalismo|Instinto Primitivo|Devastar|Fúria)[.](.*)$/);
+          const heading = line.match(/^(Assassino|Passo de Fumaça|Lótus Negra|Apunhalada Pelas Costas|Ladroagem|Aprendendo Magias|Conjuração|Familiar|Desbravador|Herbalismo|Instinto Primitivo|Devastar|Fúria|Tático|Presa|Conhecimento sobre Monstros)[.](.*)$/);
           if (heading) {
             const strong = document.createElement("strong");
             strong.style.display = "inline";
@@ -1218,7 +1315,7 @@
       const isMage = cls === "Mago";
       const isWitch = cls === "Bruxo";
       const isSpellcaster = isMage || isWitch;
-      classFeatureChoices.hidden = !featureConfig && !isSpellcaster;
+      classFeatureChoices.hidden = !featureConfig && !isSpellcaster && cls !== "Caçador";
       if (featureConfig) {
         const makeFeatureSelect = (title, description, options, value, onChange) => {
           const wrap = document.createElement("label");
@@ -1241,6 +1338,19 @@
             { label: "Força", value: "Strength" }, { label: "Destreza", value: "Dexterity" }
           ], pending.classFeatureChoices.grit, value => { pending.classFeatureChoices.grit = value; })
         );
+      } else if (cls === "Caçador") {
+        pending.classFeatureChoices = pending.classFeatureChoices || {};
+        const label = document.createElement("label");
+        label.className = "class-feature-choice";
+        const heading = document.createElement("strong"); heading.textContent = "Presa inicial";
+        const detail = document.createElement("small"); detail.textContent = "A língua correspondente será adicionada automaticamente, quando houver.";
+        const select = document.createElement("select");
+        select.append(new Option("Escolha sua presa", ""));
+        HUNTER_PREY.forEach(prey => select.append(new Option(prey.label, prey.value)));
+        select.value = pending.classFeatureChoices.prey || "";
+        select.addEventListener("change", () => { pending.classFeatureChoices.prey = select.value; updateConfirmButton(); });
+        label.append(heading, detail, select);
+        classFeatureChoices.append(label);
       } else if (isSpellcaster) {
         const spells = classSpells(cls);
         const listKey = spellListKey(cls);
@@ -1313,7 +1423,7 @@
     if (!btnConfirmClass) return;
     const missingTalentChoice = hasClassTalentChoice(pending.cls) && !talentOptions(pending.cls).some(t => t.id === pending.classTalent);
     const featureChoices = pending.classFeatureChoices || {};
-    const missingCoreFeatureChoice = pending.cls === "Guerreiro" && (!featureChoices.weaponMastery || !featureChoices.grit);
+    const missingCoreFeatureChoice = (pending.cls === "Guerreiro" && (!featureChoices.weaponMastery || !featureChoices.grit)) || (pending.cls === "Caçador" && !featureChoices.prey);
     const isSpellcaster = ["Mago", "Bruxo"].includes(pending.cls);
     const knownSpells = Array.isArray(featureChoices[spellListKey(pending.cls)]) ? featureChoices[spellListKey(pending.cls)].filter(Boolean) : [];
     const missingKnownSpells = isSpellcaster && (knownSpells.length !== 3 || new Set(knownSpells).size !== 3);
@@ -1387,7 +1497,7 @@
     const config = classLevelTalentConfig(cls);
     if (!config) return null;
     let roll = randInt(1, 6) + randInt(1, 6);
-    while (cls === "Bardo" && roll === 2 && previousResults.some(item => item?.roll === 2)) roll = randInt(1, 6) + randInt(1, 6);
+    while (["Bardo", "Caçador"].includes(cls) && roll === 2 && previousResults.some(item => item?.roll === 2)) roll = randInt(1, 6) + randInt(1, 6);
     const entry = config.entries.find(item => roll >= item.min && roll <= item.max);
     const randomChoice = (entry, chosen, rolled12 = false) => {
       if (entry.choice === "assassinBlackLotus") {
@@ -1462,6 +1572,26 @@
         chosen.bonusName = "ReduceHerbalismDC";
         chosen.bonusTo = remedy.value;
         chosen.displayDesc = `Vantagem em Herbalismo para preparar: ${remedy.label.replace(/ \(CD \d+\)$/, "")}`;
+      } else if (entry.choice === "hunterNewPrey") {
+        const acquired = [state.classFeatures?.prey, ...(Array.isArray(previousResults) ? previousResults : []).filter(item => item?.bonusName === "TerraOeste.HunterPrey").map(item => item.bonusTo)];
+        const options = HUNTER_PREY.filter(prey => !acquired.includes(prey.value));
+        const prey = options[randInt(0, options.length - 1)];
+        if (prey) {
+          chosen.id = "HunterPrey";
+          chosen.bonusName = "TerraOeste.HunterPrey";
+          chosen.bonusTo = prey.value;
+          chosen.talentRolledName = `Presa: ${prey.label}`;
+          chosen.talentRolledDesc = prey.talent;
+          chosen.displayDesc = `Nova presa: ${prey.label}${prey.language ? ` (${prey.language})` : ""}`;
+        }
+      } else if (entry.choice === "hunterTraining") {
+        const options = [{label:"Escudos",value:"shields"},{label:"Cota de malha",value:"chainmail"},{label:"Qualquer arma",value:"all-weapons"}];
+        const option = options[randInt(0, options.length - 1)];
+        chosen.bonusName = "TerraOeste.HunterTraining";
+        chosen.bonusTo = option.value;
+        chosen.talentRolledName = `Treinamento: ${option.label}`;
+        chosen.talentRolledDesc = `Trained in ${option.label.toLowerCase()}`;
+        chosen.displayDesc = `Treinamento adicional: ${option.label}`;
       } else if (entry.choice === "stat") {
         const options = entry.statOptions || ["STR", "DEX", "CHA"];
         const code = options[randInt(0, options.length - 1)];
@@ -1707,6 +1837,5 @@
     });
   }
 })();
-
 
 

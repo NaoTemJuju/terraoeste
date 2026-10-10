@@ -1,0 +1,40 @@
+{
+  "folder": null,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "13.350",
+    "systemId": "shadowdark",
+    "systemVersion": "4.0.6"
+  },
+  "type": "Basic",
+  "img": "icons/containers/bags/pouch-leather-brown.webp",
+  "system": {
+    "description": "<p>Item provisório de equipamento do Caçador. Defina quantidade, preço e efeitos conforme as regras da mesa.</p>",
+    "source": {
+      "title": "terraoeste"
+    },
+    "properties": [],
+    "quantity": 1,
+    "cost": {
+      "cp": 0,
+      "gp": 0,
+      "sp": 0
+    },
+    "slots": {
+      "free_carry": 0,
+      "per_slot": 1,
+      "slots_used": 1
+    },
+    "stashed": false
+  },
+  "_id": "TO00000000000020",
+  "name": "Água Benta",
+  "sort": 20000000,
+  "flags": {
+    "terraoeste-class-content": {
+      "contentId": "holy-water"
+    }
+  }
+}

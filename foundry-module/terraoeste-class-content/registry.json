@@ -107,11 +107,19 @@
       "Viajante das Estrelas": "Compendium.terraoeste-class-content.backgrounds.Item.TO00000000000138",
       "Vigia": "Compendium.terraoeste-class-content.backgrounds.Item.TO00000000000156",
       "Vigia do Limiar": "Compendium.terraoeste-class-content.backgrounds.Item.TO00000000000175"
+    },
+    "Basic": {
+      "Água Benta": "Compendium.terraoeste-class-content.gear.Item.TO00000000000020",
+      "Holy Water": "Compendium.terraoeste-class-content.gear.Item.TO00000000000020",
+      "Estaca": "Compendium.terraoeste-class-content.gear.Item.TO00000000000021",
+      "Stake": "Compendium.terraoeste-class-content.gear.Item.TO00000000000021"
     }
   },
   "classes": {
     "Bárbaro": "Compendium.terraoeste-class-content.classes.Item.TO00000000000001",
-    "Barbarian": "Compendium.terraoeste-class-content.classes.Item.TO00000000000001"
+    "Barbarian": "Compendium.terraoeste-class-content.classes.Item.TO00000000000001",
+    "Caçador": "Compendium.terraoeste-class-content.classes.Item.TO00000000000002",
+    "Hunter": "Compendium.terraoeste-class-content.classes.Item.TO00000000000002"
   },
   "classBonuses": {
     "Bárbaro": {
@@ -129,6 +137,25 @@
       "StatBonus_INT:+1": "Compendium.terraoeste-class-content.talents.Item.TO00000000000014",
       "StatBonus_WIS:+1": "Compendium.terraoeste-class-content.talents.Item.TO00000000000015",
       "StatBonus_CHA:+1": "Compendium.terraoeste-class-content.talents.Item.TO00000000000016"
+    },
+    "Caçador": {
+      "TerraOeste.HunterPrey_angels": "Compendium.terraoeste-class-content.talents.Item.TO00000000000024",
+      "TerraOeste.HunterPrey_aquatic": "Compendium.terraoeste-class-content.talents.Item.TO00000000000025",
+      "TerraOeste.HunterPrey_beasts-monsters": "Compendium.terraoeste-class-content.talents.Item.TO00000000000026",
+      "TerraOeste.HunterPrey_constructs-golems": "Compendium.terraoeste-class-content.talents.Item.TO00000000000027",
+      "TerraOeste.HunterPrey_demons-devils": "Compendium.terraoeste-class-content.talents.Item.TO00000000000028",
+      "TerraOeste.HunterPrey_dragons": "Compendium.terraoeste-class-content.talents.Item.TO00000000000029",
+      "TerraOeste.HunterPrey_ancients-elementals": "Compendium.terraoeste-class-content.talents.Item.TO00000000000030",
+      "TerraOeste.HunterPrey_fey-plants": "Compendium.terraoeste-class-content.talents.Item.TO00000000000031",
+      "TerraOeste.HunterPrey_giants-ogres-trolls": "Compendium.terraoeste-class-content.talents.Item.TO00000000000032",
+      "TerraOeste.HunterPrey_undead": "Compendium.terraoeste-class-content.talents.Item.TO00000000000033",
+      "TerraOeste.HunterTraining_shields": "Compendium.terraoeste-class-content.talents.Item.TO00000000000034",
+      "TerraOeste.HunterTraining_chainmail": "Compendium.terraoeste-class-content.talents.Item.TO00000000000035",
+      "TerraOeste.HunterTraining_all-weapons": "Compendium.terraoeste-class-content.talents.Item.TO00000000000036",
+      "StatBonus_STR:+2": "Compendium.terraoeste-class-content.talents.Item.TO00000000000006",
+      "StatBonus_DEX:+2": "Compendium.terraoeste-class-content.talents.Item.TO00000000000020",
+      "StatBonus_INT:+2": "Compendium.terraoeste-class-content.talents.Item.TO00000000000021",
+      "Plus1ToHit_Melee and ranged attacks": "Compendium.terraoeste-class-content.talents.Item.TO00000000000037"
     }
   },
   "bonuses": {

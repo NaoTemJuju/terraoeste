@@ -4,7 +4,7 @@ Módulo independente de conteúdo para Shadowdark 4.0.6 e Foundry 13+. Usa a org
 
 ## Conteúdo inicial
 
-Seis compêndios nativos: **Classes**, **Talentos**, **Habilidades**, **Tabelas**, **Equipamento** e **Antecedentes**. O conjunto inclui Bárbaro, Instinto Primitivo, Devastar, Fúria, seis opções de talentos da classe, seis aumentos de atributo +1 para distribuir os dois pontos do resultado 12, Machado de Batalha e 102 antecedentes editáveis agrupados por classe nos metadados do módulo.
+Seis compêndios nativos: **Classes**, **Talentos**, **Habilidades**, **Tabelas**, **Equipamento** e **Antecedentes**. O conjunto inclui Bárbaro e Caçador; suas habilidades, talentos e tabelas; Machado de Batalha, Água Benta e Estaca; e 102 antecedentes editáveis agrupados por classe nos metadados do módulo.
 
 O módulo não cria classes a partir de texto arbitrário do personagem. Novas classes entram por documentos revisáveis e um registro explícito de identificadores; isso evita efeitos inventados e talentos silenciosamente ausentes.
 
@@ -24,6 +24,8 @@ O efeito de Fúria **não** liga vantagem permanente nem encerra sozinho após 3
 
 O mapa instalado não possui Machado de Batalha. A pedido do usuário, o módulo inclui uma versão provisória **1d12**, já vinculada à classe. Carga 1, uma mão, alcance próximo, preço não definido (0) e ausência de propriedades adicionais são valores provisórios editáveis; não representam regras oficiais confirmadas.
 
+O mapa verificado também não possui Água Benta nem Estaca. O módulo inclui ambos no compêndio de equipamento como itens básicos editáveis, sem inventar dano, preço ou propriedades; ajuste esses campos conforme as regras da mesa. O Caçador é um documento de classe completo, com três habilidades editáveis, talentos registrados, tabela 2d6 e tabela d10 de Presas. Talentos situacionais descrevem o efeito para aplicação manual, sem automações não verificadas.
+
 ## Instalar
 
 1. Feche o servidor Foundry antes de copiar compêndios.
@@ -35,7 +37,7 @@ O módulo de escolhas `terraoeste-foundry-choice-guard` pode continuar ativo. Am
 
 Ainda não existe URL de download automático publicada. O manifesto da pasta de fontes não instala sozinho: é necessário gerar/obter o ZIP com os bancos compilados.
 
-O ZIP compilado da versão atual fica em `release/terraoeste-class-content-0.2.0.zip`. Após modificar fontes, reconstrua-o antes de publicar uma nova versão. O manifesto não depende da presença de Node/npm no PC do jogador.
+O ZIP compilado da versão atual fica em `release/terraoeste-class-content-0.3.0.zip`. Após modificar fontes, reconstrua-o antes de publicar uma nova versão. O manifesto não depende da presença de Node/npm no PC do jogador.
 
 ## Editar no Foundry
 
@@ -81,7 +83,7 @@ O objeto define o mapa completo de substituições. Inclua também talentos pers
 
 O registro inicial aceita aliases antigos `BarbarianCriticalRange` e `BarbarianExtraFuryUse`. JSONs anteriores que tinham esses talentos apenas em `terraOesteClassTalents` são convertidos em bônus em uma cópia do payload. Ocorrências repetidas são preservadas; bônus já presentes não são duplicados.
 
-Os bônus comuns de ataque, dano e atributos do Bárbaro também resolvem os itens deste módulo por `classBonuses`, para que suas edições sejam usadas na importação. Há modelos +1 e +2 para todos os atributos, cobrindo pontos separados ou concentrados do resultado 12. A resolução de outras classes continua no importador original.
+Os bônus comuns de ataque, dano e atributos do Bárbaro também resolvem os itens deste módulo por `classBonuses`, para que suas edições sejam usadas na importação. Há modelos +1 e +2 para todos os atributos, cobrindo pontos separados ou concentrados do resultado 12. O registro do Caçador associa cada tipo de presa e treinamento a documentos reais do compêndio. A presa inicial concede o idioma correspondente, quando houver; Constructos e Golens e Mortos-Vivos não concedem idioma adicional.
 
 ## Compilar e empacotar
 
@@ -90,7 +92,7 @@ Na pasta deste módulo:
 ```powershell
 npm ci
 npm run build
-Compress-Archive -LiteralPath "./dist/terraoeste-class-content" -DestinationPath "./dist/terraoeste-class-content-0.2.0.zip" -Force
+Compress-Archive -LiteralPath "./dist/terraoeste-class-content" -DestinationPath "./release/terraoeste-class-content-0.3.0.zip" -Force
 ```
 
 O build valida IDs, referências internas e registro, rejeita placeholders, gera LevelDB somente nesta pasta e prepara `dist/terraoeste-class-content`. Não acessa bancos do Foundry. `src` e `registry.json` são as fontes versionadas; `packs` e `dist` são artefatos gerados.
