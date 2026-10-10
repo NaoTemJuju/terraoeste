@@ -82,7 +82,21 @@
     ["7","4","3","2","1","–"], ["8","4","4","2","2","–"],
     ["9","4","4","3","2","1"], ["10","4","4","4","2","2"]
   ];
+  const druidKnownSpellRows = [
+    ["1","2","–","–","–","–"], ["2","3","–","–","–","–"],
+    ["3","3","1","–","–","–"], ["4","3","2","–","–","–"],
+    ["5","3","2","1","–","–"], ["6","3","2","2","–","–"],
+    ["7","3","3","2","1","–"], ["8","3","3","2","2","–"],
+    ["9","3","3","2","2","1"], ["10","3","3","3","2","2"]
+  ];
   window.app.getClassSpellExportData = (cls, choices = {}, talents = []) => {
+    if (cls === "Druida") {
+      const selected = Array.isArray(choices?.druidSpells) ? choices.druidSpells : [];
+      const extra = (Array.isArray(talents) ? talents : [])
+        .filter(talent => talent?.id === "DruidExtraSpell" && talent.bonusTo)
+        .map(talent => String(talent.bonusTo).trim());
+      return { spellsKnown: [...new Set([...selected, ...extra].map(value => String(value || "").trim()).filter(Boolean))].join(", ") || "None", bonuses: [] };
+    }
     if (!["Mago", "Bruxo"].includes(cls)) return { spellsKnown: "None", bonuses: [] };
     const spells = classSpells(cls);
     const key = spellListKey(cls);
@@ -141,6 +155,13 @@
     { value: "giants-ogres-trolls", label: "Gigantes, Ogros e Trolls", language: "Gigantês", talent: "Vantagem em testes para se esconder ou enganar criaturas do tamanho de um cavalo ou maiores" },
     { value: "undead", label: "Mortos-Vivos", language: "", talent: "Você pode expulsar mortos-vivos e consagrar água como um sacerdote; use Inteligência no teste" }
   ];
+  const EXPLORER_FAITHFUL_TOOLS = [
+    { value: "Dagger", label: "Adaga" }, { value: "Shortbow", label: "Arco curto" },
+    { value: "Javelin", label: "Azagaia" }, { value: "Crossbow", label: "Besta" },
+    { value: "Staff", label: "Cajado" }, { value: "Club", label: "Clava" },
+    { value: "Shortsword", label: "Espada curta" }, { value: "Spear", label: "Lança" },
+    { value: "Mace", label: "Maça" }
+  ];
 
   function makeClassFeatureBonuses(cls, choices){
     if (cls === "Caçador" && choices?.prey) {
@@ -149,6 +170,13 @@
         sourceType: "Class", sourceName: "Caçador", sourceCategory: "Ability",
         name: `Presa: ${prey.label}`, bonusName: "TerraOeste.HunterPrey",
         bonusTo: prey.value, gainedAtLevel: 1
+      }] : [];
+    }
+    if (cls === "Explorador" && choices?.explorerFaithfulTool) {
+      const tool = EXPLORER_FAITHFUL_TOOLS.find(item => item.value === choices.explorerFaithfulTool);
+      return tool ? [{
+        sourceType: "Class", sourceName: "Explorador", sourceCategory: "Ability", name: "Ferramenta Fiel",
+        bonusName: "Plus1AttackAndDamagePlusHalfLevel", bonusTo: tool.value, gainedAtLevel: 1
       }] : [];
     }
     if (!["Guerreiro", "Fighter"].includes(cls) || !choices) return [];
@@ -177,6 +205,10 @@
       const spells = (choices.mageSpells || []).map(value => MAGE_SPELLS.find(spell => spell.value === value)?.label).filter(Boolean);
       return spells.length ? `Magias de 1º círculo: ${spells.join(", ")}` : "";
     }
+    if (cls === "Explorador") {
+      const tool = EXPLORER_FAITHFUL_TOOLS.find(item => item.value === choices.explorerFaithfulTool);
+      return tool ? `Ferramenta Fiel: ${tool.label}` : String(choices.explorerFaithfulTool || "");
+    }
     if (!["Guerreiro", "Fighter"].includes(cls)) return "";
     const weapon = FIGHTER_WEAPON_LABELS[choices.weaponMastery];
     const grit = choices.grit === "Strength" ? "Força" : choices.grit === "Dexterity" ? "Destreza" : "";
@@ -200,6 +232,9 @@
       while (witchSpells.length < 3) witchSpells.push(pool.splice(randInt(0, pool.length - 1), 1)[0].value);
       return { witchSpells };
     }
+    if (cls === "Explorador") return {
+      explorerFaithfulTool: EXPLORER_FAITHFUL_TOOLS[randInt(0, EXPLORER_FAITHFUL_TOOLS.length - 1)].value
+    };
     return null;
   };
 
@@ -252,6 +287,8 @@
     "Bardo": "Bardos são viajantes bem-vindos e conselheiros sábios; sua tarefa é proteger e compartilhar o conhecimento transmitido através dos tempos.",
     "Caçador": "Matadores de dragões grisalhos, caçadores de vampiros, estudiosos e campeões destruidores de demônios que dedicaram seus estudos à destruição de monstros.",
     "Cavaleiro": "Combatentes orgulhosos e habilidosos que lutam em nome da cavalaria e da honra. Para derrotar seus inimigos, contam com mais do que uma lâmina afiada e uma grande armadura de aço.",
+    "Explorador": "Aventureiros de olhar firme que adentram lugares esquecidos da terra. Sempre têm a ferramenta certa ou o conhecimento necessário para sair de uma enrascada.",
+    "Druida": "Místicos adornados com vinhas, penas e tons terrosos; seus olhos selvagens e símbolos primitivos refletem seu profundo vínculo com a flora, a fauna e a natureza selvagem.",
     "Bruxo": "Manipuladores dos segredos ocultos e da magia ancestral, tecendo feitiços com elementos misteriosos e pactos sombrios. Guiados por intuições profundas, portadores de maldições.",
     "Guerreiro": "Gladiadores ensanguentados usando armaduras amassadas, duelistas acrobáticos com suas espadas de arremesso, ou arqueiros élficos de visão aguçada que forjam suas lendas com aço e coragem.",
     "Mago": "Adeptos tatuados com runas, sábios usando óculos, e bruxas conjuradoras de chamas que ousam manipular as terríveis forças da magia.",
@@ -264,6 +301,8 @@
     "Bardo": { weapons: "Adaga, arco curto, besta, cajado, espada curta, lança e maça", armor: "Armadura de couro, cota de malha e escudos", hp: "1d6 por nível" },
     "Caçador": { weapons: "Adaga, água benta, arco curto, arco longo, bestas, espada curta, espada longa, estaca e lança", armor: "Armadura de couro", hp: "1d6 por nível", languages: "Todos os idiomas concedidos por sua presa" },
     "Cavaleiro": { weapons: "Adaga, besta, clava, espada bastarda, espada curta, espada longa, lança longa, mangual e maça", armor: "Todas as armaduras e escudos", hp: "1d8 por nível" },
+    "Explorador": { weapons: "Adaga, arco curto, azagaia, besta, cajado, clava, espada curta, lança e maça", armor: "Armadura de couro, cota de malha e escudos", hp: "1d6 por nível", languages: "Duas línguas comuns adicionais" },
+    "Druida": { weapons: "Adaga, cajado, clava e funda", armor: "Armadura de couro e escudos", hp: "1d6 por nível", languages: "Druídico e Silvestre" },
     "Patrulheiro": { weapons: "Adaga, arco longo, espada longa, arco curto, espada curta, lança e cajado", armor: "Armadura de couro e cota de malha", hp: "1d8 por nível" },
     "Guerreiro": { weapons: "Todas as armas", armor: "Todas as armaduras", hp: "1d8 por nível" },
     "Malandro": { weapons: "Adaga, besta, clava, espada curta e arco curto", armor: "Armadura de couro e cota de malha de mithral", hp: "1d4 por nível" },
@@ -367,6 +406,27 @@
         { roll: "12", effect: "Escolha um talento ou distribua +2 pontos entre atributos" }
       ]
     },
+    "Explorador": {
+      title: "Talentos de Explorador",
+      effectHeader: "Efeito (role novamente 10–11 se Vasculhador já tiver sucesso com 3–6)",
+      entries: [
+        { roll: "2", effect: "Ganhe 2 espaços de equipamento e uma Ferramenta Fiel extra" },
+        { roll: "3–6", effect: "+1 para ataques corpo a corpo ou à distância e dano" },
+        { roll: "7–9", effect: "+2 em Força, Destreza ou Constituição" },
+        { roll: "10–11", effect: "Adicione mais um ponto ao alcance de sucesso de Vasculhador" },
+        { roll: "12", effect: "Escolha um talento ou distribua +2 pontos entre atributos" }
+      ]
+    },
+    "Druida": {
+      title: "Talentos de Druida",
+      entries: [
+        { roll: "2", effect: "Escolha: Vantagem nos testes de Forma Selvagem ou uma nova magia de um nível que você conheça" },
+        { roll: "3–5", effect: "+2 em Constituição ou Sabedoria" },
+        { roll: "6–9", effect: "+1 em testes de conjuração ou +1 em ataques corpo a corpo" },
+        { roll: "10–11", effect: "Vantagem para conjurar uma magia que você conhece" },
+        { roll: "12", effect: "Escolha um talento ou distribua +2 pontos entre atributos" }
+      ]
+    },
     "Guerreiro": {
       title: "Talentos de Guerreiro",
       entries: [
@@ -454,6 +514,24 @@
       "Fardo Leve. Armaduras, incluindo escudos, que você está equipado preenchem um espaço de equipamento a menos.",
       "",
       "Montarias. Sempre que adquirir uma montaria, seu comportamento é no mínimo confiável: ela vem quando você chama e nunca se assusta. Sua montaria tem níveis adicionais iguais à metade do seu nível, arredondada para baixo. Se perder sua montaria, você pode usar seu tempo livre para adquirir e treinar outra. Passe em um teste de Carisma CD 15 para que a nova criatura se torne sua montaria; reduza a CD em um passo a cada tentativa."
+    ].join("\n"),
+    "Explorador": [
+      "Vasculhador. Ao gastar o último item consumível, role 1d6. Com 5 ou 6, você recupera o item como se não o tivesse usado. Cada talento Vasculhador Aprimorado amplia em 1 o alcance de sucesso, até 3–6.",
+      "",
+      "Desbravador. Você é hábil em explorar lugares inóspitos, esquecidos ou desconhecidos e tem Vantagem em testes para escalar, nadar, buscar alimentos, compreender línguas desconhecidas e evitar ou escapar de perigos naturais.",
+      "",
+      "Ferramenta Fiel. Escolha uma arma ou equipamento que saiba usar. Você recebe +1, aumentado em +1 na metade dos níveis seguintes (arredondado para baixo), em testes ou jogadas de ataque feitos com esse tipo de equipamento ou arma. A arma escolhida na criação recebe Maestria em Armas; para outro equipamento, aplique o bônus de testes manualmente."
+    ].join("\n"),
+    "Druida": [
+      "Deusa da Natureza. Você deve ter Verdana como sua divindade.",
+      "",
+      "Falar com Animais. Você conhece a magia Falar com Animais. Ela não conta para seu número de magias conhecidas.",
+      "",
+      "Vínculo Natural. Você atravessa e se localiza por florestas densas com facilidade e não deixa rastros. Você tem Vantagem em testes relacionados à natureza selvagem e aos animais.",
+      "",
+      "Forma Selvagem. Você pode se transformar em um animal da lista de Forma Selvagem com um teste de Constituição. Você mantém Inteligência, Sabedoria e Carisma, mas assume a Força, Destreza, Constituição, PV, CA, movimento, ataques e características do animal. Não pode falar ou conjurar magias enquanto estiver transformado. Ao chegar a 0 PV, volta à forma verdadeira com 1 PV. Se falhar no teste, não pode tentar novamente até descansar. Se tirar 1 natural, role também na tabela de Desastre Selvagem.",
+      "",
+      "Conjuração. Você pode conjurar magias de Druida que conhece. No 1º nível, conhece duas magias de nível 1 à sua escolha da lista de magias de Druida. Consulte a tabela de magias conhecidas por nível. Se tirar 1 natural em um teste de conjuração, role também na tabela de Desastre Selvagem."
     ].join("\n"),
     "Patrulheiro": RANGER_SPECIAL_ABILITY,
     "Malandro": THIEF_SPECIAL_ABILITY,
@@ -571,6 +649,28 @@
         { min: 12, max: 12, id: "KnightChooseTalentOrStats", choice: "twelve", desc: "Escolha um talento ou distribua +2 pontos entre atributos", foundryDesc: "Choose a talent or distribute +2 points among ability scores" }
       ]
     },
+    "Explorador": {
+      foundryName: "Explorador",
+      title: "Talentos de Explorador",
+      entries: [
+        { min: 2, max: 2, id: "ExplorerSlotsAndTool", name: "+2 Espaços e Ferramenta Fiel Adicional", choice: "explorerExtraTool", desc: "Ganhe 2 espaços de equipamento e uma Ferramenta Fiel extra", foundryDesc: "Gain 2 gear slots and one additional Faithful Tool", bonusName: "TerraOeste.ExplorerSlotsAndTool", bonusTo: "TerraOeste.ExplorerSlotsAndTool" },
+        { min: 3, max: 6, id: "ExplorerAttackAndDamage", choice: "rangerAttackBonus", desc: "+1 para ataques corpo a corpo ou à distância e dano", foundryDesc: "+1 to melee or ranged attacks and damage", bonusName: "Plus1ToHitAndDamage" },
+        { min: 7, max: 9, id: "StatBonus", choice: "stat", statOptions: ["STR", "DEX", "CON"], desc: "+2 em Força, Destreza ou Constituição", foundryDesc: "+2 Strength, Dexterity, or Constitution", bonusName: "StatBonus" },
+        { min: 10, max: 11, id: "ExplorerScavengerUpgrade", name: "Vasculhador Aprimorado", desc: "Adicione mais um ponto ao alcance de sucesso de Vasculhador; role novamente se ele já funcionar com 3–6", foundryDesc: "Increase the success range of Scavenger by one; reroll if it already succeeds on 3–6", bonusName: "TerraOeste.ExplorerScavengerUpgrade", bonusTo: "TerraOeste.ExplorerScavengerUpgrade" },
+        { min: 12, max: 12, id: "ExplorerChooseTalentOrStats", choice: "twelve", desc: "Escolha um talento ou distribua +2 pontos entre atributos", foundryDesc: "Choose a talent or distribute +2 points among ability scores" }
+      ]
+    },
+    "Druida": {
+      foundryName: "Druida",
+      title: "Talentos de Druida",
+      entries: [
+        { min: 2, max: 2, id: "DruidWildShapeOrSpell", choice: "druidWildShapeOrSpell", desc: "Escolha Vantagem em Forma Selvagem ou uma magia adicional de um nível conhecido", foundryDesc: "Choose Advantage on Wild Shape checks or one additional spell of a known tier", exportAsBonus: false },
+        { min: 3, max: 5, id: "StatBonus", choice: "stat", statOptions: ["CON", "WIS"], desc: "+2 em Constituição ou Sabedoria", foundryDesc: "+2 Constitution or Wisdom", bonusName: "StatBonus" },
+        { min: 6, max: 9, id: "DruidCastingOrMelee", choice: "druidCastingOrMelee", desc: "+1 em testes de conjuração ou +1 em ataques corpo a corpo", foundryDesc: "+1 to spellcasting checks or +1 to melee attacks" },
+        { min: 10, max: 11, id: "AdvOnCastOneSpell", choice: "druidKnownSpell", desc: "Ganhe Vantagem ao conjurar uma magia que você conhece", foundryDesc: "Gain Advantage casting one spell you know", bonusName: "AdvOnCastOneSpell" },
+        { min: 12, max: 12, id: "DruidChooseTalentOrStats", choice: "twelve", desc: "Escolha um talento ou distribua +2 pontos entre atributos", foundryDesc: "Choose a talent or distribute +2 points among ability scores" }
+      ]
+    },
     "Patrulheiro": {
       foundryName: "Patrulheiro",
       title: "Talentos de Patrulheiro",
@@ -683,7 +783,12 @@
     const config = classLevelTalentConfig(cls);
     const effectName = result.bonusName || result.id;
     const bonusTo = result.bonusTo || result.talentRolledName || effectName;
-    return String(bonusTo).split(/,\s*/).filter(Boolean).map(target => ({ sourceType: "Class", sourceName: window.app.getFoundryClassName(cls) || config?.foundryName || cls, sourceCategory: "Talent", name: result.talentRolledName || effectName, bonusName: effectName, bonusTo: target, gainedAtLevel: 1 }));
+    const bonuses = String(bonusTo).split(/,\s*/).filter(Boolean).map(target => ({ sourceType: "Class", sourceName: window.app.getFoundryClassName(cls) || config?.foundryName || cls, sourceCategory: "Talent", name: result.talentRolledName || effectName, bonusName: effectName, bonusTo: target, gainedAtLevel: 1 }));
+    if (cls === "Explorador" && result.id === "ExplorerSlotsAndTool") {
+      const tool = EXPLORER_FAITHFUL_TOOLS.find(item => item.value === result.faithfulTool);
+      if (tool) bonuses.push({ sourceType: "Class", sourceName: "Explorador", sourceCategory: "Talent", name: "Ferramenta Fiel adicional", bonusName: "Plus1AttackAndDamagePlusHalfLevel", bonusTo: tool.value, gainedAtLevel: 1 });
+    }
+    return bonuses;
   }
   function renderLevelTalentChoices(result, rollIndex){
     if (!classLevelTalent) return;
@@ -748,6 +853,51 @@
         };
         details.append(makeStatSelect("Primeiro ponto", code => { selected[0] = code; updateStats(); }, null, 1));
         details.append(makeStatSelect("Segundo ponto", code => { selected[1] = code; updateStats(); }, null, 1));
+      } else if (entry.choice === "explorerExtraTool") {
+        const select = document.createElement("select");
+        select.append(new Option("Escolha uma arma ou outro equipamento", ""));
+        const initialTool = state.classFeatures?.explorerFaithfulTool;
+        const priorExtras = (pending.classLevelTalents || []).filter((item, index) => index !== rollIndex && item?.id === "ExplorerSlotsAndTool").map(item => item.faithfulTool);
+        const options = EXPLORER_FAITHFUL_TOOLS.filter(tool => tool.value !== initialTool && !priorExtras.includes(tool.value));
+        options.forEach(tool => select.append(new Option(tool.label, tool.value)));
+        select.append(new Option("Outro equipamento (registrar manualmente)", "custom"));
+        const custom = document.createElement("input");
+        custom.type = "text";
+        custom.placeholder = "Nome do equipamento adicional";
+        custom.hidden = true;
+        const save = document.createElement("button");
+        save.type = "button";
+        save.className = "ghost";
+        save.textContent = "Registrar Ferramenta Fiel adicional";
+        save.hidden = true;
+        select.addEventListener("change", () => {
+          const isCustom = select.value === "custom";
+          custom.hidden = !isCustom;
+          save.hidden = !isCustom;
+          if (!select.value || isCustom) {
+            pending.classLevelTalents[rollIndex] = null;
+            updateTalentContinueButton();
+            return;
+          }
+          chosen.id = "ExplorerSlotsAndTool";
+          chosen.bonusName = "TerraOeste.ExplorerSlotsAndTool";
+          chosen.bonusTo = "TerraOeste.ExplorerSlotsAndTool";
+          chosen.faithfulTool = select.value;
+          chosen.talentRolledName = "+2 Espaços e Ferramenta Fiel Adicional";
+          chosen.displayDesc = `+2 espaços; Ferramenta Fiel adicional: ${EXPLORER_FAITHFUL_TOOLS.find(tool => tool.value === select.value)?.label || select.value}`;
+          complete(chosen);
+        });
+        save.addEventListener("click", () => {
+          if (!custom.value.trim()) return;
+          chosen.id = "ExplorerSlotsAndTool";
+          chosen.bonusName = "TerraOeste.ExplorerSlotsAndTool";
+          chosen.bonusTo = "TerraOeste.ExplorerSlotsAndTool";
+          chosen.faithfulTool = custom.value.trim();
+          chosen.talentRolledName = "+2 Espaços e Ferramenta Fiel Adicional";
+          chosen.displayDesc = `+2 espaços; Ferramenta Fiel adicional: ${custom.value.trim()} (bônus aplicado manualmente)`;
+          complete(chosen);
+        });
+        details.append(select, custom, save);
       } else if (["weaponMastery", "armorMastery", "knightArmorMastery"].includes(entry.choice)) {
         const weapon = entry.choice === "weaponMastery";
         const armorOptions = entry.choice === "knightArmorMastery" ? KNIGHT_ARMOR_TYPES : FIGHTER_ARMOR_TYPES;
@@ -787,6 +937,94 @@
           complete(chosen);
         });
         details.append(select);
+      } else if (entry.choice === "druidWildShapeOrSpell") {
+        const select = document.createElement("select");
+        select.append(new Option("Escolha o benefício", ""), new Option("Vantagem em testes de Forma Selvagem", "shape"), new Option("Aprender uma magia adicional", "spell"));
+        const extra = document.createElement("div");
+        extra.className = "class-level-talent-choice-details";
+        select.addEventListener("change", () => {
+          extra.replaceChildren();
+          pending.classLevelTalents[rollIndex] = null;
+          if (select.value === "shape") {
+            chosen.id = "DruidWildShapeAdvantage";
+            chosen.talentRolledName = "Vantagem em Forma Selvagem";
+            chosen.talentRolledDesc = "Advantage on Wild Shape checks";
+            chosen.bonusName = "";
+            chosen.bonusTo = "";
+            chosen.exportAsBonus = false;
+            chosen.displayDesc = "Vantagem nos testes de Forma Selvagem";
+            complete(chosen);
+          } else if (select.value === "spell") {
+            const name = document.createElement("input");
+            name.type = "text";
+            name.placeholder = "Nome da magia adicional";
+            const tier = document.createElement("select");
+            tier.append(new Option("Nível da magia", ""));
+            for (let level = 1; level <= 5; level++) tier.append(new Option(String(level), String(level)));
+            const save = document.createElement("button");
+            save.type = "button";
+            save.className = "ghost";
+            save.textContent = "Registrar magia";
+            save.addEventListener("click", () => {
+              if (!name.value.trim() || !tier.value) return;
+              chosen.id = "DruidExtraSpell";
+              chosen.talentRolledName = "Magia Adicional de Druida";
+              chosen.talentRolledDesc = "Learn one additional druid spell of a tier you know";
+              chosen.bonusName = "";
+              chosen.bonusTo = name.value.trim();
+              chosen.exportAsBonus = false;
+              chosen.druidSpellTier = Number(tier.value);
+              chosen.displayDesc = `Magia adicional registrada: ${name.value.trim()} (nível ${tier.value})`;
+              complete(chosen);
+            });
+            extra.append(name, tier, save);
+          } else {
+            updateTalentContinueButton();
+          }
+        });
+        details.append(select, extra);
+      } else if (entry.choice === "druidCastingOrMelee") {
+        const select = document.createElement("select");
+        select.append(new Option("Escolha o benefício", ""), new Option("+1 em testes de conjuração", "casting"), new Option("+1 em ataques corpo a corpo", "melee"));
+        select.addEventListener("change", () => {
+          if (!select.value) { pending.classLevelTalents[rollIndex] = null; updateTalentContinueButton(); return; }
+          if (select.value === "casting") {
+            chosen.id = "Plus1ToCastingSpells";
+            chosen.talentRolledName = "+1 em Testes de Conjuração de Magia";
+            chosen.talentRolledDesc = "+1 to spellcasting checks";
+            chosen.bonusName = "Plus1ToCastingSpells";
+            chosen.bonusTo = "Casting spells";
+            chosen.displayDesc = "+1 em testes de conjuração";
+          } else {
+            chosen.id = "Plus1ToHit";
+            chosen.talentRolledName = "+1 para Ataques Corpo a Corpo";
+            chosen.talentRolledDesc = "+1 to melee attacks";
+            chosen.bonusName = "Plus1ToHit";
+            chosen.bonusTo = "Melee attacks";
+            chosen.displayDesc = "+1 em ataques corpo a corpo";
+          }
+          complete(chosen);
+        });
+        details.append(select);
+      } else if (entry.choice === "druidKnownSpell") {
+        const spellName = document.createElement("input");
+        spellName.type = "text";
+        spellName.placeholder = "Nome de uma magia de Druida que você conhece";
+        const save = document.createElement("button");
+        save.type = "button";
+        save.className = "ghost";
+        save.textContent = "Registrar magia";
+        save.addEventListener("click", () => {
+          const value = spellName.value.trim();
+          if (!value) return;
+          chosen.talentRolledName = "Vantagem em Conjuração";
+          chosen.talentRolledDesc = "Advantage casting one druid spell you know";
+          chosen.bonusName = "AdvOnCastOneSpell";
+          chosen.bonusTo = value;
+          chosen.displayDesc = `Vantagem ao conjurar: ${value}`;
+          complete(chosen);
+        });
+        details.append(spellName, save);
       } else if (entry.choice === "bardAttackOrFascinate") {
         const select = document.createElement("select");
         select.append(new Option("Escolha o benefício", ""), new Option("+1 em ataques corpo a corpo e à distância", "attacks"), new Option("+1 em testes de Fascinar", "fascinate"));
@@ -1027,7 +1265,7 @@
         result.displayDesc = `+2 em ${stat}`;
         finish(result);
       }, result.statOptions || ["STR","DEX","CHA"]));
-    } else if (["weaponMastery", "armorMastery", "knightArmorMastery", "magicItem", "mageStatOrCasting", "mageKnownSpell", "mageExtraSpell", "witchStatOrCasting", "witchKnownSpell", "witchExtraSpell", "rangerWeaponDamage", "rangerAttackBonus", "rangerHerbalism", "assassinStatOrMelee", "assassinBlackLotus", "barbarianStatOrMelee", "bardAttackOrFascinate", "hunterNewPrey", "hunterTraining", "distributeStats"].includes(result.needsChoice)) {
+    } else if (["weaponMastery", "armorMastery", "knightArmorMastery", "magicItem", "mageStatOrCasting", "mageKnownSpell", "mageExtraSpell", "witchStatOrCasting", "witchKnownSpell", "witchExtraSpell", "rangerWeaponDamage", "rangerAttackBonus", "rangerHerbalism", "assassinStatOrMelee", "assassinBlackLotus", "barbarianStatOrMelee", "explorerExtraTool", "druidWildShapeOrSpell", "druidCastingOrMelee", "druidKnownSpell", "bardAttackOrFascinate", "hunterNewPrey", "hunterTraining", "distributeStats"].includes(result.needsChoice)) {
       showEntryChoice(config.entries.find(entry => entry.id === result.id), result, choiceArea);
     } else if (result.needsChoice === "rangerTwelve") {
       const select = document.createElement("select");
@@ -1136,7 +1374,7 @@
     button.disabled = nextIndex >= count || !!pending.classLevelTalentDraft;
     button.addEventListener("click", () => {
       let roll = randInt(1, 6) + randInt(1, 6);
-      while (["Bardo", "Caçador"].includes(cls) && roll === 2 && pending.classLevelTalents.some(item => item?.roll === 2)) roll = randInt(1, 6) + randInt(1, 6);
+      while (shouldRerollClassLevelResult(cls, roll, pending.classLevelTalents)) roll = randInt(1, 6) + randInt(1, 6);
       const entry = config.entries.find(item => roll >= item.min && roll <= item.max);
       const result = resultForEntry(entry, roll);
       pending.classLevelTalentDraft = { result, index: nextIndex };
@@ -1188,8 +1426,8 @@
   function renderMageSpellTables(cls){
     if (!mageSpellTables) return;
     mageSpellTables.replaceChildren();
-    mageSpellTables.hidden = !["Mago", "Bruxo"].includes(cls);
-    if (!["Mago", "Bruxo"].includes(cls)) return;
+    mageSpellTables.hidden = !["Mago", "Bruxo", "Druida"].includes(cls);
+    if (!["Mago", "Bruxo", "Druida"].includes(cls)) return;
     const makeTable = (titleText, headers, rows, captionText = "") => {
       const title = document.createElement("h4");
       title.textContent = titleText;
@@ -1217,7 +1455,8 @@
       return { title, table };
     };
     const isWitch = cls === "Bruxo";
-    const knownSpellRows = isWitch ? witchKnownSpellRows : [
+    const isDruid = cls === "Druida";
+    const knownSpellRows = isDruid ? druidKnownSpellRows : isWitch ? witchKnownSpellRows : [
       ["1","3","–","–","–","–"],
       ["2","4","–","–","–","–"],
       ["3","4","1","–","–","–"],
@@ -1229,7 +1468,7 @@
       ["9","4","4","3","2","1"],
       ["10","4","4","4","2","2"]
     ];
-    const knownSpellTable = makeTable(isWitch ? "Magias de Bruxo Conhecidas" : "Magias de Mago Conhecidas", ["Nível","1","2","3","4","5"], knownSpellRows, "Magias Conhecidas por Nível de Magia");
+    const knownSpellTable = makeTable(isDruid ? "Magias de Druida Conhecidas" : isWitch ? "Magias de Bruxo Conhecidas" : "Magias de Mago Conhecidas", ["Nível","1","2","3","4","5"], knownSpellRows, "Magias Conhecidas por Nível de Magia");
     const info = document.createElement("details");
     info.className = "mage-known-spells-info";
     info.style.margin = "8px 0";
@@ -1241,6 +1480,12 @@
     trigger.style.cssText = "display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border:1px solid currentColor;border-radius:50%;font-size:14px;font-weight:700;line-height:1;cursor:pointer;list-style:none;";
     info.append(trigger, knownSpellTable.title, knownSpellTable.table);
     mageSpellTables.append(info);
+    if (isDruid) {
+      const note = document.createElement("p");
+      note.textContent = "Falar com Animais é uma magia adicional e não ocupa um espaço de magia conhecida. A lista de magias de Druida será incluída quando for enviada.";
+      mageSpellTables.append(note);
+      return;
+    }
     const spellList = classSpells(cls);
     const spellListTable = isWitch
       ? makeTable("Magias de 1º nível de Bruxo", ["Magia","Duração","Alcance"], spellList.map(spell => [spell.label,spell.duration,spell.range]))
@@ -1333,7 +1578,7 @@
         classInfoAbility.replaceChildren();
         specialAbility.split(String.fromCharCode(10)).forEach((line, index) => {
           if (index) classInfoAbility.append(document.createElement("br"));
-          const heading = line.match(/^(Assassino|Passo de Fumaça|Lótus Negra|Apunhalada Pelas Costas|Ladroagem|Aprendendo Magias|Conjuração|Familiar|Desbravador|Herbalismo|Instinto Primitivo|Devastar|Fúria|Tático|Presa|Conhecimento sobre Monstros|Égide|Fardo Leve|Montarias)[.](.*)$/);
+          const heading = line.match(/^(Assassino|Passo de Fumaça|Lótus Negra|Apunhalada Pelas Costas|Ladroagem|Aprendendo Magias|Conjuração|Familiar|Desbravador|Herbalismo|Instinto Primitivo|Devastar|Fúria|Tático|Presa|Conhecimento sobre Monstros|Égide|Fardo Leve|Montarias|Deusa da Natureza|Falar com Animais|Vínculo Natural|Forma Selvagem|Vasculhador|Ferramenta Fiel)[.](.*)$/);
           if (heading) {
             const strong = document.createElement("strong");
             strong.style.display = "inline";
@@ -1352,7 +1597,7 @@
       const isMage = cls === "Mago";
       const isWitch = cls === "Bruxo";
       const isSpellcaster = isMage || isWitch;
-      classFeatureChoices.hidden = !featureConfig && !isSpellcaster && cls !== "Caçador";
+      classFeatureChoices.hidden = !featureConfig && !isSpellcaster && cls !== "Caçador" && cls !== "Druida" && cls !== "Explorador";
       if (featureConfig) {
         const makeFeatureSelect = (title, description, options, value, onChange) => {
           const wrap = document.createElement("label");
@@ -1388,6 +1633,58 @@
         select.addEventListener("change", () => { pending.classFeatureChoices.prey = select.value; updateConfirmButton(); });
         label.append(heading, detail, select);
         classFeatureChoices.append(label);
+      } else if (cls === "Explorador") {
+        pending.classFeatureChoices = pending.classFeatureChoices || {};
+        const wrap = document.createElement("label");
+        wrap.className = "class-feature-choice";
+        const heading = document.createElement("strong"); heading.textContent = "Ferramenta Fiel";
+        const detail = document.createElement("small"); detail.textContent = "Escolha uma arma que saiba usar ou registre outro equipamento. Armas da lista recebem o bônus de Maestria em Armas no JSON.";
+        const select = document.createElement("select");
+        select.append(new Option("Escolha uma arma ou outro equipamento", ""));
+        EXPLORER_FAITHFUL_TOOLS.forEach(tool => select.append(new Option(tool.label, tool.value)));
+        select.append(new Option("Outro equipamento (registrar manualmente)", "custom"));
+        const custom = document.createElement("input");
+        custom.type = "text";
+        custom.placeholder = "Nome do equipamento";
+        const current = String(pending.classFeatureChoices.explorerFaithfulTool || "");
+        const known = EXPLORER_FAITHFUL_TOOLS.some(tool => tool.value === current);
+        select.value = known ? current : current ? "custom" : "";
+        custom.value = known ? "" : current;
+        custom.hidden = select.value !== "custom";
+        const updateChoice = () => {
+          custom.hidden = select.value !== "custom";
+          pending.classFeatureChoices.explorerFaithfulTool = select.value === "custom" ? custom.value.trim() : select.value;
+          updateConfirmButton();
+        };
+        select.addEventListener("change", updateChoice);
+        custom.addEventListener("input", updateChoice);
+        wrap.append(heading, detail, select, custom);
+        classFeatureChoices.append(wrap);
+      } else if (cls === "Druida") {
+        pending.classFeatureChoices = pending.classFeatureChoices || {};
+        const selectedSpells = Array.isArray(pending.classFeatureChoices.druidSpells) ? pending.classFeatureChoices.druidSpells : [];
+        pending.classFeatureChoices.druidSpells = [selectedSpells[0] || "", selectedSpells[1] || ""];
+        const heading = document.createElement("strong");
+        heading.textContent = "Magias de 1º nível (escolha 2 da lista de Druida)";
+        const note = document.createElement("small");
+        note.textContent = "Falar com Animais é uma magia adicional e não ocupa uma dessas escolhas. Digite os nomes das outras magias; a lista será adicionada quando for enviada.";
+        classFeatureChoices.append(heading, note);
+        pending.classFeatureChoices.druidSpells.forEach((value, index) => {
+          const wrap = document.createElement("label");
+          wrap.className = "class-feature-choice";
+          const label = document.createElement("strong");
+          label.textContent = `Magia ${index + 1}`;
+          const input = document.createElement("input");
+          input.type = "text";
+          input.placeholder = "Nome da magia de Druida";
+          input.value = value;
+          input.addEventListener("input", () => {
+            pending.classFeatureChoices.druidSpells[index] = input.value.trim();
+            updateConfirmButton();
+          });
+          wrap.append(label, input);
+          classFeatureChoices.append(wrap);
+        });
       } else if (isSpellcaster) {
         const spells = classSpells(cls);
         const listKey = spellListKey(cls);
@@ -1451,6 +1748,14 @@
     if (!classLevelTalentConfig(cls)) return 0;
     return 1 + Math.max(0, Number(window.app.getRaceExtraClassTalentRolls?.(race, raceTalent)) || 0);
   }
+  function shouldRerollClassLevelResult(cls, roll, previousResults = []) {
+    if (["Bardo", "Caçador"].includes(cls) && roll === 2 && previousResults.some(item => item?.roll === 2)) return true;
+    if (cls === "Explorador" && roll >= 10 && roll <= 11) {
+      const upgrades = previousResults.filter(item => item?.id === "ExplorerScavengerUpgrade" || item?.bonusName === "TerraOeste.ExplorerScavengerUpgrade").length;
+      return upgrades >= 2;
+    }
+    return false;
+  }
   function updateTalentContinueButton(){
     const count = Number(pending.classLevelTalentRollCount) || 0;
     const complete = count > 0 && Array.isArray(pending.classLevelTalents) && pending.classLevelTalents.length >= count && pending.classLevelTalents.slice(0, count).every(Boolean) && !pending.classLevelTalentDraft;
@@ -1464,7 +1769,9 @@
     const isSpellcaster = ["Mago", "Bruxo"].includes(pending.cls);
     const knownSpells = Array.isArray(featureChoices[spellListKey(pending.cls)]) ? featureChoices[spellListKey(pending.cls)].filter(Boolean) : [];
     const missingKnownSpells = isSpellcaster && (knownSpells.length !== 3 || new Set(knownSpells).size !== 3);
-    btnConfirmClass.disabled = !pending.cls || missingTalentChoice || missingCoreFeatureChoice || missingKnownSpells;
+    const druidSpells = Array.isArray(featureChoices.druidSpells) ? featureChoices.druidSpells.map(value => String(value || "").trim()).filter(Boolean) : [];
+    const missingDruidSpells = pending.cls === "Druida" && (druidSpells.length !== 2 || new Set(druidSpells.map(value => value.toLocaleLowerCase("pt-BR"))).size !== 2);
+    btnConfirmClass.disabled = !pending.cls || missingTalentChoice || missingCoreFeatureChoice || missingKnownSpells || missingDruidSpells;
   }
 
   function goToClassLevelTalent(){
@@ -1534,7 +1841,7 @@
     const config = classLevelTalentConfig(cls);
     if (!config) return null;
     let roll = randInt(1, 6) + randInt(1, 6);
-    while (["Bardo", "Caçador"].includes(cls) && roll === 2 && previousResults.some(item => item?.roll === 2)) roll = randInt(1, 6) + randInt(1, 6);
+    while (shouldRerollClassLevelResult(cls, roll, previousResults)) roll = randInt(1, 6) + randInt(1, 6);
     const entry = config.entries.find(item => roll >= item.min && roll <= item.max);
     const randomChoice = (entry, chosen, rolled12 = false) => {
       if (entry.choice === "assassinBlackLotus") {
@@ -1629,6 +1936,62 @@
         chosen.talentRolledName = `Treinamento: ${option.label}`;
         chosen.talentRolledDesc = `Trained in ${option.label.toLowerCase()}`;
         chosen.displayDesc = `Treinamento adicional: ${option.label}`;
+      } else if (entry.choice === "explorerExtraTool") {
+        const initialTool = state.classFeatures?.explorerFaithfulTool;
+        const usedTools = (Array.isArray(previousResults) ? previousResults : []).filter(item => item?.id === "ExplorerSlotsAndTool").map(item => item.faithfulTool);
+        const options = EXPLORER_FAITHFUL_TOOLS.filter(tool => tool.value !== initialTool && !usedTools.includes(tool.value));
+        const tool = options.length ? options[randInt(0, options.length - 1)] : null;
+        chosen.id = "ExplorerSlotsAndTool";
+        chosen.bonusName = "TerraOeste.ExplorerSlotsAndTool";
+        chosen.bonusTo = "TerraOeste.ExplorerSlotsAndTool";
+        chosen.faithfulTool = tool?.value || "Equipment chosen manually";
+        chosen.displayDesc = `+2 espaços; Ferramenta Fiel adicional: ${tool?.label || "escolha manual"}`;
+      } else if (entry.choice === "druidWildShapeOrSpell") {
+        if (randInt(0, 1) === 0) {
+          chosen.id = "DruidWildShapeAdvantage";
+          chosen.talentRolledName = "Vantagem em Forma Selvagem";
+          chosen.talentRolledDesc = "Advantage on Wild Shape checks";
+          chosen.displayDesc = "Vantagem nos testes de Forma Selvagem";
+        } else {
+          chosen.id = "DruidExtraSpell";
+          chosen.talentRolledName = "Magia Adicional de Druida";
+          chosen.talentRolledDesc = "Learn one additional druid spell of a tier you know";
+          chosen.displayDesc = "Magia adicional de um nível conhecido (escolha a magia)";
+        }
+        chosen.bonusName = "";
+        chosen.bonusTo = "";
+        chosen.exportAsBonus = false;
+      } else if (entry.choice === "druidCastingOrMelee") {
+        if (randInt(0, 1) === 0) {
+          chosen.id = "Plus1ToCastingSpells";
+          chosen.talentRolledName = "+1 em Testes de Conjuração de Magia";
+          chosen.talentRolledDesc = "+1 to spellcasting checks";
+          chosen.bonusName = "Plus1ToCastingSpells";
+          chosen.bonusTo = "Casting spells";
+          chosen.displayDesc = "+1 em testes de conjuração";
+        } else {
+          chosen.id = "Plus1ToHit";
+          chosen.talentRolledName = "+1 para Ataques Corpo a Corpo";
+          chosen.talentRolledDesc = "+1 to melee attacks";
+          chosen.bonusName = "Plus1ToHit";
+          chosen.bonusTo = "Melee attacks";
+          chosen.displayDesc = "+1 em ataques corpo a corpo";
+        }
+      } else if (entry.choice === "druidKnownSpell") {
+        const knownSpells = Array.isArray(state.classFeatures?.druidSpells) ? state.classFeatures.druidSpells.filter(Boolean) : [];
+        const spell = knownSpells.length ? knownSpells[randInt(0, knownSpells.length - 1)] : "";
+        chosen.talentRolledName = "Vantagem em Conjuração";
+        chosen.talentRolledDesc = "Advantage casting one druid spell you know";
+        if (spell) {
+          chosen.bonusName = "AdvOnCastOneSpell";
+          chosen.bonusTo = spell;
+          chosen.displayDesc = `Vantagem ao conjurar: ${spell}`;
+        } else {
+          chosen.bonusName = "";
+          chosen.bonusTo = "";
+          chosen.exportAsBonus = false;
+          chosen.displayDesc = "Vantagem para conjurar uma magia conhecida (escolha a magia)";
+        }
       } else if (entry.choice === "stat") {
         const options = entry.statOptions || ["STR", "DEX", "CHA"];
         const code = options[randInt(0, options.length - 1)];
